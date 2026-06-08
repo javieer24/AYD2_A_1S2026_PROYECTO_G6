@@ -354,6 +354,81 @@ Usuario UES → Adaptador UES → Keycloak OAuth2 Provider
 Independientemente de la institucion de origen, el sistema siempre trabaja con un Token JWT firmado por Keycloak que contiene: usuarioId, institucionId, rol y expiracion. El resto de microservicios del PRCCD no conocen el protocolo original de cada universidad; solo validan el JWT contra la llave publica de Keycloak. Esto cumple RF-01 y R-08 sin requerir cambios en los sistemas universitarios.
 
 ---
+## 8.6 Estrategia de privacidad y cifrado
+
+El cumplimiento del GDPR y las legislaciones locales (R-05) impone cuatro requisitos que la arquitectura de datos atiende de forma explicita.
+
+### Cifrado en transito
+
+Toda comunicacion entre componentes utiliza TLS 1.3. Esto aplica a:
+
+- Conexiones externas: universidades hacia API Gateway, candidatos hacia API Gateway, ministerios hacia API Gateway.
+- Comunicacion interna: entre microservicios dentro de la Red Interna SICA.
+- Conexiones a base de datos: aplicaciones hacia PostgreSQL, aplicaciones hacia MongoDB.
+
+### Cifrado en reposo
+
+| Capa | Mecanismo | Estandar |
+|---|---|---|
+| PostgreSQL — datos transaccionales | Cifrado de columnas sensibles con pgcrypto | AES-256 |
+| MinIO — evidencia antifraude | Cifrado por objeto en bucket | AES-256-SSE |
+| Servidor PKI — llaves privadas CA | Cifrado de volumen del servidor | AES-256 |
+
+### Derecho al olvido
+
+El borrado de datos personales se implementa en dos fases:
+
+1. **Fase 1 — Anonimizacion inmediata:** al recibir la solicitud, los campos identificables del Usuario (nombre, email, datos de contacto) se reemplazan por tokens no reversibles. El usuarioId permanece como referencia tecnica para mantener integridad referencial con certificados y registros de auditoria.
+2. **Fase 2 — Purga programada:** una tarea programada verifica semanalmente si han vencido los periodos de retencion legal. Los certificados asociados a un usuario con solicitud de olvido se marcan como REVOCADO pero conservan el hashSHA256 y el hashBlockchain para permitir verificacion de autenticidad historica sin revelar identidad.
+
+### Anonimizacion para dashboards
+
+El proceso de anonimizacion ejecuta agregaciones sobre SesionExamen y Certificado antes de insertar filas en MetricaAgregada. Las reglas aplicadas son:
+
+- Solo se exponen grupos con un minimo de 10 registros para evitar re-identificacion estadistica.
+- Los campos de genero y carrera se aplican como dimensiones de agrupamiento, nunca como identificadores individuales.
+- El servicio de analitica solo puede leer de MetricaAgregada, nunca directamente de tablas transaccionales, cumpliendo EaC-06 (cero datos personales identificables expuestos).
+
+---
+
+## 8.7 Certificados verificables: PKI con respaldo en Hyperledger Fabric
+
+El enunciado establece que los certificados deben ser verificables criptograficamente mediante PKI o Blockchain (Hyperledger). La arquitectura del PRCCD implementa ambos en dos capas complementarias, alineadas con las tecnologias definidas en la seccion 7.4.
+
+### Capa 1 — PKI con firma digital (Servidor PKI)
+
+La capa base de firma utiliza el Servidor PKI dedicado. El proceso de emision es el siguiente:
+
+1. El candidato aprueba el examen. El servicio de certificacion construye el payload con: identificador unico, nombre de la competencia, institucion, fecha de emision y puntaje obtenido.
+2. Se genera el hash SHA-256 del payload. Esta huella garantiza que cualquier alteracion posterior al contenido sea detectable.
+3. El Servidor PKI firma el hash con la llave privada de la CA del SICA utilizando RSA-2048 o ECDSA-P256.
+4. Se emite el certificado en formato X.509, el estandar internacional de infraestructura de llave publica.
+5. El candidato recibe el certificado con un codigo QR que apunta al endpoint de verificacion publica, donde cualquier tercero puede validar la autenticidad usando la llave publica de la CA del SICA (RF-10).
+
+### Capa 2 — Registro inmutable en Hyperledger Fabric
+
+Una vez emitido el certificado X.509, el Servicio de Certificacion publica el hashSHA256 del certificado en la red Hyperledger Fabric. Este registro distribuido actua como bitacora inmutable adicional que demuestra la existencia del certificado desde el momento de su emision.
+
+El campo hashBlockchain en la tabla Certificado almacena la referencia a la transaccion en Hyperledger Fabric. Esto permite que ministerios y empresas verificadoras confirmen tanto la validez de la firma digital (via PKI) como la existencia historica del registro (via Hyperledger), satisfaciendo el requisito de validez juridica transfronteriza (R-07).
+
+### Proceso completo de emision
+![Flujo emision certificado PRCCD](imagenes/flujo_emision_certificado.png)
+
+### Cumplimiento de drivers
+
+| Driver | Como lo atiende esta estrategia |
+|---|---|
+| RF-04 (certificados verificables criptograficamente) | Firma digital sobre hash SHA-256 via PKI + registro en Hyperledger Fabric. |
+| RF-05 (rastro de auditoria inmutable) | Registro en tabla RegistroAuditoria de solo INSERT y registro en blockchain. |
+| RF-10 (verificacion externa por QR/hash) | Endpoint publico que valida firma contra llave publica CA del SICA. |
+| R-02 (Open Source) | Keycloak (Apache 2.0), MinIO (AGPL), PostgreSQL (PostgreSQL License), Hyperledger Fabric (Apache 2.0). |
+| R-07 (validez juridica transfronteriza) | X.509 reconocido internacionalmente; Hyperledger Fabric como registro distribuido adicional. |
+| EaC-03 (cero modificaciones no autorizadas) | La firma digital hace detectable cualquier alteracion del certificado. El blockchain hace irrefutable la existencia del registro original. |
+| EaC-07 (consulta de auditoria menor a 5 segundos) | Consulta indexada por certificadoId o hashSHA256 en PostgreSQL. |
+
+---
+
+---
 
 # 9. Diseno de Interfaces UI/UX
 
