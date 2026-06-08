@@ -273,3 +273,76 @@ La orientacion a eventos aborda la auditoria inmutable y la captura de evidencia
 
 > *Repositorio: AYD2_A_1S2026_PROYECTO_G6*
 
+## 11.1 Control de Versiones y Flujo Git Flow
+
+Para el desarrollo de la fase uno del proyecto se utilizará una estrategia de ramas basada en Git Flow, con el objetivo de mantener un control ordenado de los cambios, separar el trabajo de cada integrante y asegurar que la documentación avance de forma controlada, revisable y coherente.
+
+### Ramas principales
+
+#### main
+
+La rama `main` representa la versión estable y final del proyecto. En esta rama solo se integrarán entregables revisados, aprobados y listos para ser presentados. No se debe trabajar directamente sobre esta rama.
+
+#### release
+
+La rama `release` se utilizará para preparar versiones candidatas de entrega. En esta rama se realizarán ajustes finales de redacción, formato, numeración, referencias internas y validación general antes de integrar los cambios a `main`.
+
+#### develop
+
+La rama `develop` será la rama principal de integración del trabajo del equipo. Todas las ramas de tipo `feature` deberán partir desde `develop` y, al finalizar una tarea, deberán integrarse nuevamente mediante Pull Request.
+
+#### docs
+
+La rama `docs` se utilizará como rama de integración específica para la documentación del proyecto. En esta rama se consolidarán los avances documentales antes de integrarlos a ramas principales del flujo de trabajo.
+
+### Ramas de trabajo para documentación
+
+Para cada tarea específica de documentación se utilizarán ramas con el formato `feature/docs-*`. Estas ramas deberán crearse a partir de `develop` o de `docs`, según la organización definida por el equipo.
+
+Ejemplos de ramas:
+
+- `feature/docs-gitflow`
+- `feature/docs-kanban`
+- `feature/docs-stakeholders`
+- `feature/docs-arquitectura`
+- `feature/docs-revision`
+- `feature/docs-consolidacion`
+
+### Regla de commits
+
+Cada commit deberá utilizar el siguiente formato:
+
+`carnet: mensaje del cambio`
+
+Ejemplo:
+
+`201801391: documentar flujo git flow para la fase uno`
+
+El mensaje del commit debe ser claro, breve y representar el cambio realizado. No se deben utilizar mensajes genéricos como “cambios”, “avance” o “documento final”.
+
+### Flujo de trabajo
+
+El flujo de trabajo será el siguiente:
+
+1. Actualizar la rama base con los últimos cambios del repositorio remoto.
+2. Crear una rama `feature/docs-*` para la tarea asignada.
+3. Realizar los cambios correspondientes en la documentación, diagramas o evidencias.
+4. Confirmar los cambios mediante commits con el formato establecido.
+5. Subir la rama al repositorio remoto.
+6. Crear un Pull Request hacia `docs` o `develop`, según corresponda.
+7. Solicitar revisión de al menos un integrante del equipo.
+8. Corregir observaciones si existieran.
+9. Integrar los cambios mediante merge.
+10. Eliminar la rama `feature` una vez integrada.
+
+### Criterios para integrar cambios
+
+Una rama podrá integrarse cuando cumpla con los siguientes criterios:
+
+- La sección asignada está completa.
+- El contenido está alineado con el enunciado del proyecto.
+- No existen conflictos con otras secciones.
+- El formato es consistente con el documento principal.
+- El commit respeta el formato definido.
+- El Pull Request fue revisado por otro integrante del equipo.
+
