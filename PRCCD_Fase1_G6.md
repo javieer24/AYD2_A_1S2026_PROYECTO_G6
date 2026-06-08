@@ -6,40 +6,41 @@ Universidad San Carlos de Guatemala
 Facultad de Ingenieria
 Escuela de Ciencias y Sistemas
 Analisis y Diseno de Sistemas 2 - Seccion A
+Escuela de Vacaciones Junio 2026
 
 **Proyecto Fase 1**
 
-| Nombre | Carne
-|--------|-------|
-| | - |
-| Oswaldo Choc | 201901844
-| Jencer Hamilton | - |
-| Javier Monjes | - |
-|  | - |
-|  | - |
+| Nombre                           | Carne     | Rol                                       |
+| ---------------------------------- | ----------- | ------------------------------------------- |
+| Luis Fernando Gomez Rendon       | 201801391 | Scrum Master / Coordinador de repositorio |
+| Ander Gilberto Popol Poron       | 201801518 | Product Owner / Analista de negocio       |
+| Jencer Hamilton Hernandez Alonzo | 202002141 | Arquitecto de drivers y calidad           |
+| Oswaldo Antonio Choc Cuteres     | 201901844 | Arquitecto de sistema e infraestructura   |
+| Javier Andres Monjes Solorzano   | 202100081 | Disenador de datos e integracion          |
+| Juan Jose Gerardi Hernandez      | 201900532 | Disenador UI/UX y patrones                |
 
 Catedratica: Ing. Claudia Rojas de Moran
-Primer Semestre 2026
+Vacaciones de junio 2026
 
 ---
 
 # Tabla de Contenido
 
 1. Identificacion del caso de negocio y Stakeholders
-   - 1.1 Listado de Stakeholders y preocupaciones arquitectonicas
-   - 1.2 Core del negocio
+   * 1.1 Listado de Stakeholders y preocupaciones arquitectonicas
+   * 1.2 Core del negocio
 2. Caracteristicas del sistema y Drivers Arquitectonicos
-   - 2.1 Drivers RF - Requerimientos Funcionales
-   - 2.2 Drivers EaC - Escenarios de Atributos de Calidad
-   - 2.3 Drivers de Restriccion
-   - 2.4 Caracteristicas priorizadas del sistema
+   * 2.1 Drivers RF - Requerimientos Funcionales
+   * 2.2 Drivers EaC - Escenarios de Atributos de Calidad
+   * 2.3 Drivers de Restriccion
+   * 2.4 Caracteristicas priorizadas del sistema
 3. Diagramas de CDU expandidos
-   - 3.1 Diagrama de casos de uso expandidos
-   - 3.2 Detalle de drivers por CDU
+   * 3.1 Diagrama de casos de uso expandidos
+   * 3.2 Detalle de drivers por CDU
 4. Matrices de trazabilidad
-   - 4.1 Stakeholders vs Requerimientos
-   - 4.2 Stakeholders vs CDU
-   - 4.3 Requerimientos vs CDU
+   * 4.1 Stakeholders vs Requerimientos
+   * 4.2 Stakeholders vs CDU
+   * 4.3 Requerimientos vs CDU
 5. Seleccion arquitectonica
 6. Vistas Arquitectonicas - Nivel de Sistema
 7. Vistas Arquitectonicas - Nivel de Infraestructura
@@ -68,66 +69,66 @@ Primer Semestre 2026
 
 ## 2.1 Drivers RF - Requerimientos Funcionales
 
-| ID | Requisito Funcional | Prioridad |
-|----|---------------------|-----------|
-| RF-01 | El sistema debe permitir la autenticacion federada mediante los protocolos LDAP, SAML y OAuth2 segun la institucion universitaria | Alta |
-| RF-02 | El sistema debe ejecutar evaluaciones mediante un motor de examenes adaptativos que ajuste la dificultad en tiempo real segun las respuestas previas del candidato | Alta |
-| RF-03 | El sistema debe capturar y almacenar evidencia antifraude durante la evaluacion, incluyendo capturas de pantalla, logs de tecleo y rafagas de video | Alta |
-| RF-04 | El sistema debe emitir certificados digitales verificables criptograficamente mediante PKI o Blockchain (Hyperledger) | Alta |
-| RF-05 | El sistema debe mantener un rastro de auditoria inmutable por cada certificado emitido | Alta |
-| RF-06 | El sistema debe importar y exportar datos academicos en formatos JSON, XML y CSV | Media |
-| RF-07 | El sistema debe integrarse nativamente con los sistemas de USAC, UCR y UES sin obligar a estas instituciones a cambiar su forma de operar | Alta |
-| RF-08 | El sistema debe generar dashboards analiticos segmentados por pais, carrera universitaria y genero | Media |
-| RF-09 | El sistema debe anonimizar y agregar los datos antes de exponerlos en las interfaces gerenciales | Alta |
-| RF-10 | El sistema debe permitir la verificacion externa de un certificado mediante codigo, QR o hash | Media |
-| RF-11 | El sistema debe gestionar usuarios, roles y permisos por institucion | Media |
-| RF-12 | El sistema debe habilitar los periodos de certificacion exclusivamente durante la primera semana de cada mes | Alta |
+| ID    | Requisito Funcional                                                                                                                                                | Prioridad |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| RF-01 | El sistema debe permitir la autenticacion federada mediante los protocolos LDAP, SAML y OAuth2 segun la institucion universitaria                                  | Alta      |
+| RF-02 | El sistema debe ejecutar evaluaciones mediante un motor de examenes adaptativos que ajuste la dificultad en tiempo real segun las respuestas previas del candidato | Alta      |
+| RF-03 | El sistema debe capturar y almacenar evidencia antifraude durante la evaluacion, incluyendo capturas de pantalla, logs de tecleo y rafagas de video                | Alta      |
+| RF-04 | El sistema debe emitir certificados digitales verificables criptograficamente mediante PKI o Blockchain (Hyperledger)                                              | Alta      |
+| RF-05 | El sistema debe mantener un rastro de auditoria inmutable por cada certificado emitido                                                                             | Alta      |
+| RF-06 | El sistema debe importar y exportar datos academicos en formatos JSON, XML y CSV                                                                                   | Media     |
+| RF-07 | El sistema debe integrarse nativamente con los sistemas de USAC, UCR y UES sin obligar a estas instituciones a cambiar su forma de operar                          | Alta      |
+| RF-08 | El sistema debe generar dashboards analiticos segmentados por pais, carrera universitaria y genero                                                                 | Media     |
+| RF-09 | El sistema debe anonimizar y agregar los datos antes de exponerlos en las interfaces gerenciales                                                                   | Alta      |
+| RF-10 | El sistema debe permitir la verificacion externa de un certificado mediante codigo, QR o hash                                                                      | Media     |
+| RF-11 | El sistema debe gestionar usuarios, roles y permisos por institucion                                                                                               | Media     |
+| RF-12 | El sistema debe habilitar los periodos de certificacion exclusivamente durante la primera semana de cada mes                                                       | Alta      |
 
 ---
 
 ## 2.2 Drivers EaC - Escenarios de Atributos de Calidad
 
-| ID | Atributo | Estimulo | Entorno | Respuesta esperada | Medida |
-|----|----------|----------|---------|-------------------|--------|
-| EaC-01 | Escalabilidad | Miles de usuarios acceden simultaneamente | Primera semana del mes, periodo de certificacion | El sistema escala sin degradar el servicio | Tiempo de respuesta < 3 seg con 5,000 usuarios simultaneos |
-| EaC-02 | Disponibilidad | Fallo de un componente interno | Periodo de certificacion activo | El sistema continua operando mediante redundancia | Disponibilidad >= 99.9% |
-| EaC-03 | Seguridad | Intento de alteracion de una calificacion | En cualquier momento | El sistema rechaza la alteracion y registra el intento | 0 modificaciones no autorizadas en la bitacora |
-| EaC-04 | Interoperabilidad | Universidad envia datos en CSV legacy | Integracion con sistema heredado | El sistema ingesta y normaliza los datos correctamente | 100% de registros procesados sin perdida |
-| EaC-05 | Rendimiento | Candidato responde una pregunta | Durante evaluacion activa | El motor adaptativo calcula y presenta la siguiente pregunta | Tiempo de ajuste < 2 segundos |
-| EaC-06 | Privacidad | Solicitud de datos para dashboard gerencial | Consulta analitica | El sistema expone solo datos agregados y anonimizados | 0 datos personales identificables expuestos |
-| EaC-07 | Auditabilidad | Ministerio solicita verificar un certificado | Post emision | El sistema provee trazabilidad completa e inmutable | Tiempo de consulta de auditoria < 5 segundos |
-| EaC-08 | Mantenibilidad | Se requiere agregar un nuevo protocolo de autenticacion | Evolucion del sistema | El sistema permite integrar el nuevo protocolo sin afectar otros modulos | Tiempo de integracion < 2 semanas |
+| ID     | Atributo          | Estimulo                                                | Entorno                                          | Respuesta esperada                                                       | Medida                                                     |
+| -------- | ------------------- | --------------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| EaC-01 | Escalabilidad     | Miles de usuarios acceden simultaneamente               | Primera semana del mes, periodo de certificacion | El sistema escala sin degradar el servicio                               | Tiempo de respuesta < 3 seg con 5,000 usuarios simultaneos |
+| EaC-02 | Disponibilidad    | Fallo de un componente interno                          | Periodo de certificacion activo                  | El sistema continua operando mediante redundancia                        | Disponibilidad >= 99.9%                                    |
+| EaC-03 | Seguridad         | Intento de alteracion de una calificacion               | En cualquier momento                             | El sistema rechaza la alteracion y registra el intento                   | 0 modificaciones no autorizadas en la bitacora             |
+| EaC-04 | Interoperabilidad | Universidad envia datos en CSV legacy                   | Integracion con sistema heredado                 | El sistema ingesta y normaliza los datos correctamente                   | 100% de registros procesados sin perdida                   |
+| EaC-05 | Rendimiento       | Candidato responde una pregunta                         | Durante evaluacion activa                        | El motor adaptativo calcula y presenta la siguiente pregunta             | Tiempo de ajuste < 2 segundos                              |
+| EaC-06 | Privacidad        | Solicitud de datos para dashboard gerencial             | Consulta analitica                               | El sistema expone solo datos agregados y anonimizados                    | 0 datos personales identificables expuestos                |
+| EaC-07 | Auditabilidad     | Ministerio solicita verificar un certificado            | Post emision                                     | El sistema provee trazabilidad completa e inmutable                      | Tiempo de consulta de auditoria < 5 segundos               |
+| EaC-08 | Mantenibilidad    | Se requiere agregar un nuevo protocolo de autenticacion | Evolucion del sistema                            | El sistema permite integrar el nuevo protocolo sin afectar otros modulos | Tiempo de integracion < 2 semanas                          |
 
 ---
 
 ## 2.3 Drivers de Restriccion
 
-| ID | Tipo | Restriccion |
-|----|------|-------------|
-| R-01 | Economica | El presupuesto maximo para el piloto es de USD 180,000 |
-| R-02 | Tecnologica | Se debe priorizar el uso de tecnologias Open Source para optimizar costos de licenciamiento |
-| R-03 | Operativa | La primera version debe desplegarse on-premise reutilizando infraestructura existente del SICA |
-| R-04 | Tecnologica | La arquitectura debe estar preparada para migracion transparente a la nube en fases posteriores |
-| R-05 | Normativa | Debe cumplir con GDPR y leyes locales de proteccion de datos de cada pais miembro |
-| R-06 | Normativa | La evidencia antifraude debe retenerse de forma inalterable por un minimo de 5 anos |
-| R-07 | Normativa | Cada certificado debe tener validez juridica transfronteriza respaldada por firma electronica avanzada |
-| R-08 | Operativa | La arquitectura debe integrarse con sistemas legados sin obligar a las universidades a modificar sus procesos |
-| R-09 | Temporal | La primera version arquitectonica debe estar completamente definida y documentada en 3-4 semanas |
+| ID   | Tipo        | Restriccion                                                                                                   |
+| ------ | ------------- | --------------------------------------------------------------------------------------------------------------- |
+| R-01 | Economica   | El presupuesto maximo para el piloto es de USD 180,000                                                        |
+| R-02 | Tecnologica | Se debe priorizar el uso de tecnologias Open Source para optimizar costos de licenciamiento                   |
+| R-03 | Operativa   | La primera version debe desplegarse on-premise reutilizando infraestructura existente del SICA                |
+| R-04 | Tecnologica | La arquitectura debe estar preparada para migracion transparente a la nube en fases posteriores               |
+| R-05 | Normativa   | Debe cumplir con GDPR y leyes locales de proteccion de datos de cada pais miembro                             |
+| R-06 | Normativa   | La evidencia antifraude debe retenerse de forma inalterable por un minimo de 5 anos                           |
+| R-07 | Normativa   | Cada certificado debe tener validez juridica transfronteriza respaldada por firma electronica avanzada        |
+| R-08 | Operativa   | La arquitectura debe integrarse con sistemas legados sin obligar a las universidades a modificar sus procesos |
+| R-09 | Temporal    | La primera version arquitectonica debe estar completamente definida y documentada en 3-4 semanas              |
 
 ---
 
 ## 2.4 Caracteristicas priorizadas del sistema
 
-| Prioridad | Caracteristica | Justificacion de impacto |
-|-----------|---------------|--------------------------|
-| 1 | Motor de evaluacion adaptativa | Es el nucleo funcional del negocio, sin esto no hay plataforma |
-| 2 | Emision de certificados verificables criptograficamente | Es la propuesta de valor principal ante ministerios e instituciones |
-| 3 | Autenticacion federada e integracion universitaria | Sin integracion con USAC/UCR/UES no hay usuarios en el sistema |
-| 4 | Auditoria antifraude inmutable | Requisito legal y de confianza institucional obligatorio |
-| 5 | Privacidad y cifrado de datos | Cumplimiento normativo no negociable (GDPR) |
-| 6 | Dashboards analiticos anonimizados | Valor estrategico para ministerios de educacion y trabajo |
-| 7 | Escalabilidad en picos de trafico | Garantia de calidad de servicio durante certificaciones |
-| 8 | Preparacion para migracion a nube | Vision de evolucion tecnologica a largo plazo |
+| Prioridad | Caracteristica                                          | Justificacion de impacto                                            |
+| ----------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
+| 1         | Motor de evaluacion adaptativa                          | Es el nucleo funcional del negocio, sin esto no hay plataforma      |
+| 2         | Emision de certificados verificables criptograficamente | Es la propuesta de valor principal ante ministerios e instituciones |
+| 3         | Autenticacion federada e integracion universitaria      | Sin integracion con USAC/UCR/UES no hay usuarios en el sistema      |
+| 4         | Auditoria antifraude inmutable                          | Requisito legal y de confianza institucional obligatorio            |
+| 5         | Privacidad y cifrado de datos                           | Cumplimiento normativo no negociable (GDPR)                         |
+| 6         | Dashboards analiticos anonimizados                      | Valor estrategico para ministerios de educacion y trabajo           |
+| 7         | Escalabilidad en picos de trafico                       | Garantia de calidad de servicio durante certificaciones             |
+| 8         | Preparacion para migracion a nube                       | Vision de evolucion tecnologica a largo plazo                       |
 
 ---
 
@@ -203,29 +204,42 @@ La orientacion a eventos aborda la auditoria inmutable y la captura de evidencia
 
 ### Justificacion por driver
 
-| Driver | Como lo atiende la arquitectura seleccionada |
-|--------|----------------------------------------------|
-| EaC-01 Escalabilidad 5,000 usuarios | El servicio de examenes escala horizontalmente de forma independiente |
-| EaC-02 Disponibilidad 99.9% | Cada microservicio tiene redundancia propia; un fallo no compromete el sistema completo |
+| Driver                               | Como lo atiende la arquitectura seleccionada                                               |
+| -------------------------------------- | -------------------------------------------------------------------------------------------- |
+| EaC-01 Escalabilidad 5,000 usuarios  | El servicio de examenes escala horizontalmente de forma independiente                      |
+| EaC-02 Disponibilidad 99.9%          | Cada microservicio tiene redundancia propia; un fallo no compromete el sistema completo    |
 | EaC-03 Seguridad auditoria inmutable | Los eventos de auditoria se registran de forma asincrona e inmutable en el bus de mensajes |
-| EaC-04 Integracion con CSV legacy | Un microservicio de integracion dedicado por universidad maneja cada protocolo y formato |
-| EaC-05 Rendimiento motor adaptativo | El motor de examenes es un servicio aislado, sin dependencias que puedan degradarlo |
-| EaC-08 Agregar nuevo protocolo | Se agrega un nuevo adaptador sin modificar los servicios existentes |
-| R-02 Open Source | Todos los componentes seleccionados tienen alternativas Open Source viables |
-| R-03 On-premise | Los microservicios se contendorizan con Docker y se orquestan con Kubernetes on-premise |
-| R-04 Migracion a nube | La contenedorizacion permite mover los servicios a cualquier proveedor cloud sin rediseno |
+| EaC-04 Integracion con CSV legacy    | Un microservicio de integracion dedicado por universidad maneja cada protocolo y formato   |
+| EaC-05 Rendimiento motor adaptativo  | El motor de examenes es un servicio aislado, sin dependencias que puedan degradarlo        |
+| EaC-08 Agregar nuevo protocolo       | Se agrega un nuevo adaptador sin modificar los servicios existentes                        |
+| R-02 Open Source                     | Todos los componentes seleccionados tienen alternativas Open Source viables                |
+| R-03 On-premise                      | Los microservicios se contendorizan con Docker y se orquestan con Kubernetes on-premise    |
+| R-04 Migracion a nube                | La contenedorizacion permite mover los servicios a cualquier proveedor cloud sin rediseno  |
 
 ---
 
 # 6. Vistas Arquitectonicas - Nivel de Sistema
 
 ## 6.1 Diagrama de bloques
-
-> *Diagrama pendiente de generacion en draw.io*
+![Diagrama de bloques](imagenes/diagramadebloques.png)
 
 ## 6.2 Descripcion del diagrama de bloques
 
-> *Pendiente*
+El diagrama representa la arquitectura del PRCCD organizada en tres zonas funcionales.
+
+**Zona de integracion**
+
+A la izquierda se ubican las tres universidades piloto: USAC, UCR y UES. Cada una se conecta a la Capa de Integracion Universitaria, que es el unico punto de entrada al sistema para instituciones externas. Esta capa traduce los distintos protocolos de autenticacion (LDAP, SAML, OAuth2) y formatos de datos (JSON, XML, CSV) a un formato interno estandarizado, de modo que cada universidad puede seguir operando con sus propios sistemas sin modificarlos.
+
+**Zona de procesamiento**
+
+En el centro opera el nucleo del negocio. El Motor de Evaluacion Adaptativa recibe al candidato, gestiona el examen en tiempo real y ajusta la dificultad de las preguntas segun las respuestas previas. La comunicacion con el candidato es bidireccional: el motor le presenta preguntas y recibe sus respuestas de forma continua durante la evaluacion. Al aprobar, el Servicio de Certificacion genera el certificado digital con respaldo criptografico mediante PKI o Blockchain. El Servicio de Analitica consume eventos del bus para construir los dashboards destinados a los ministerios, asegurando que los datos expuestos sean siempre agregados y anonimizados.
+
+**Zona de eventos y persistencia**
+
+A la derecha el Bus de Eventos actua como columna vertebral asincrona del sistema. Recibe eventos del motor de examenes y del servicio de certificacion, y los distribuye al Servicio de Auditoria Inmutable y al Almacenamiento Seguro de Evidencia Antifraude. Este diseno garantiza que ninguna accion relevante pueda modificarse o eliminarse, cumpliendo con el requisito de retencion de 5 anos establecido por el GDPR y las legislaciones locales.
+
+Los Ministerios de Educacion y Trabajo acceden al sistema por dos vias: a traves del Servicio de Analitica para consultar dashboards con metricas regionales, y a traves del Servicio de Auditoria para verificar la validez de certificados emitidos.
 
 ---
 
@@ -233,11 +247,11 @@ La orientacion a eventos aborda la auditoria inmutable y la captura de evidencia
 
 ## 7.1 Diagrama de componentes
 
-> *Diagrama pendiente de generacion en draw.io*
+![Diagrama de componentes](imagenes/diagramadecomponentes.png)
 
 ## 7.2 Diagrama de despliegue
 
-> *Diagrama pendiente de generacion en draw.io*
+![Diagrama de despliegue](imagenes/diagramadeDespliegue.png)
 
 ## 7.3 Diagrama de distribucion
 
@@ -271,5 +285,5 @@ La orientacion a eventos aborda la auditoria inmutable y la captura de evidencia
 
 > *Tablero Kanban: https://trello.com/b/XWZkVwXY*
 
-> *Repositorio: AYD2_A_1S2026_PROYECTO_G6*
+> *Repositorio: AYD2\_A\_1S2026\_PROYECTO\_G6*
 
