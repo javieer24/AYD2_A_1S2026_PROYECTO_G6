@@ -221,6 +221,7 @@ La orientacion a eventos aborda la auditoria inmutable y la captura de evidencia
 # 6. Vistas Arquitectonicas - Nivel de Sistema
 
 ## 6.1 Diagrama de bloques
+
 ![Diagrama de bloques](imagenes/diagramadebloques.png)
 
 ## 6.2 Descripcion del diagrama de bloques
@@ -255,11 +256,21 @@ Los Ministerios de Educacion y Trabajo acceden al sistema por dos vias: a traves
 
 ## 7.3 Diagrama de distribucion
 
-> *Diagrama pendiente de generacion en draw.io*
+![Diagrama de distribucion](imagenes/diagramadeDistribucion.png)
 
 ## 7.4 Justificacion de tecnologias y frameworks
 
-> *Pendiente*
+| Tecnologia         | Rol en el sistema                      | Justificacion                                                                                                                                   |
+| -------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Docker             | Contenedorizacion de microservicios    | Permite desplegar cada servicio de forma independiente on-premise y facilita la migracion a nube sin redisenar la arquitectura (R-03, R-04)     |
+| Kubernetes         | Orquestacion de contenedores           | Gestiona el escalado automatico de servicios durante los picos de la primera semana del mes (EaC-01)                                            |
+| Kafka              | Bus de eventos                         | Maneja grandes volumenes de mensajes de forma asincrona, garantiza que los eventos de auditoria no se pierdan ni se modifiquen (EaC-03, EaC-07) |
+| Nginx              | Balanceador de carga                   | Distribuye el trafico entre instancias durante los picos de certificacion. Open Source y ampliamente probado en produccion (R-02)               |
+| PostgreSQL         | Base de datos relacional               | Almacena usuarios, certificados y registros de auditoria. Open Source, robusto y con soporte de transacciones ACID (R-02)                       |
+| MongoDB            | Base de datos documental               | Almacena las preguntas y resultados de examenes por su estructura flexible y variable (R-02)                                                    |
+| Hyperledger Fabric | Blockchain para certificados           | Implementa el registro distribuido e inmutable de certificados emitidos con validez juridica transfronteriza (RF-04, R-07)                      |
+| Keycloak           | Gestion de identidad federada          | Maneja autenticacion con LDAP, SAML y OAuth2 desde un solo punto sin obligar a las universidades a cambiar sus sistemas (RF-01, R-08)           |
+| MinIO              | Almacenamiento de evidencia antifraude | Almacenamiento de objetos Open Source compatible con politicas WORM para retencion inmutable de 5 anos (R-06)                                   |
 
 ---
 
@@ -286,4 +297,5 @@ Los Ministerios de Educacion y Trabajo acceden al sistema por dos vias: a traves
 > *Tablero Kanban: https://trello.com/b/XWZkVwXY*
 
 > *Repositorio: AYD2\_A\_1S2026\_PROYECTO\_G6*
+> 
 
