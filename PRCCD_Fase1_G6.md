@@ -55,7 +55,108 @@ Vacaciones de junio 2026
 
 ## 1.1 Listado de Stakeholders y preocupaciones arquitectonicas
 
-> *Seccion a cargo de: Jencer Hamilton*
+# Stakeholders y Preocupaciones Arquitectónicas — PRCCD
+
+## 1. Directivos de Alta Dirección del SICA
+
+### Intereses
+
+* Unificar la región centroamericana bajo una sola plataforma de certificación.
+* Que la primera versión arquitectónica esté completamente definida y documentada en 3–4 semanas.
+* Visibilidad política del proyecto como logro regional.
+
+### Preocupaciones y conflictos
+
+* Presión de tiempo vs. calidad arquitectónica.
+* Expectativa de integración sin forzar cambios en las instituciones educativas.
+
+---
+
+## 2. Dirección Financiera
+
+### Intereses
+
+* Respetar el presupuesto máximo de USD 180,000 para el piloto.
+* Priorizar tecnologías Open Source para minimizar costos de licenciamiento.
+
+### Preocupaciones y conflictos
+
+* Tensión entre presupuesto limitado y los requerimientos técnicos complejos como blockchain, PKI, motor adaptativo y almacenamiento seguro de evidencia biométrica.
+
+---
+
+## 3. Administradores de TI Operativos del SICA
+
+### Intereses
+
+* Despliegue on-premise reutilizando servidores e infraestructura física existente.
+* Que el sistema sea mantenible con personal de soporte limitado.
+* Arquitectura preparada para migración futura a la nube.
+
+### Preocupaciones y conflictos
+
+* Capacidades técnicas heterogéneas del equipo interno.
+* Complejidad de mantenimiento de un ecosistema de software fragmentado.
+
+---
+
+## 4. Instituciones Educativas como USAC, UCR, UES
+
+### Intereses
+
+* No modificar sus sistemas ni flujos de trabajo actuales.
+* Integración nativa con sus sistemas legacy.
+
+### Preocupaciones y conflictos
+
+* Cada institución opera como silo tecnológico con protocolos de autenticación distintos: LDAP, SAML y OAuth2.
+* Formatos de datos dispares: JSON, XML y CSV.
+* Riesgo de rechazo institucional si se les exige adaptación.
+
+---
+
+## 5. Estudiantes y Profesionales Certificados (Usuarios Finales)
+
+### Intereses
+
+* Experiencia de evaluación fluida e intuitiva, incluso bajo exámenes adaptativos.
+* Certificados digitales válidos transfronterizamente y verificables.
+* Protección de sus datos personales (derecho al olvido y encriptación).
+
+### Preocupaciones y conflictos
+
+* Riesgo de degradación del servicio durante picos de tráfico como en la primera semana de cada mes.
+* Privacidad ante la recolección de evidencia biométrica como capturas, logs de tecleo y video.
+
+---
+
+## 6. Ministerios de Trabajo y Educación
+
+### Intereses
+
+* Dashboards analíticos con métricas segmentadas por país, carrera y género.
+* Validez jurídica transfronteriza de los certificados emitidos.
+* Rastro de auditoría inmutable en cada certificado.
+
+### Preocupaciones y conflictos
+
+* Los datos analíticos deben anonimizarse antes de exponerse, generando un conflicto entre inteligencia de negocio y privacidad.
+
+---
+
+## 7. Entes Regulatorios y Normativos
+
+### Intereses
+
+* Cumplimiento con GDPR y leyes locales como la Ley de Acceso a la Información Pública de Guatemala.
+* Encriptación de datos sensibles en reposo y en tránsito.
+* Retención inalterable de evidencia por 5 años.
+* Firmas electrónicas avanzadas para prevenir fraude académico.
+
+### Preocupaciones y conflictos
+
+* Distintas legislaciones de privacidad por país generan requisitos normativos en conflicto entre sí.
+
 
 ---
 
