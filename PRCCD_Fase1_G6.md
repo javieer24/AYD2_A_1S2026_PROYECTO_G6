@@ -329,25 +329,13 @@ El PRCCD implementa autenticacion federada mediante Keycloak como Identity Broke
 ### Flujo por institucion
 
 **USAC — LDAP:**
-```
-Usuario USAC → Adaptador USAC → Keycloak LDAP Connector
-    → Validacion directorio USAC → Token JWT PRCCD
-    → API Gateway → Acceso a servicios internos
-```
+![Flujo autenticacion federada USAC](imagenes/auth_usac.png)
 
 **UCR — SAML 2.0:**
-```
-Usuario UCR → Adaptador UCR → Keycloak SAML IdP Broker
-    → Assertion SAML UCR → Token JWT PRCCD
-    → API Gateway → Acceso a servicios internos
-```
+![Flujo autenticacion federada UCR](imagenes/auth_ucr.png)
 
 **UES — OAuth2:**
-```
-Usuario UES → Adaptador UES → Keycloak OAuth2 Provider
-    → Authorization Code UES → Token JWT PRCCD
-    → API Gateway → Acceso a servicios internos
-```
+![Flujo autenticacion federada UES](imagenes/auth_ues.png)
 
 ### Resultado unificado
 
