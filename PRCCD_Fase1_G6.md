@@ -389,21 +389,8 @@ Cada adaptador es responsable de tres funciones:
 
 ### Flujo de integracion de datos
 
-```
-Universidad externa
-       |
-       | (JSON / XML / CSV segun institucion)
-       v
-Adaptador institucional (microservicio dedicado)
-       |
-       | Transforma al modelo canonico interno
-       v
-API Gateway
-       |
-       | Token JWT validado por Keycloak
-       v
-Servicios internos PRCCD
-```
+![Integracion de datos PRCCD](imagenes/integracion_datos.png)
+
 
 ### Cumplimiento de drivers
 
