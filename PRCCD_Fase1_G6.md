@@ -412,28 +412,7 @@ Una vez emitido el certificado X.509, el Servicio de Certificacion publica el ha
 El campo hashBlockchain en la tabla Certificado almacena la referencia a la transaccion en Hyperledger Fabric. Esto permite que ministerios y empresas verificadoras confirmen tanto la validez de la firma digital (via PKI) como la existencia historica del registro (via Hyperledger), satisfaciendo el requisito de validez juridica transfronteriza (R-07).
 
 ### Proceso completo de emision
-
-```
-Candidato aprueba examen
-         |
-         v
-Construir payload (id, competencia, institucion, fecha, puntaje)
-         |
-         v
-Generar hash SHA-256 del payload
-         |
-         v
-Servidor PKI firma el hash → Certificado X.509
-         |
-         v
-Publicar hashSHA256 en Hyperledger Fabric → hashBlockchain
-         |
-         v
-Registrar en RegistroAuditoria (solo INSERT, inmutable)
-         |
-         v
-Certificado disponible para verificacion publica (QR / hash / llave publica CA)
-```
+![Flujo emision certificado PRCCD](imagenes/flujo_emision_certificado.png)
 
 ### Cumplimiento de drivers
 
