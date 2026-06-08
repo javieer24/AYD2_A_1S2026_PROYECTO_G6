@@ -267,6 +267,92 @@ Los Ministerios de Educacion y Trabajo acceden al sistema por dos vias: a traves
 
 > *Seccion a cargo de: Javier*
 
+
+
+
+
+---
+
+## 8.4 Estrategia de interoperabilidad
+
+El PRCCD debe integrarse con USAC, UCR y UES sin obligar a ninguna institucion a modificar sus sistemas (R-08, RF-07). La estrategia se basa en el patron de microservicio adaptador por institucion, visible en el diagrama de componentes donde se definen los adaptadores USAC (LDAP), UCR (SAML) y UES (OAuth2/CSV).
+
+### Microservicio adaptador por universidad
+
+Cada universidad tiene un adaptador dedicado que actua como capa anticorrupcion entre el protocolo externo y el modelo interno del PRCCD:
+
+| Adaptador | Universidad | Protocolo de autenticacion | Formato de datos soportado |
+|---|---|---|---|
+| Adaptador USAC | USAC | LDAP | JSON / CSV |
+| Adaptador UCR | UCR | SAML 2.0 | XML |
+| Adaptador UES | UES | OAuth2 | JSON / CSV |
+
+Cada adaptador es responsable de tres funciones:
+
+1. Traducir el protocolo de autenticacion externo a un token JWT interno valido para el API Gateway.
+2. Transformar los datos academicos entrantes al formato canonico interno del PRCCD, independientemente de si llegan como JSON, XML o archivos planos CSV.
+3. Exponer un endpoint de sincronizacion periodica que el sistema invoca para importar novedades academicas de cada institucion mediante Apache Camel como motor de integracion.
+
+### Flujo de integracion de datos
+
+```
+Universidad externa
+       |
+       | (JSON / XML / CSV segun institucion)
+       v
+Adaptador institucional (microservicio dedicado)
+       |
+       | Transforma al modelo canonico interno
+       v
+API Gateway
+       |
+       | Token JWT validado por Keycloak
+       v
+Servicios internos PRCCD
+```
+
+### Cumplimiento de drivers
+
+| Driver | Como lo atiende esta estrategia |
+|---|---|
+| RF-06 (JSON/XML/CSV) | Cada adaptador implementa un parser especifico para el formato de su institucion. |
+| RF-07 (integracion sin cambios) | Las universidades no modifican nada; el adaptador se conecta a sus endpoints existentes. |
+| EaC-04 (CSV legacy) | El Adaptador USAC incluye un procesador de archivos planos con validacion de columnas y manejo de registros malformados. |
+| EaC-08 (nuevo protocolo en menos de 2 semanas) | Agregar una nueva universidad implica crear un nuevo microservicio adaptador sin tocar los existentes. |
+
+---
+
+## 8.5 Autenticacion federada
+
+El PRCCD implementa autenticacion federada mediante Keycloak como Identity Broker centralizado, tecnologia ya definida en la seccion 7.4. Keycloak actua como intermediario unico entre los tres protocolos universitarios y el sistema interno.
+
+### Flujo por institucion
+
+**USAC — LDAP:**
+```
+Usuario USAC → Adaptador USAC → Keycloak LDAP Connector
+    → Validacion directorio USAC → Token JWT PRCCD
+    → API Gateway → Acceso a servicios internos
+```
+
+**UCR — SAML 2.0:**
+```
+Usuario UCR → Adaptador UCR → Keycloak SAML IdP Broker
+    → Assertion SAML UCR → Token JWT PRCCD
+    → API Gateway → Acceso a servicios internos
+```
+
+**UES — OAuth2:**
+```
+Usuario UES → Adaptador UES → Keycloak OAuth2 Provider
+    → Authorization Code UES → Token JWT PRCCD
+    → API Gateway → Acceso a servicios internos
+```
+
+### Resultado unificado
+
+Independientemente de la institucion de origen, el sistema siempre trabaja con un Token JWT firmado por Keycloak que contiene: usuarioId, institucionId, rol y expiracion. El resto de microservicios del PRCCD no conocen el protocolo original de cada universidad; solo validan el JWT contra la llave publica de Keycloak. Esto cumple RF-01 y R-08 sin requerir cambios en los sistemas universitarios.
+
 ---
 
 # 9. Diseno de Interfaces UI/UX
