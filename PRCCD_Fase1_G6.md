@@ -148,11 +148,90 @@ Vacaciones de junio 2026
 
 # 4. Matrices de trazabilidad
 
-> *Seccion a cargo de: Jencer Hamilton*
 
 ## 4.1 Stakeholders vs Requerimientos
 
-> *Pendiente*
+La matriz de trazabilidad Stakeholders vs Requerimientos permite identificar qué actores del negocio exigen, validan o se ven impactados por cada requisito funcional del sistema. Su objetivo es demostrar que los requerimientos definidos para la Plataforma Regional de Certificación de Competencias Digitales (PRCCD) responden directamente a necesidades reales de los involucrados, evitando requisitos aislados o sin justificación dentro del caso de negocio.
+
+Esta matriz también facilita el análisis de impacto: si cambia un requisito funcional, el equipo puede identificar rápidamente qué stakeholder debe ser consultado o qué área del negocio se verá afectada. Por esa razón, se utiliza como evidencia de alineación entre las necesidades del negocio, la arquitectura propuesta y los requisitos funcionales definidos para la solución.
+
+## Leyenda
+
+| Símbolo | Significado |
+|---|---|
+| **E** | El stakeholder exige directamente el requisito. |
+| **I** | El stakeholder se ve impactado por el requisito. |
+| **V** | El stakeholder valida o consulta el resultado del requisito. |
+| *(vacío)* | No existe una relación directa relevante para esta matriz. |
+
+## Stakeholders considerados
+
+| ID | Stakeholder | Interés o preocupación principal |
+|---|---|---|
+| ST-01 | Secretaría General del SICA | Impulsa la iniciativa regional y requiere que la plataforma unifique la certificación de competencias digitales en la región. |
+| ST-02 | Alta dirección del SICA | Exige una solución estratégica, escalable y justificable que pueda integrarse regionalmente sin afectar la operación de las instituciones. |
+| ST-03 | Dirección financiera | Controla el presupuesto del piloto, prioriza costos, licenciamiento y sostenibilidad económica de la solución. |
+| ST-04 | Administradores de TI / Soporte operativo | Se encargan de la operación, soporte, despliegue on-premise, seguridad técnica y administración de usuarios. |
+| ST-05 | Universidades integradas: USAC, UCR y UES | Proveen identidad, datos académicos e integración con sistemas heredados sin cambiar sus protocolos internos. |
+| ST-06 | Ministerios de educación | Consumen información analítica y validan el impacto educativo de las competencias digitales certificadas. |
+| ST-07 | Ministerios de trabajo | Requieren información confiable sobre competencias laborales y certificados verificables para el ecosistema laboral. |
+| ST-08 | Candidatos / estudiantes / profesionales | Utilizan la plataforma para autenticarse, evaluarse y obtener una certificación digital verificable. |
+| ST-09 | Entes reguladores y autoridades de protección de datos | Velan por el cumplimiento normativo, privacidad, derecho al olvido, retención e integridad de la evidencia. |
+| ST-10 | Auditores | Revisan evidencia antifraude, trazabilidad, bitácoras inmutables y validez de certificados emitidos. |
+| ST-11 | Verificadores externos de certificados | Consultan la autenticidad de certificados mediante código, QR o hash. |
+
+## Requerimientos funcionales trazados
+
+| ID | Requerimiento funcional | Prioridad |
+|---|---|---|
+| RF-01 | El sistema debe permitir la autenticación federada mediante los protocolos LDAP, SAML y OAuth2 según la institución universitaria. | Alta |
+| RF-02 | El sistema debe ejecutar evaluaciones mediante un motor de exámenes adaptativos que ajuste la dificultad en tiempo real según las respuestas previas del candidato. | Alta |
+| RF-03 | El sistema debe capturar y almacenar evidencia antifraude durante la evaluación, incluyendo capturas de pantalla, logs de tecleo y ráfagas de video. | Alta |
+| RF-04 | El sistema debe emitir certificados digitales verificables criptográficamente mediante PKI o Blockchain (Hyperledger). | Alta |
+| RF-05 | El sistema debe mantener un rastro de auditoría inmutable por cada certificado emitido. | Alta |
+| RF-06 | El sistema debe importar y exportar datos académicos en formatos JSON, XML y CSV. | Media |
+| RF-07 | El sistema debe integrarse nativamente con los sistemas de USAC, UCR y UES sin obligar a estas instituciones a cambiar su forma de operar. | Alta |
+| RF-08 | El sistema debe generar dashboards analíticos segmentados por país, carrera universitaria y género. | Media |
+| RF-09 | El sistema debe anonimizar y agregar los datos antes de exponerlos en las interfaces gerenciales. | Alta |
+| RF-10 | El sistema debe permitir la verificación externa de un certificado mediante código, QR o hash. | Media |
+| RF-11 | El sistema debe gestionar usuarios, roles y permisos por institución. | Media |
+| RF-12 | El sistema debe habilitar los períodos de certificación exclusivamente durante la primera semana de cada mes. | Alta |
+
+## Matriz Stakeholders vs Requerimientos
+
+| Stakeholder | RF-01 | RF-02 | RF-03 | RF-04 | RF-05 | RF-06 | RF-07 | RF-08 | RF-09 | RF-10 | RF-11 | RF-12 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| ST-01 - Secretaría General del SICA | I | E | I | E | E | I | E | E | I | I | I | E |
+| ST-02 - Alta dirección del SICA | I | E | I | E | E | I | E | E | I | I | I | E |
+| ST-03 - Dirección financiera |  |  |  | I | E |  |  | I | I | I | I | I |
+| ST-04 - Administradores de TI / Soporte operativo | I | I | I | I | I | I | I |  | I | I | E | I |
+| ST-05 - Universidades integradas: USAC, UCR y UES | E | I |  |  |  | E | E | I | I |  | I | I |
+| ST-06 - Ministerios de educación |  |  |  | I | I |  |  | E | E | I |  |  |
+| ST-07 - Ministerios de trabajo |  |  |  | I | E |  |  | E | E | I |  |  |
+| ST-08 - Candidatos / estudiantes / profesionales | I | E | I | I |  |  |  |  |  | I |  | I |
+| ST-09 - Entes reguladores y autoridades de protección de datos |  |  | I | I | E |  |  | I | E | I |  |  |
+| ST-10 - Auditores |  |  | E | I | E |  |  |  | I | I |  |  |
+| ST-11 - Verificadores externos de certificados |  |  |  | I | I |  |  |  |  | E |  |  |
+
+## Justificación de trazabilidad
+
+| Stakeholder | Requerimientos relacionados | Justificación |
+|---|---|---|
+| ST-01 / ST-02 | RF-02, RF-04, RF-07, RF-08, RF-12 | Estos stakeholders impulsan la plataforma regional, por lo que exigen evaluación adaptativa, certificación verificable, integración universitaria, analítica y control de períodos de certificación. |
+| ST-03 | RF-05, RF-08, RF-09, RF-10, RF-11, RF-12 | La dirección financiera necesita control, auditoría, evidencia de valor institucional, administración de accesos y trazabilidad para justificar el piloto. |
+| ST-04 | RF-01, RF-03, RF-05, RF-06, RF-07, RF-11, RF-12 | El área operativa se ve impactada por autenticación, integración, usuarios, seguridad, evidencia y operación de períodos de certificación. |
+| ST-05 | RF-01, RF-06, RF-07 | Las universidades exigen interoperabilidad real, autenticación federada y compatibilidad con formatos heterogéneos sin modificar sus procesos internos. |
+| ST-06 / ST-07 | RF-04, RF-05, RF-08, RF-09, RF-10 | Los ministerios necesitan certificados confiables, auditoría y dashboards con datos agregados y anonimizados para tomar decisiones regionales. |
+| ST-08 | RF-01, RF-02, RF-04, RF-10, RF-12 | Los candidatos necesitan acceder, evaluarse en períodos habilitados, obtener certificación y poder demostrar su validez ante terceros. |
+| ST-09 | RF-03, RF-05, RF-09 | Los reguladores impactan directamente los requisitos de evidencia, auditoría, privacidad y anonimización. |
+| ST-10 | RF-03, RF-05, RF-10 | Los auditores requieren evidencia antifraude, bitácora inmutable y mecanismos de verificación. |
+| ST-11 | RF-10 | Los verificadores externos dependen principalmente de la consulta pública de autenticidad del certificado. |
+
+## Lectura de la matriz
+
+La matriz evidencia que los requisitos funcionales de mayor prioridad se encuentran asociados con los stakeholders más críticos del proyecto. Por ejemplo, la autenticación federada y la integración universitaria se relacionan directamente con las universidades USAC, UCR y UES, debido a que el enunciado establece que cada institución trabaja con protocolos y formatos distintos. Asimismo, la emisión de certificados verificables, la auditoría inmutable y la verificación externa se relacionan con ministerios, auditores, entes reguladores y verificadores externos, debido a la necesidad de garantizar validez jurídica, trazabilidad y prevención de fraude académico.
+
+También se observa que los requisitos de analítica y anonimización están ligados principalmente a los ministerios y autoridades regulatorias, ya que los dashboards deben mostrar información segmentada sin exponer datos personales identificables. Finalmente, los requisitos relacionados con el motor de evaluación adaptativa y los períodos de certificación impactan directamente a los candidatos y a la alta dirección del SICA, porque representan el núcleo funcional de la plataforma y la condición operativa principal del negocio.
 
 ---
 
