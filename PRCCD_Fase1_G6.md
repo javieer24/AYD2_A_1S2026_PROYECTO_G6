@@ -162,8 +162,9 @@ Vacaciones de junio 2026
 
 ## 1.2 Core del negocio
 
-> *Seccion a cargo de: Jencer Hamilton*
+> *Seccion a cargo de: Ander*
 
+![Diagrama CDU Alto Nivel](/AYD2_A_1S2026_PROYECTO_G6/imagenes/CDU__AltoNivel.png)
 ---
 
 # 2. Caracteristicas del sistema y Drivers Arquitectonicos
