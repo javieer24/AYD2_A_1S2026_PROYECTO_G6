@@ -691,19 +691,23 @@ El campo hashBlockchain en la tabla Certificado almacena la referencia a la tran
 ### Patrón 1 — Strategy *(Comportamiento)*
 
 **Descripción**  
- 
+ Es un patron de diseño de comportamiento que permite definir una familia de algoritmos, colocar cada uno de ellos en una clase separada y hacer sus objetos intercambiables.
 ...
 
 **Aplicación en el proyecto**  
+En el proyecto se aplica en el sistema de autentificacion federada para manejar los distintos protocolos universitarios como LDAP, SAML y Outh2.
 ...
 
 **Justificación**  
+Permite cambiar el metodo de autenticacion según la universidad sin modificar el nucleo del sistema. Facilitando agregar nuevas instituciones y reduce el acoplamiento. 
 ...
 
 **Diagrama**
 
+![diagrama de clases strategy](./imagenes/strategy.png)
 
-### Patrón 2 — Adapter *(Comportamiento)*
+
+### Patrón 2 — Adapter *(Estructural)*
 
 **Descripción**  
 ...
@@ -716,7 +720,7 @@ El campo hashBlockchain en la tabla Certificado almacena la referencia a la tran
 
 **Diagrama**
 
-### Patrón 3 — Decorator *(Comportamiento)*
+### Patrón 3 — Decorator *(Estructural)*
 
 **Descripción**  
 ...
@@ -729,7 +733,7 @@ El campo hashBlockchain en la tabla Certificado almacena la referencia a la tran
 
 **Diagrama**
 
-### Patrón 4 — Facade *(Comportamiento)*
+### Patrón 4 — Facade *(Estructural)*
 
 **Descripción**  
 ...
