@@ -1041,12 +1041,6 @@ El Servidor de Almacenamiento Antifraude utiliza MinIO con politica de bucket co
 
 ---
 
-
-
-
-
----
-
 ## 8.4 Estrategia de interoperabilidad
 
 El PRCCD debe integrarse con USAC, UCR y UES sin obligar a ninguna institucion a modificar sus sistemas (R-08, RF-07). La estrategia se basa en el patron de microservicio adaptador por institucion, visible en el diagrama de componentes donde se definen los adaptadores USAC (LDAP), UCR (SAML) y UES (OAuth2/CSV).
@@ -1177,8 +1171,6 @@ El campo hashBlockchain en la tabla Certificado almacena la referencia a la tran
 
 ---
 
----
-
 # 9. Diseño de Interfaces UI/UX
 
 > *Seccion a cargo de: equipo*
@@ -1191,33 +1183,30 @@ El campo hashBlockchain en la tabla Certificado almacena la referencia a la tran
 
 **Descripción**  
  Es un patron de diseño de comportamiento que permite definir una familia de algoritmos, colocar cada uno de ellos en una clase separada y hacer sus objetos intercambiables.
-...
 
 **Aplicación en el proyecto**  
 En el proyecto se aplica en el sistema de autentificacion federada para manejar los distintos protocolos universitarios como LDAP, SAML y Outh2.
-...
 
 **Justificación**  
 Permite cambiar el metodo de autenticacion según la universidad sin modificar el nucleo del sistema. Facilitando agregar nuevas instituciones y reduce el acoplamiento. 
-...
 
 **Diagrama**
-
 ![diagrama de clases strategy](./imagenes/strategy.png)
 
 
 ### Patrón 2 — Adapter *(Estructural)*
 
 **Descripción**  
-...
+Adapter es un patron de diseño estructural que permite la colaboracion entre objetos con interfaces incompatibles. Es decir que se puede crear un objeto especial que convierte la interfaz de un objeto, de forma que otro objeto pueda comprenderla.
 
 **Aplicación en el proyecto**  
-...
+En el proyecto se implementa en los microservicios de integracion para transformar formatos externos (CSV, XML, JSON) al modelo canonico interno del PRCCD
 
 **Justificación**  
-...
+Cada universidad maneja tecnologias, protocolos y formatos distintos. Adapter permite integrar esos sistemas al modelo interno del proyecto sin obligarlos a las instituciones a modificar su infraestructura existente. Ademas facilita el mantenimiento, la escalabilidad y la incorporacion de nuevas universidades o tecnologias futuras.
 
 **Diagrama**
+![diagrama de clases adapter](./imagenes/adapter.png)
 
 ### Patrón 3 — Decorator *(Estructural)*
 
