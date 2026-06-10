@@ -691,7 +691,76 @@ También se observa que los requisitos de analítica y anonimización están lig
 
 ## 4.2 Stakeholders vs CDU
 
-> *Pendiente*
+La presente matriz de trazabilidad relaciona los stakeholders identificados para la Plataforma Regional de Certificación de Competencias Digitales (PRCCD) con los Casos de Uso del Sistema (CDU). Su propósito es demostrar que cada funcionalidad implementada responde a necesidades específicas de los actores involucrados y que todos los stakeholders relevantes tienen representación dentro de la solución arquitectónica.
+
+Esta matriz complementa la trazabilidad Stakeholders vs Requerimientos al mostrar cómo dichas necesidades se materializan en funcionalidades concretas del sistema.
+
+### Leyenda
+
+| Símbolo   | Significado                                                               |
+| --------- | ------------------------------------------------------------------------- |
+| E         | El stakeholder exige directamente el caso de uso.                         |
+| I         | El stakeholder se ve impactado por el caso de uso.                        |
+| V         | El stakeholder valida, supervisa o consulta el resultado del caso de uso. |
+| *(vacío)* | No existe relación significativa.                                         |
+
+### Matriz Stakeholders vs Casos de Uso del Sistema
+
+| Stakeholder                           | CUS-01 | CUS-02 | CUS-03 | CUS-03.1 | CUS-04 | CUS-05 | CUS-06 | CUS-07 | CUS-07.1 | CUS-08 | CUS-09 | CUS-10 | CUS-11 | CUS-12 |
+| ------------------------------------- | ------ | ------ | ------ | -------- | ------ | ------ | ------ | ------ | -------- | ------ | ------ | ------ | ------ | ------ |
+| ST-01 Secretaría General del SICA     | I      | I      | E      | I        | I      | E      | E      | I      | E        | I      | E      | I      | I      | E      |
+| ST-02 Alta Dirección del SICA         | I      | I      | E      | I        | I      | E      | E      | I      | E        | I      | E      | I      | I      | E      |
+| ST-03 Dirección Financiera            |        | I      |        |          |        | I      | E      |        |          |        | I      | I      | I      | I      |
+| ST-04 Administradores TI / Operativos | E      | E      | I      | E        | I      | I      | I      | I      | E        | I      |        |        | I      | E      |
+| ST-05 Universidades USAC / UCR / UES  | E      |        | I      |          |        |        |        | E      | E        | E      |        |        |        |        |
+| ST-06 Ministerios de Educación        |        |        |        |          |        | I      | I      |        |          |        | E      | E      | V      |        |
+| ST-07 Ministerios de Trabajo          |        |        |        |          |        | I      | I      |        |          |        | E      | E      | V      |        |
+| ST-08 Candidatos / Profesionales      | E      |        | E      |          | I      | E      |        |        |          |        |        |        | V      | I      |
+| ST-09 Entes Regulatorios              |        |        |        |          | I      | I      | E      |        |          |        | I      | E      | V      |        |
+| ST-10 Auditores                       |        |        |        |          | E      | I      | E      |        |          |        |        | I      | V      |        |
+| ST-11 Verificadores Externos          |        |        |        |          |        |        |        |        |          |        |        |        | E      |        |
+
+### Resumen de Participación por Stakeholder
+
+| Stakeholder                 | Casos de uso principales                                                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Secretaría General del SICA | Ejecutar evaluación adaptativa, emitir certificados, auditoría inmutable, dashboards, sincronización universitaria y administración de períodos. |
+| Alta Dirección del SICA     | Certificación regional, evaluación adaptativa, integración universitaria, analítica y control operativo.                                         |
+| Dirección Financiera        | Auditoría, certificación, verificación y control institucional.                                                                                  |
+| Administradores TI          | Autenticación, gestión de usuarios, integración universitaria, sincronización y administración de períodos.                                      |
+| Universidades               | Autenticación federada, importación/exportación de datos y sincronización institucional.                                                         |
+| Ministerios de Educación    | Dashboards, anonimización, auditoría y verificación de certificados.                                                                             |
+| Ministerios de Trabajo      | Dashboards, anonimización, auditoría y verificación de certificados.                                                                             |
+| Candidatos / Profesionales  | Autenticación, evaluación adaptativa, captura de evidencia y emisión de certificados.                                                            |
+| Entes Regulatorios          | Auditoría, privacidad, anonimización y cumplimiento normativo.                                                                                   |
+| Auditores                   | Evidencia antifraude, auditoría inmutable y validación de certificados.                                                                          |
+| Verificadores Externos      | Verificación pública de certificados mediante código, QR o hash.                                                                                 |
+
+### Análisis de Cobertura
+
+La matriz evidencia que todos los stakeholders identificados durante el análisis del negocio poseen participación directa o indirecta en al menos un Caso de Uso del Sistema. Los candidatos y profesionales interactúan principalmente con las funcionalidades de autenticación, evaluación y certificación, mientras que las universidades se relacionan con los procesos de interoperabilidad e integración de datos. Por otra parte, los ministerios, auditores y entes reguladores participan principalmente en los procesos de auditoría, verificación, anonimización y explotación analítica de la información.
+
+Asimismo, se observa que los casos de uso más estratégicos para el negocio son CUS-03 Ejecutar evaluación adaptativa, CUS-05 Emitir certificado digital, CUS-06 Registrar auditoría inmutable y CUS-07.1 Sincronizar sistemas universitarios, debido a que concentran la mayor cantidad de stakeholders interesados y representan el núcleo funcional de la Plataforma Regional de Certificación de Competencias Digitales (PRCCD).
+
+### Cobertura CDU vs Stakeholders
+
+| CDU                                          | Stakeholders Relacionados                                     |
+| -------------------------------------------- | ------------------------------------------------------------- |
+| CUS-01 Autenticar usuario                    | ST-01, ST-02, ST-04, ST-05, ST-08                             |
+| CUS-02 Gestionar usuarios y roles            | ST-01, ST-02, ST-03, ST-04                                    |
+| CUS-03 Ejecutar evaluación adaptativa        | ST-01, ST-02, ST-05, ST-08                                    |
+| CUS-03.1 Gestionar banco de preguntas        | ST-01, ST-02, ST-04                                           |
+| CUS-04 Capturar evidencia antifraude         | ST-01, ST-02, ST-08, ST-09, ST-10                             |
+| CUS-05 Emitir certificado digital            | ST-01, ST-02, ST-03, ST-06, ST-07, ST-08, ST-09, ST-10        |
+| CUS-06 Registrar auditoría inmutable         | ST-01, ST-02, ST-03, ST-06, ST-07, ST-09, ST-10               |
+| CUS-07 Importar datos académicos             | ST-01, ST-02, ST-04, ST-05                                    |
+| CUS-07.1 Sincronizar sistemas universitarios | ST-01, ST-02, ST-04, ST-05                                    |
+| CUS-08 Exportar datos académicos             | ST-01, ST-02, ST-04, ST-05                                    |
+| CUS-09 Generar dashboards analíticos         | ST-01, ST-02, ST-03, ST-06, ST-07, ST-09                      |
+| CUS-10 Anonimizar y agregar datos            | ST-03, ST-06, ST-07, ST-09, ST-10                             |
+| CUS-11 Verificar certificado                 | ST-01, ST-02, ST-03, ST-04, ST-06, ST-07, ST-09, ST-10, ST-11 |
+| CUS-12 Administrar períodos de certificación | ST-01, ST-02, ST-03, ST-04, ST-08                             |
+
 
 ---
 
