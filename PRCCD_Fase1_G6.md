@@ -238,15 +238,367 @@ Vacaciones de junio 2026
 
 ## 3.1 Diagrama de casos de uso expandidos
 
-> *Seccion a cargo de: Jencer Hamilton*
+
+El diagrama de casos de uso expandidos del sistema representa las interacciones principales entre los actores externos y la Plataforma Regional de Certificación de Competencias Digitales (PRCCD). A diferencia del caso de uso de negocio de alto nivel, este diagrama se enfoca en la funcionalidad observable del sistema desde la perspectiva de sus actores, manteniéndose independiente de detalles de implementación.
+
+![Diagrama de casos de uso expandidos del sistema](imagenes/CDU_Expandido.png)
+
+## Actores del sistema
+
+| Actor | Descripción |
+|---|---|
+| Candidato / Profesional | Usuario final que se autentica, realiza evaluaciones adaptativas, recibe certificados digitales y puede consultar su validez. |
+| Universidad USAC / UCR / UES | Institución educativa que se integra al sistema para autenticación federada e intercambio de datos académicos. |
+| Sistema Universitario Externo | Sistema legacy universitario que provee datos mediante LDAP, SAML, OAuth2, JSON, XML o CSV. |
+| Administrador SICA | Responsable de configurar períodos de certificación, gestionar usuarios, roles, permisos y banco de preguntas. |
+| Ministerio de Educación / Trabajo | Actor institucional que consulta dashboards, verifica certificados y revisa información regional de competencias. |
+| Auditor | Actor que consulta evidencia antifraude, rastros de auditoría y registros inmutables de certificación. |
+| Verificador Externo | Empresa, institución o tercero que valida un certificado mediante código, QR o hash. |
+| Autoridad Certificadora PKI / Blockchain | Servicio externo o infraestructura de confianza que respalda la emisión, firma y verificación criptográfica de certificados. |
+| Ente Regulatorio | Autoridad normativa que valida cumplimiento de protección de datos, auditoría, privacidad y retención de evidencia. |
+
+## Casos de uso del sistema
+
+| ID | Caso de uso | Descripción |
+|---|---|---|
+| CUS-01 | Autenticar usuario | Permite el acceso mediante autenticación federada usando LDAP, SAML u OAuth2 según la universidad. |
+| CUS-02 | Gestionar usuarios, roles y permisos | Permite administrar perfiles, permisos y accesos por institución. |
+| CUS-03 | Ejecutar evaluación adaptativa | Permite que el candidato realice una evaluación cuya dificultad se ajusta en tiempo real. |
+| CUS-03.1 | Gestionar banco de preguntas | Permite administrar preguntas y parámetros usados por el motor adaptativo. |
+| CUS-04 | Capturar evidencia antifraude | Captura evidencia durante la evaluación, incluyendo capturas de pantalla, logs de tecleo y ráfagas de video. |
+| CUS-05 | Emitir certificado digital | Genera certificados digitales verificables criptográficamente mediante PKI o Blockchain. |
+| CUS-06 | Registrar auditoría inmutable | Registra eventos relevantes del sistema en una bitácora inmutable. |
+| CUS-07 | Importar datos académicos | Permite ingresar datos académicos desde sistemas externos en JSON, XML o CSV. |
+| CUS-07.1 | Sincronizar sistemas universitarios | Coordina la integración con sistemas universitarios externos sin modificar sus procesos internos. |
+| CUS-08 | Exportar datos académicos | Permite entregar información académica en formatos compatibles con las instituciones. |
+| CUS-09 | Generar dashboards analíticos | Presenta métricas regionales segmentadas por país, carrera universitaria y género. |
+| CUS-10 | Anonimizar y agregar datos | Procesa datos antes de exponerlos en dashboards para cumplir privacidad y protección de datos. |
+| CUS-11 | Verificar certificado | Permite validar certificados mediante código, QR o hash. |
+| CUS-12 | Administrar períodos de certificación | Permite habilitar períodos de certificación exclusivamente durante la primera semana de cada mes. |
+
+## Relaciones principales
+
+| Relación | Justificación |
+|---|---|
+| CUS-03 incluye CUS-01 | Para realizar una evaluación, el candidato debe estar autenticado. |
+| CUS-03 incluye CUS-04 | Durante la evaluación debe capturarse evidencia antifraude. |
+| CUS-03 incluye CUS-03.1 | La evaluación adaptativa depende del banco de preguntas. |
+| CUS-05 incluye CUS-06 | Todo certificado emitido debe generar auditoría inmutable. |
+| CUS-05 incluye CUS-11 | Todo certificado emitido debe poder verificarse posteriormente. |
+| CUS-07 y CUS-08 incluyen CUS-07.1 | La importación y exportación dependen de la sincronización con sistemas universitarios. |
+| CUS-09 incluye CUS-10 | Los dashboards solo deben exponer información agregada y anonimizada. |
+| CUS-12 extiende CUS-03 | La ejecución de evaluaciones depende de que el período de certificación esté habilitado. |
+| CUS-05 extiende CUS-03 | El certificado se emite únicamente cuando el candidato aprueba la evaluación. |
 
 ---
 
 ## 3.2 Detalle de drivers por CDU
 
-> *Seccion a cargo de: Jencer Hamilton*
+La siguiente tabla presenta el detalle de los Casos de Uso del Sistema (CDU) identificados para la Plataforma Regional de Certificación de Competencias Digitales (PRCCD). Para cada CDU se documenta su objetivo, actores involucrados, precondiciones, flujo principal, flujos alternos y los drivers arquitectónicos asociados, permitiendo mantener la trazabilidad entre requerimientos funcionales, atributos de calidad, restricciones y funcionalidades del sistema.
 
 ---
+
+### CUS-01 – Autenticar usuario
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Permitir que un usuario acceda al sistema mediante autenticación federada utilizando LDAP, SAML o OAuth2 según la institución de origen. |
+| Actor principal | Candidato / Profesional |
+| Actores secundarios | Universidad, Sistema Universitario Externo, Administrador SICA |
+| Precondiciones | Usuario registrado en institución integrada; proveedor de identidad disponible. |
+| Flujo principal | 1. Usuario accede al sistema.<br>2. Selecciona institución.<br>3. Sistema redirige al proveedor de identidad.<br>4. Se validan credenciales.<br>5. Se genera JWT.<br>6. Usuario accede al sistema. |
+| Flujos alternos | Credenciales inválidas; proveedor de identidad no disponible; tiempo de espera agotado. |
+| Drivers RF | RF-01, RF-07, RF-11 |
+| Drivers EaC | EaC-02, EaC-04, EaC-08 |
+| Drivers Restricción | R-02, R-03, R-08 |
+
+---
+
+### CUS-02 – Gestionar usuarios, roles y permisos
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Administrar usuarios, roles y permisos institucionales dentro del sistema. |
+| Actor principal | Administrador SICA |
+| Precondiciones | Administrador autenticado con permisos de gestión. |
+| Flujo principal | 1. Consulta usuarios.<br>2. Crea, modifica o desactiva usuarios.<br>3. Asigna roles.<br>4. Guarda cambios.<br>5. Sistema registra auditoría. |
+| Flujos alternos | Usuario duplicado; rol inexistente; permisos inconsistentes. |
+| Drivers RF | RF-11 |
+| Drivers EaC | EaC-03, EaC-07 |
+| Drivers Restricción | R-05 |
+
+---
+
+### CUS-03 – Ejecutar evaluación adaptativa
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Permitir que el candidato realice una evaluación cuya dificultad se ajuste dinámicamente según su desempeño. |
+| Actor principal | Candidato / Profesional |
+| Precondiciones | Usuario autenticado; período de certificación activo; banco de preguntas disponible. |
+| Flujo principal | 1. Inicia evaluación.<br>2. Sistema presenta pregunta.<br>3. Usuario responde.<br>4. Motor calcula habilidad.<br>5. Ajusta dificultad.<br>6. Continúa hasta finalizar.<br>7. Calcula resultado final. |
+| Flujos alternos | Interrupción de conexión; tiempo agotado; suspensión de sesión. |
+| Drivers RF | RF-02, RF-12 |
+| Drivers EaC | EaC-01, EaC-05 |
+| Drivers Restricción | R-09 |
+
+---
+
+### CUS-03.1 – Gestionar banco de preguntas
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Administrar preguntas, categorías y parámetros utilizados por el motor adaptativo. |
+| Actor principal | Administrador SICA |
+| Precondiciones | Banco de preguntas existente; permisos administrativos. |
+| Flujo principal | Crear, modificar, clasificar y validar preguntas para evaluación adaptativa. |
+| Flujos alternos | Pregunta duplicada; parámetros IRT inválidos. |
+| Drivers RF | RF-02 |
+| Drivers EaC | EaC-05, EaC-08 |
+| Drivers Restricción | R-03 |
+
+---
+
+### CUS-04 – Capturar evidencia antifraude
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Registrar evidencia de comportamiento del candidato durante la evaluación. |
+| Actor principal | Candidato / Profesional |
+| Actores secundarios | Auditor |
+| Precondiciones | Evaluación activa. |
+| Flujo principal | Captura pantallas, logs de tecleo y ráfagas de video; almacena evidencia cifrada. |
+| Flujos alternos | Cámara no disponible; fallo de almacenamiento; permisos denegados. |
+| Drivers RF | RF-03 |
+| Drivers EaC | EaC-03, EaC-07 |
+| Drivers Restricción | R-05, R-06 |
+
+---
+
+### CUS-05 – Emitir certificado digital
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Generar certificados digitales verificables para candidatos aprobados. |
+| Actor principal | Candidato / Profesional |
+| Actores secundarios | Autoridad Certificadora PKI / Blockchain |
+| Precondiciones | Evaluación aprobada. |
+| Flujo principal | Construye payload; firma certificado; registra hash; genera QR; entrega certificado. |
+| Flujos alternos | Error de firma; indisponibilidad PKI; error blockchain. |
+| Drivers RF | RF-04 |
+| Drivers EaC | EaC-03, EaC-07 |
+| Drivers Restricción | R-07 |
+
+---
+
+### CUS-06 – Registrar auditoría inmutable
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Mantener trazabilidad completa de los eventos críticos del sistema. |
+| Actor principal | Auditor |
+| Precondiciones | Existencia de evento auditable. |
+| Flujo principal | Sistema registra evento; genera hash; almacena registro inmutable. |
+| Flujos alternos | Error de almacenamiento; inconsistencia de hash. |
+| Drivers RF | RF-05 |
+| Drivers EaC | EaC-03, EaC-07 |
+| Drivers Restricción | R-06 |
+
+---
+
+### CUS-07 – Importar datos académicos
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Incorporar datos académicos provenientes de universidades externas. |
+| Actor principal | Sistema Universitario Externo |
+| Precondiciones | Fuente de datos disponible. |
+| Flujo principal | Recibe JSON/XML/CSV; valida formato; transforma; almacena información. |
+| Flujos alternos | Formato inválido; datos incompletos; conexión fallida. |
+| Drivers RF | RF-06, RF-07 |
+| Drivers EaC | EaC-04 |
+| Drivers Restricción | R-08 |
+
+---
+
+### CUS-07.1 – Sincronizar sistemas universitarios
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Mantener sincronizados los sistemas universitarios con PRCCD. |
+| Actor principal | Sistema Universitario Externo |
+| Precondiciones | Integración configurada. |
+| Flujo principal | Consulta cambios; transforma datos; actualiza repositorio interno. |
+| Flujos alternos | Endpoint no disponible; error de transformación. |
+| Drivers RF | RF-07 |
+| Drivers EaC | EaC-04, EaC-08 |
+| Drivers Restricción | R-08 |
+
+---
+
+### CUS-08 – Exportar datos académicos
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Entregar información académica a instituciones externas. |
+| Actor principal | Universidad |
+| Precondiciones | Datos disponibles. |
+| Flujo principal | Selecciona información; genera formato requerido; exporta resultados. |
+| Flujos alternos | Error de formato; exportación incompleta. |
+| Drivers RF | RF-06 |
+| Drivers EaC | EaC-04 |
+| Drivers Restricción | R-08 |
+
+---
+
+### CUS-09 – Generar dashboards analíticos
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Mostrar indicadores regionales de competencias digitales. |
+| Actor principal | Ministerio de Educación / Trabajo |
+| Precondiciones | Existencia de datos consolidados. |
+| Flujo principal | Consulta métricas; genera visualizaciones; presenta indicadores segmentados. |
+| Flujos alternos | Falta de datos; consulta demasiado grande. |
+| Drivers RF | RF-08 |
+| Drivers EaC | EaC-06 |
+| Drivers Restricción | R-05 |
+
+---
+
+### CUS-10 – Anonimizar y agregar datos
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Proteger la privacidad antes de exponer información analítica. |
+| Actor principal | Ente Regulatorio |
+| Precondiciones | Datos consolidados disponibles. |
+| Flujo principal | Aplica reglas de anonimización; agrega métricas; publica resultados. |
+| Flujos alternos | Registros insuficientes; reglas regulatorias actualizadas. |
+| Drivers RF | RF-09 |
+| Drivers EaC | EaC-06 |
+| Drivers Restricción | R-05 |
+
+---
+
+### CUS-11 – Verificar certificado
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Validar la autenticidad de un certificado emitido. |
+| Actor principal | Verificador Externo |
+| Actores secundarios | Ministerio de Educación / Trabajo, Auditor |
+| Precondiciones | Certificado emitido. |
+| Flujo principal | Ingresa código, QR o hash; sistema valida firma y registro; presenta resultado. |
+| Flujos alternos | Certificado inexistente; certificado revocado. |
+| Drivers RF | RF-10 |
+| Drivers EaC | EaC-07 |
+| Drivers Restricción | R-07 |
+
+---
+
+### CUS-12 – Administrar períodos de certificación
+
+| Elemento | Detalle |
+|-----------|----------|
+| Objetivo | Controlar los períodos habilitados para certificación. |
+| Actor principal | Administrador SICA |
+| Precondiciones | Calendario institucional configurado. |
+| Flujo principal | Define fechas; habilita período; publica disponibilidad; monitorea vigencia. |
+| Flujos alternos | Configuración inválida; modificación fuera de tiempo. |
+| Drivers RF | RF-12 |
+| Drivers EaC | EaC-01, EaC-02 |
+| Drivers Restricción | R-09 |
+
+---
+
+### Resumen de trazabilidad CDU vs Drivers
+
+| CDU | RF asociados |
+|------|-------------|
+| CUS-01 | RF-01, RF-07, RF-11 |
+| CUS-02 | RF-11 |
+| CUS-03 | RF-02, RF-12 |
+| CUS-03.1 | RF-02 |
+| CUS-04 | RF-03 |
+| CUS-05 | RF-04 |
+| CUS-06 | RF-05 |
+| CUS-07 | RF-06, RF-07 |
+| CUS-07.1 | RF-07 |
+| CUS-08 | RF-06 |
+| CUS-09 | RF-08 |
+| CUS-10 | RF-09 |
+| CUS-11 | RF-10 |
+| CUS-12 | RF-12 |
+---
+
+## 3.2.1 Asociación de Drivers Arquitectónicos por Caso de Uso
+
+La siguiente matriz resume la relación existente entre los Casos de Uso del Sistema (CDU) y los drivers arquitectónicos identificados para la Plataforma Regional de Certificación de Competencias Digitales (PRCCD). Esta asociación permite verificar que cada funcionalidad del sistema se encuentra respaldada por requerimientos funcionales, atributos de calidad y restricciones definidas durante el análisis arquitectónico.
+
+| CDU      | Nombre del Caso de Uso                | RF Asociados        | EaC Asociados          | Restricciones Asociadas |
+| -------- | ------------------------------------- | ------------------- | ---------------------- | ----------------------- |
+| CUS-01   | Autenticar usuario                    | RF-01, RF-07, RF-11 | EaC-02, EaC-04, EaC-08 | R-02, R-03, R-08        |
+| CUS-02   | Gestionar usuarios, roles y permisos  | RF-11               | EaC-03, EaC-07         | R-05                    |
+| CUS-03   | Ejecutar evaluación adaptativa        | RF-02, RF-12        | EaC-01, EaC-05         | R-09                    |
+| CUS-03.1 | Gestionar banco de preguntas          | RF-02               | EaC-05, EaC-08         | R-03                    |
+| CUS-04   | Capturar evidencia antifraude         | RF-03               | EaC-03, EaC-07         | R-05, R-06              |
+| CUS-05   | Emitir certificado digital            | RF-04               | EaC-03, EaC-07         | R-07                    |
+| CUS-06   | Registrar auditoría inmutable         | RF-05               | EaC-03, EaC-07         | R-06                    |
+| CUS-07   | Importar datos académicos             | RF-06, RF-07        | EaC-04                 | R-08                    |
+| CUS-07.1 | Sincronizar sistemas universitarios   | RF-07               | EaC-04, EaC-08         | R-08                    |
+| CUS-08   | Exportar datos académicos             | RF-06               | EaC-04                 | R-08                    |
+| CUS-09   | Generar dashboards analíticos         | RF-08               | EaC-06                 | R-05                    |
+| CUS-10   | Anonimizar y agregar datos            | RF-09               | EaC-06                 | R-05                    |
+| CUS-11   | Verificar certificado                 | RF-10               | EaC-07                 | R-07                    |
+| CUS-12   | Administrar períodos de certificación | RF-12               | EaC-01, EaC-02         | R-09                    |
+
+### Cobertura de Drivers Arquitectónicos
+
+#### Requerimientos Funcionales
+
+| RF    | CDU Relacionados         |
+| ----- | ------------------------ |
+| RF-01 | CUS-01                   |
+| RF-02 | CUS-03, CUS-03.1         |
+| RF-03 | CUS-04                   |
+| RF-04 | CUS-05                   |
+| RF-05 | CUS-06                   |
+| RF-06 | CUS-07, CUS-08           |
+| RF-07 | CUS-01, CUS-07, CUS-07.1 |
+| RF-08 | CUS-09                   |
+| RF-09 | CUS-10                   |
+| RF-10 | CUS-11                   |
+| RF-11 | CUS-01, CUS-02           |
+| RF-12 | CUS-03, CUS-12           |
+
+#### Escenarios de Atributos de Calidad
+
+| EaC    | CDU Relacionados                       |
+| ------ | -------------------------------------- |
+| EaC-01 | CUS-03, CUS-12                         |
+| EaC-02 | CUS-01, CUS-12                         |
+| EaC-03 | CUS-02, CUS-04, CUS-05, CUS-06         |
+| EaC-04 | CUS-01, CUS-07, CUS-07.1, CUS-08       |
+| EaC-05 | CUS-03, CUS-03.1                       |
+| EaC-06 | CUS-09, CUS-10                         |
+| EaC-07 | CUS-02, CUS-04, CUS-05, CUS-06, CUS-11 |
+| EaC-08 | CUS-01, CUS-03.1, CUS-07.1             |
+
+#### Restricciones
+
+| Restricción | CDU Relacionados                 |
+| ----------- | -------------------------------- |
+| R-02        | CUS-01                           |
+| R-03        | CUS-01, CUS-03.1                 |
+| R-05        | CUS-02, CUS-04, CUS-09, CUS-10   |
+| R-06        | CUS-04, CUS-06                   |
+| R-07        | CUS-05, CUS-11                   |
+| R-08        | CUS-01, CUS-07, CUS-07.1, CUS-08 |
+| R-09        | CUS-03, CUS-12                   |
+
+La matriz anterior demuestra que todos los Casos de Uso del Sistema poseen respaldo directo en los drivers arquitectónicos identificados durante el análisis, garantizando trazabilidad entre las necesidades del negocio, los atributos de calidad esperados y las restricciones técnicas, normativas y operativas definidas para la Plataforma Regional de Certificación de Competencias Digitales (PRCCD).
+
 
 # 4. Matrices de trazabilidad
 
@@ -339,13 +691,160 @@ También se observa que los requisitos de analítica y anonimización están lig
 
 ## 4.2 Stakeholders vs CDU
 
-> *Pendiente*
+La presente matriz de trazabilidad relaciona los stakeholders identificados para la Plataforma Regional de Certificación de Competencias Digitales (PRCCD) con los Casos de Uso del Sistema (CDU). Su propósito es demostrar que cada funcionalidad implementada responde a necesidades específicas de los actores involucrados y que todos los stakeholders relevantes tienen representación dentro de la solución arquitectónica.
+
+Esta matriz complementa la trazabilidad Stakeholders vs Requerimientos al mostrar cómo dichas necesidades se materializan en funcionalidades concretas del sistema.
+
+### Leyenda
+
+| Símbolo   | Significado                                                               |
+| --------- | ------------------------------------------------------------------------- |
+| E         | El stakeholder exige directamente el caso de uso.                         |
+| I         | El stakeholder se ve impactado por el caso de uso.                        |
+| V         | El stakeholder valida, supervisa o consulta el resultado del caso de uso. |
+| *(vacío)* | No existe relación significativa.                                         |
+
+### Matriz Stakeholders vs Casos de Uso del Sistema
+
+| Stakeholder                           | CUS-01 | CUS-02 | CUS-03 | CUS-03.1 | CUS-04 | CUS-05 | CUS-06 | CUS-07 | CUS-07.1 | CUS-08 | CUS-09 | CUS-10 | CUS-11 | CUS-12 |
+| ------------------------------------- | ------ | ------ | ------ | -------- | ------ | ------ | ------ | ------ | -------- | ------ | ------ | ------ | ------ | ------ |
+| ST-01 Secretaría General del SICA     | I      | I      | E      | I        | I      | E      | E      | I      | E        | I      | E      | I      | I      | E      |
+| ST-02 Alta Dirección del SICA         | I      | I      | E      | I        | I      | E      | E      | I      | E        | I      | E      | I      | I      | E      |
+| ST-03 Dirección Financiera            |        | I      |        |          |        | I      | E      |        |          |        | I      | I      | I      | I      |
+| ST-04 Administradores TI / Operativos | E      | E      | I      | E        | I      | I      | I      | I      | E        | I      |        |        | I      | E      |
+| ST-05 Universidades USAC / UCR / UES  | E      |        | I      |          |        |        |        | E      | E        | E      |        |        |        |        |
+| ST-06 Ministerios de Educación        |        |        |        |          |        | I      | I      |        |          |        | E      | E      | V      |        |
+| ST-07 Ministerios de Trabajo          |        |        |        |          |        | I      | I      |        |          |        | E      | E      | V      |        |
+| ST-08 Candidatos / Profesionales      | E      |        | E      |          | I      | E      |        |        |          |        |        |        | V      | I      |
+| ST-09 Entes Regulatorios              |        |        |        |          | I      | I      | E      |        |          |        | I      | E      | V      |        |
+| ST-10 Auditores                       |        |        |        |          | E      | I      | E      |        |          |        |        | I      | V      |        |
+| ST-11 Verificadores Externos          |        |        |        |          |        |        |        |        |          |        |        |        | E      |        |
+
+### Resumen de Participación por Stakeholder
+
+| Stakeholder                 | Casos de uso principales                                                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Secretaría General del SICA | Ejecutar evaluación adaptativa, emitir certificados, auditoría inmutable, dashboards, sincronización universitaria y administración de períodos. |
+| Alta Dirección del SICA     | Certificación regional, evaluación adaptativa, integración universitaria, analítica y control operativo.                                         |
+| Dirección Financiera        | Auditoría, certificación, verificación y control institucional.                                                                                  |
+| Administradores TI          | Autenticación, gestión de usuarios, integración universitaria, sincronización y administración de períodos.                                      |
+| Universidades               | Autenticación federada, importación/exportación de datos y sincronización institucional.                                                         |
+| Ministerios de Educación    | Dashboards, anonimización, auditoría y verificación de certificados.                                                                             |
+| Ministerios de Trabajo      | Dashboards, anonimización, auditoría y verificación de certificados.                                                                             |
+| Candidatos / Profesionales  | Autenticación, evaluación adaptativa, captura de evidencia y emisión de certificados.                                                            |
+| Entes Regulatorios          | Auditoría, privacidad, anonimización y cumplimiento normativo.                                                                                   |
+| Auditores                   | Evidencia antifraude, auditoría inmutable y validación de certificados.                                                                          |
+| Verificadores Externos      | Verificación pública de certificados mediante código, QR o hash.                                                                                 |
+
+### Análisis de Cobertura
+
+La matriz evidencia que todos los stakeholders identificados durante el análisis del negocio poseen participación directa o indirecta en al menos un Caso de Uso del Sistema. Los candidatos y profesionales interactúan principalmente con las funcionalidades de autenticación, evaluación y certificación, mientras que las universidades se relacionan con los procesos de interoperabilidad e integración de datos. Por otra parte, los ministerios, auditores y entes reguladores participan principalmente en los procesos de auditoría, verificación, anonimización y explotación analítica de la información.
+
+Asimismo, se observa que los casos de uso más estratégicos para el negocio son CUS-03 Ejecutar evaluación adaptativa, CUS-05 Emitir certificado digital, CUS-06 Registrar auditoría inmutable y CUS-07.1 Sincronizar sistemas universitarios, debido a que concentran la mayor cantidad de stakeholders interesados y representan el núcleo funcional de la Plataforma Regional de Certificación de Competencias Digitales (PRCCD).
+
+### Cobertura CDU vs Stakeholders
+
+| CDU                                          | Stakeholders Relacionados                                     |
+| -------------------------------------------- | ------------------------------------------------------------- |
+| CUS-01 Autenticar usuario                    | ST-01, ST-02, ST-04, ST-05, ST-08                             |
+| CUS-02 Gestionar usuarios y roles            | ST-01, ST-02, ST-03, ST-04                                    |
+| CUS-03 Ejecutar evaluación adaptativa        | ST-01, ST-02, ST-05, ST-08                                    |
+| CUS-03.1 Gestionar banco de preguntas        | ST-01, ST-02, ST-04                                           |
+| CUS-04 Capturar evidencia antifraude         | ST-01, ST-02, ST-08, ST-09, ST-10                             |
+| CUS-05 Emitir certificado digital            | ST-01, ST-02, ST-03, ST-06, ST-07, ST-08, ST-09, ST-10        |
+| CUS-06 Registrar auditoría inmutable         | ST-01, ST-02, ST-03, ST-06, ST-07, ST-09, ST-10               |
+| CUS-07 Importar datos académicos             | ST-01, ST-02, ST-04, ST-05                                    |
+| CUS-07.1 Sincronizar sistemas universitarios | ST-01, ST-02, ST-04, ST-05                                    |
+| CUS-08 Exportar datos académicos             | ST-01, ST-02, ST-04, ST-05                                    |
+| CUS-09 Generar dashboards analíticos         | ST-01, ST-02, ST-03, ST-06, ST-07, ST-09                      |
+| CUS-10 Anonimizar y agregar datos            | ST-03, ST-06, ST-07, ST-09, ST-10                             |
+| CUS-11 Verificar certificado                 | ST-01, ST-02, ST-03, ST-04, ST-06, ST-07, ST-09, ST-10, ST-11 |
+| CUS-12 Administrar períodos de certificación | ST-01, ST-02, ST-03, ST-04, ST-08                             |
+
 
 ---
 
 ## 4.3 Requerimientos vs CDU
 
-> *Pendiente*
+La matriz de trazabilidad Requerimientos vs Casos de Uso del Sistema (CDU) permite verificar que todos los requerimientos funcionales identificados durante el análisis del negocio se encuentran implementados mediante uno o más casos de uso del sistema. Su objetivo principal es garantizar la cobertura funcional completa de la solución y demostrar que no existen requisitos sin representación dentro del modelo funcional de la Plataforma Regional de Certificación de Competencias Digitales (PRCCD).
+
+Esta matriz constituye un mecanismo de validación arquitectónica que facilita la identificación de requisitos no implementados, casos de uso redundantes o funcionalidades sin justificación de negocio.
+
+### Leyenda
+
+| Símbolo   | Significado                                                                |
+| --------- | -------------------------------------------------------------------------- |
+| X         | El caso de uso implementa total o parcialmente el requerimiento funcional. |
+| *(vacío)* | No existe relación directa.                                                |
+
+---
+
+### Matriz Requerimientos Funcionales vs Casos de Uso
+
+| RF / CDU                                            | CUS-01 | CUS-02 | CUS-03 | CUS-03.1 | CUS-04 | CUS-05 | CUS-06 | CUS-07 | CUS-07.1 | CUS-08 | CUS-09 | CUS-10 | CUS-11 | CUS-12 |
+| --------------------------------------------------- | ------ | ------ | ------ | -------- | ------ | ------ | ------ | ------ | -------- | ------ | ------ | ------ | ------ | ------ |
+| RF-01 Autenticación federada LDAP/SAML/OAuth2       | X      |        |        |          |        |        |        |        |          |        |        |        |        |        |
+| RF-02 Evaluación adaptativa                         |        |        | X      | X        |        |        |        |        |          |        |        |        |        |        |
+| RF-03 Evidencia antifraude                          |        |        |        |          | X      |        |        |        |          |        |        |        |        |        |
+| RF-04 Certificados verificables criptográficamente  |        |        |        |          |        | X      |        |        |          |        |        |        |        |        |
+| RF-05 Auditoría inmutable                           |        |        |        |          |        |        | X      |        |          |        |        |        |        |        |
+| RF-06 Importación y exportación de datos académicos |        |        |        |          |        |        |        | X      |          | X      |        |        |        |        |
+| RF-07 Integración con USAC, UCR y UES               | X      |        |        |          |        |        |        | X      | X        |        |        |        |        |        |
+| RF-08 Dashboards analíticos                         |        |        |        |          |        |        |        |        |          |        | X      |        |        |        |
+| RF-09 Anonimización y agregación de datos           |        |        |        |          |        |        |        |        |          |        |        | X      |        |        |
+| RF-10 Verificación externa de certificados          |        |        |        |          |        |        |        |        |          |        |        |        | X      |        |
+| RF-11 Gestión de usuarios, roles y permisos         | X      | X      |        |          |        |        |        |        |          |        |        |        |        |        |
+| RF-12 Administración de períodos de certificación   |        |        | X      |          |        |        |        |        |          |        |        |        |        | X      |
+
+---
+
+### Resumen de Cobertura de Requerimientos
+
+| Requerimiento | Casos de Uso Asociados   |
+| ------------- | ------------------------ |
+| RF-01         | CUS-01                   |
+| RF-02         | CUS-03, CUS-03.1         |
+| RF-03         | CUS-04                   |
+| RF-04         | CUS-05                   |
+| RF-05         | CUS-06                   |
+| RF-06         | CUS-07, CUS-08           |
+| RF-07         | CUS-01, CUS-07, CUS-07.1 |
+| RF-08         | CUS-09                   |
+| RF-09         | CUS-10                   |
+| RF-10         | CUS-11                   |
+| RF-11         | CUS-01, CUS-02           |
+| RF-12         | CUS-03, CUS-12           |
+
+---
+
+### Resumen de Cobertura de Casos de Uso
+
+| Caso de Uso                                  | Requerimientos Cubiertos |
+| -------------------------------------------- | ------------------------ |
+| CUS-01 Autenticar usuario                    | RF-01, RF-07, RF-11      |
+| CUS-02 Gestionar usuarios, roles y permisos  | RF-11                    |
+| CUS-03 Ejecutar evaluación adaptativa        | RF-02, RF-12             |
+| CUS-03.1 Gestionar banco de preguntas        | RF-02                    |
+| CUS-04 Capturar evidencia antifraude         | RF-03                    |
+| CUS-05 Emitir certificado digital            | RF-04                    |
+| CUS-06 Registrar auditoría inmutable         | RF-05                    |
+| CUS-07 Importar datos académicos             | RF-06, RF-07             |
+| CUS-07.1 Sincronizar sistemas universitarios | RF-07                    |
+| CUS-08 Exportar datos académicos             | RF-06                    |
+| CUS-09 Generar dashboards analíticos         | RF-08                    |
+| CUS-10 Anonimizar y agregar datos            | RF-09                    |
+| CUS-11 Verificar certificado                 | RF-10                    |
+| CUS-12 Administrar períodos de certificación | RF-12                    |
+
+---
+
+### Validación de Cobertura
+
+El análisis de trazabilidad evidencia que los doce requerimientos funcionales definidos para la Plataforma Regional de Certificación de Competencias Digitales (PRCCD) se encuentran completamente representados por uno o más Casos de Uso del Sistema. No se identificaron requerimientos sin implementación funcional ni casos de uso sin justificación de negocio.
+
+Asimismo, se observa que ciertos requerimientos estratégicos poseen cobertura múltiple debido a su impacto transversal dentro de la arquitectura. Destacan RF-07 Integración con universidades, implementado mediante los casos de uso de autenticación federada, importación de datos y sincronización institucional; RF-11 Gestión de usuarios, cubierto por autenticación y administración de roles; y RF-12 Gestión de períodos de certificación, que afecta tanto la ejecución de evaluaciones como la administración operativa del sistema.
+
+La matriz confirma que la solución propuesta mantiene alineación completa entre las necesidades del negocio, los requerimientos funcionales definidos y las funcionalidades representadas en el modelo de casos de uso del sistema, garantizando consistencia arquitectónica y trazabilidad de extremo a extremo.
 
 ---
 
