@@ -1211,39 +1211,39 @@ Cada universidad maneja tecnologias, protocolos y formatos distintos. Adapter pe
 ### Patrón 3 — Decorator *(Estructural)*
 
 **Descripción**  
-...
+Es un patron de diseño estructural que permite añadir funcionalidades a objetos colocando estos objetos dentro de objetos encapsuladores especiales que contienen estas funcionalidades.
 
 **Aplicación en el proyecto**  
-...
+Se usa en el modulo de analitica para aplicar capas de anonimizacion y transformacion a los datos antes de mostrar en dashboards ministeriales.
 
 **Justificación**  
-...
+Permite agregar reglas de privacidad de formam modular y combinable, evitando clases monoliticas y facilitando extensiones.
 
 **Diagrama**
 
 ### Patrón 4 — Facade *(Estructural)*
 
 **Descripción**  
-...
+Es un patron de diseño estructural que proporciona una interfaz simplificada a una biblioteca, un framework o cualquier otro grupo complejo de clases.
 
 **Aplicación en el proyecto**  
-...
+se utiliza en el proceso de emision de certificados, coordinando servicios como PKI, blockchain, auditoria y notificaciones.
 
 **Justificación**  
-...
+Simplifica el acceso a un flujo complejo, reduciendo el acoplamiento entre el controlador y multiples servicios internos.
 
 **Diagrama**
 
 ### Patrón 5 — Chain of Responsability *(Comportamiento)*
 
 **Descripción**  
-...
+Es un patron de diseño de comportamiento que permite pasar solicitudes a lo largo de una cadena de manejadores. Al recibir una solicitud, cada manejador decide si la procesa o si la pasa al siguiente manejador de la cadena.
 
 **Aplicación en el proyecto**  
-...
+Se implementa en el flujo de validacion previo al acceso de examenes, verificando JWT, periodo activo y restricciones antifraude antes de permitir el ingreso del usuario.
 
 **Justificación**  
-...
+Cada validacion se mantiene independiente y desacoplada, facilitando agregar o modificar reglas sin afectar el resto del flujo principal de validacion.
 
 **Diagrama**
 
