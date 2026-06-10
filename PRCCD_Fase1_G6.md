@@ -238,7 +238,57 @@ Vacaciones de junio 2026
 
 ## 3.1 Diagrama de casos de uso expandidos
 
-> *Seccion a cargo de: Jencer Hamilton*
+
+El diagrama de casos de uso expandidos del sistema representa las interacciones principales entre los actores externos y la Plataforma Regional de Certificación de Competencias Digitales (PRCCD). A diferencia del caso de uso de negocio de alto nivel, este diagrama se enfoca en la funcionalidad observable del sistema desde la perspectiva de sus actores, manteniéndose independiente de detalles de implementación.
+
+![Diagrama de casos de uso expandidos del sistema](imagenes/CDU_Expandido.png)
+
+## Actores del sistema
+
+| Actor | Descripción |
+|---|---|
+| Candidato / Profesional | Usuario final que se autentica, realiza evaluaciones adaptativas, recibe certificados digitales y puede consultar su validez. |
+| Universidad USAC / UCR / UES | Institución educativa que se integra al sistema para autenticación federada e intercambio de datos académicos. |
+| Sistema Universitario Externo | Sistema legacy universitario que provee datos mediante LDAP, SAML, OAuth2, JSON, XML o CSV. |
+| Administrador SICA | Responsable de configurar períodos de certificación, gestionar usuarios, roles, permisos y banco de preguntas. |
+| Ministerio de Educación / Trabajo | Actor institucional que consulta dashboards, verifica certificados y revisa información regional de competencias. |
+| Auditor | Actor que consulta evidencia antifraude, rastros de auditoría y registros inmutables de certificación. |
+| Verificador Externo | Empresa, institución o tercero que valida un certificado mediante código, QR o hash. |
+| Autoridad Certificadora PKI / Blockchain | Servicio externo o infraestructura de confianza que respalda la emisión, firma y verificación criptográfica de certificados. |
+| Ente Regulatorio | Autoridad normativa que valida cumplimiento de protección de datos, auditoría, privacidad y retención de evidencia. |
+
+## Casos de uso del sistema
+
+| ID | Caso de uso | Descripción |
+|---|---|---|
+| CUS-01 | Autenticar usuario | Permite el acceso mediante autenticación federada usando LDAP, SAML u OAuth2 según la universidad. |
+| CUS-02 | Gestionar usuarios, roles y permisos | Permite administrar perfiles, permisos y accesos por institución. |
+| CUS-03 | Ejecutar evaluación adaptativa | Permite que el candidato realice una evaluación cuya dificultad se ajusta en tiempo real. |
+| CUS-03.1 | Gestionar banco de preguntas | Permite administrar preguntas y parámetros usados por el motor adaptativo. |
+| CUS-04 | Capturar evidencia antifraude | Captura evidencia durante la evaluación, incluyendo capturas de pantalla, logs de tecleo y ráfagas de video. |
+| CUS-05 | Emitir certificado digital | Genera certificados digitales verificables criptográficamente mediante PKI o Blockchain. |
+| CUS-06 | Registrar auditoría inmutable | Registra eventos relevantes del sistema en una bitácora inmutable. |
+| CUS-07 | Importar datos académicos | Permite ingresar datos académicos desde sistemas externos en JSON, XML o CSV. |
+| CUS-07.1 | Sincronizar sistemas universitarios | Coordina la integración con sistemas universitarios externos sin modificar sus procesos internos. |
+| CUS-08 | Exportar datos académicos | Permite entregar información académica en formatos compatibles con las instituciones. |
+| CUS-09 | Generar dashboards analíticos | Presenta métricas regionales segmentadas por país, carrera universitaria y género. |
+| CUS-10 | Anonimizar y agregar datos | Procesa datos antes de exponerlos en dashboards para cumplir privacidad y protección de datos. |
+| CUS-11 | Verificar certificado | Permite validar certificados mediante código, QR o hash. |
+| CUS-12 | Administrar períodos de certificación | Permite habilitar períodos de certificación exclusivamente durante la primera semana de cada mes. |
+
+## Relaciones principales
+
+| Relación | Justificación |
+|---|---|
+| CUS-03 incluye CUS-01 | Para realizar una evaluación, el candidato debe estar autenticado. |
+| CUS-03 incluye CUS-04 | Durante la evaluación debe capturarse evidencia antifraude. |
+| CUS-03 incluye CUS-03.1 | La evaluación adaptativa depende del banco de preguntas. |
+| CUS-05 incluye CUS-06 | Todo certificado emitido debe generar auditoría inmutable. |
+| CUS-05 incluye CUS-11 | Todo certificado emitido debe poder verificarse posteriormente. |
+| CUS-07 y CUS-08 incluyen CUS-07.1 | La importación y exportación dependen de la sincronización con sistemas universitarios. |
+| CUS-09 incluye CUS-10 | Los dashboards solo deben exponer información agregada y anonimizada. |
+| CUS-12 extiende CUS-03 | La ejecución de evaluaciones depende de que el período de certificación esté habilitado. |
+| CUS-05 extiende CUS-03 | El certificado se emite únicamente cuando el candidato aprueba la evaluación. |
 
 ---
 
