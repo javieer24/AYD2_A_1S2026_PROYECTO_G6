@@ -44,9 +44,9 @@ Vacaciones de junio 2026
 5. Seleccion arquitectonica
 6. Vistas Arquitectonicas - Nivel de Sistema
 7. Vistas Arquitectonicas - Nivel de Infraestructura
-8. Diseno de Datos
-9. Diseno de Interfaces UI/UX
-10. Patrones de Diseno
+8. Diseño de Datos
+9. Diseño de Interfaces UI/UX
+10. Patrones de Diseño
 11. Gestion del Proyecto
 
 ---
@@ -402,7 +402,7 @@ La orientacion a eventos aborda la auditoria inmutable y la captura de evidencia
 # 6. Vistas Arquitectonicas - Nivel de Sistema
 
 ## 6.1 Diagrama de bloques
-![Diagrama de bloques](imagenes/diagramadebloques.png)
+![Diagrama de bloques](imagenes/DiagramadeBloques.png)
 
 ## 6.2 Descripcion del diagrama de bloques
 
@@ -680,15 +680,80 @@ El campo hashBlockchain en la tabla Certificado almacena la referencia a la tran
 
 ---
 
-# 9. Diseno de Interfaces UI/UX
+# 9. Diseño de Interfaces UI/UX
 
 > *Seccion a cargo de: equipo*
 
 ---
 
-# 10. Patrones de Diseno
+# 10. Patrones de Diseño
 
-> *Seccion a cargo de: Juan Herrera*
+### Patrón 1 — Strategy *(Comportamiento)*
+
+**Descripción**  
+ 
+...
+
+**Aplicación en el proyecto**  
+...
+
+**Justificación**  
+...
+
+**Diagrama**
+
+
+### Patrón 2 — Adapter *(Comportamiento)*
+
+**Descripción**  
+...
+
+**Aplicación en el proyecto**  
+...
+
+**Justificación**  
+...
+
+**Diagrama**
+
+### Patrón 3 — Decorator *(Comportamiento)*
+
+**Descripción**  
+...
+
+**Aplicación en el proyecto**  
+...
+
+**Justificación**  
+...
+
+**Diagrama**
+
+### Patrón 4 — Facade *(Comportamiento)*
+
+**Descripción**  
+...
+
+**Aplicación en el proyecto**  
+...
+
+**Justificación**  
+...
+
+**Diagrama**
+
+### Patrón 5 — Chain of Responsability *(Comportamiento)*
+
+**Descripción**  
+...
+
+**Aplicación en el proyecto**  
+...
+
+**Justificación**  
+...
+
+**Diagrama**
 
 ---
 
