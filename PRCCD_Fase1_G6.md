@@ -766,7 +766,85 @@ Asimismo, se observa que los casos de uso más estratégicos para el negocio son
 
 ## 4.3 Requerimientos vs CDU
 
-> *Pendiente*
+La matriz de trazabilidad Requerimientos vs Casos de Uso del Sistema (CDU) permite verificar que todos los requerimientos funcionales identificados durante el análisis del negocio se encuentran implementados mediante uno o más casos de uso del sistema. Su objetivo principal es garantizar la cobertura funcional completa de la solución y demostrar que no existen requisitos sin representación dentro del modelo funcional de la Plataforma Regional de Certificación de Competencias Digitales (PRCCD).
+
+Esta matriz constituye un mecanismo de validación arquitectónica que facilita la identificación de requisitos no implementados, casos de uso redundantes o funcionalidades sin justificación de negocio.
+
+### Leyenda
+
+| Símbolo   | Significado                                                                |
+| --------- | -------------------------------------------------------------------------- |
+| X         | El caso de uso implementa total o parcialmente el requerimiento funcional. |
+| *(vacío)* | No existe relación directa.                                                |
+
+---
+
+### Matriz Requerimientos Funcionales vs Casos de Uso
+
+| RF / CDU                                            | CUS-01 | CUS-02 | CUS-03 | CUS-03.1 | CUS-04 | CUS-05 | CUS-06 | CUS-07 | CUS-07.1 | CUS-08 | CUS-09 | CUS-10 | CUS-11 | CUS-12 |
+| --------------------------------------------------- | ------ | ------ | ------ | -------- | ------ | ------ | ------ | ------ | -------- | ------ | ------ | ------ | ------ | ------ |
+| RF-01 Autenticación federada LDAP/SAML/OAuth2       | X      |        |        |          |        |        |        |        |          |        |        |        |        |        |
+| RF-02 Evaluación adaptativa                         |        |        | X      | X        |        |        |        |        |          |        |        |        |        |        |
+| RF-03 Evidencia antifraude                          |        |        |        |          | X      |        |        |        |          |        |        |        |        |        |
+| RF-04 Certificados verificables criptográficamente  |        |        |        |          |        | X      |        |        |          |        |        |        |        |        |
+| RF-05 Auditoría inmutable                           |        |        |        |          |        |        | X      |        |          |        |        |        |        |        |
+| RF-06 Importación y exportación de datos académicos |        |        |        |          |        |        |        | X      |          | X      |        |        |        |        |
+| RF-07 Integración con USAC, UCR y UES               | X      |        |        |          |        |        |        | X      | X        |        |        |        |        |        |
+| RF-08 Dashboards analíticos                         |        |        |        |          |        |        |        |        |          |        | X      |        |        |        |
+| RF-09 Anonimización y agregación de datos           |        |        |        |          |        |        |        |        |          |        |        | X      |        |        |
+| RF-10 Verificación externa de certificados          |        |        |        |          |        |        |        |        |          |        |        |        | X      |        |
+| RF-11 Gestión de usuarios, roles y permisos         | X      | X      |        |          |        |        |        |        |          |        |        |        |        |        |
+| RF-12 Administración de períodos de certificación   |        |        | X      |          |        |        |        |        |          |        |        |        |        | X      |
+
+---
+
+### Resumen de Cobertura de Requerimientos
+
+| Requerimiento | Casos de Uso Asociados   |
+| ------------- | ------------------------ |
+| RF-01         | CUS-01                   |
+| RF-02         | CUS-03, CUS-03.1         |
+| RF-03         | CUS-04                   |
+| RF-04         | CUS-05                   |
+| RF-05         | CUS-06                   |
+| RF-06         | CUS-07, CUS-08           |
+| RF-07         | CUS-01, CUS-07, CUS-07.1 |
+| RF-08         | CUS-09                   |
+| RF-09         | CUS-10                   |
+| RF-10         | CUS-11                   |
+| RF-11         | CUS-01, CUS-02           |
+| RF-12         | CUS-03, CUS-12           |
+
+---
+
+### Resumen de Cobertura de Casos de Uso
+
+| Caso de Uso                                  | Requerimientos Cubiertos |
+| -------------------------------------------- | ------------------------ |
+| CUS-01 Autenticar usuario                    | RF-01, RF-07, RF-11      |
+| CUS-02 Gestionar usuarios, roles y permisos  | RF-11                    |
+| CUS-03 Ejecutar evaluación adaptativa        | RF-02, RF-12             |
+| CUS-03.1 Gestionar banco de preguntas        | RF-02                    |
+| CUS-04 Capturar evidencia antifraude         | RF-03                    |
+| CUS-05 Emitir certificado digital            | RF-04                    |
+| CUS-06 Registrar auditoría inmutable         | RF-05                    |
+| CUS-07 Importar datos académicos             | RF-06, RF-07             |
+| CUS-07.1 Sincronizar sistemas universitarios | RF-07                    |
+| CUS-08 Exportar datos académicos             | RF-06                    |
+| CUS-09 Generar dashboards analíticos         | RF-08                    |
+| CUS-10 Anonimizar y agregar datos            | RF-09                    |
+| CUS-11 Verificar certificado                 | RF-10                    |
+| CUS-12 Administrar períodos de certificación | RF-12                    |
+
+---
+
+### Validación de Cobertura
+
+El análisis de trazabilidad evidencia que los doce requerimientos funcionales definidos para la Plataforma Regional de Certificación de Competencias Digitales (PRCCD) se encuentran completamente representados por uno o más Casos de Uso del Sistema. No se identificaron requerimientos sin implementación funcional ni casos de uso sin justificación de negocio.
+
+Asimismo, se observa que ciertos requerimientos estratégicos poseen cobertura múltiple debido a su impacto transversal dentro de la arquitectura. Destacan RF-07 Integración con universidades, implementado mediante los casos de uso de autenticación federada, importación de datos y sincronización institucional; RF-11 Gestión de usuarios, cubierto por autenticación y administración de roles; y RF-12 Gestión de períodos de certificación, que afecta tanto la ejecución de evaluaciones como la administración operativa del sistema.
+
+La matriz confirma que la solución propuesta mantiene alineación completa entre las necesidades del negocio, los requerimientos funcionales definidos y las funcionalidades representadas en el modelo de casos de uso del sistema, garantizando consistencia arquitectónica y trazabilidad de extremo a extremo.
 
 ---
 
