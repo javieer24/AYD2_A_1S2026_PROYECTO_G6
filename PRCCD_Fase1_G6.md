@@ -1259,7 +1259,7 @@ Se implementa en el flujo de validacion previo al acceso de examenes, verificand
 Cada validacion se mantiene independiente y desacoplada, facilitando agregar o modificar reglas sin afectar el resto del flujo principal de validacion.
 
 **Diagrama**
-
+![chain of responsability](./imagenes/chain.png)
 ---
 
 # 11. Gestion del Proyecto
