@@ -1214,7 +1214,7 @@ Adapter es un patron de diseño estructural que permite la colaboracion entre ob
 En el proyecto se implementa en los microservicios de integracion para transformar formatos externos (CSV, XML, JSON) al modelo canonico interno del PRCCD
 
 **Justificación**  
-Cada universidad maneja tecnologias, protocolos y formatos distintos. Adapter permite integrar esos sistemas al modelo interno del proyecto sin obligarlos a las instituciones a modificar su infraestructura existente. Ademas facilita el mantenimiento, la escalabilidad y la incorporacion de nuevas universidades o tecnologias futuras.
+Cada universidad maneja tecnologias, protocolos y formatos distintos. Adapter permite integrar esos sistemas al modelo interno del proyecto sin o+ pbligarlos a las instituciones a modificar su infraestructura existente. Ademas facilita el mantenimiento, la escalabilidad y la incorporacion de nuevas universidades o tecnologias futuras.
 
 **Diagrama**
 ![diagrama de clases adapter](./imagenes/adapter.png)
@@ -1231,7 +1231,7 @@ Se usa en el modulo de analitica para aplicar capas de anonimizacion y transform
 Permite agregar reglas de privacidad de formam modular y combinable, evitando clases monoliticas y facilitando extensiones.
 
 **Diagrama**
-![diagrama de clases -- decorator](./imagenes/decorator.png)
+![diagrama de clases decorator](./imagenes/decorator.png)
 
 ### Patrón 4 — Facade *(Estructural)*
 
@@ -1245,6 +1245,7 @@ se utiliza en el proceso de emision de certificados, coordinando servicios como 
 Simplifica el acceso a un flujo complejo, reduciendo el acoplamiento entre el controlador y multiples servicios internos.
 
 **Diagrama**
+![diagrama facade](./imagenes/facade.png)
 
 ### Patrón 5 — Chain of Responsability *(Comportamiento)*
 
