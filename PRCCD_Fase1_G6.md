@@ -1184,7 +1184,75 @@ El campo hashBlockchain en la tabla Certificado almacena la referencia a la tran
 
 # 9. Diseño de Interfaces UI/UX
 
-> *Seccion a cargo de: equipo*
+### Definicion de perfiles de usuario y pantallas del sistema
+
+* #### Candidato
+  Usuario que realiza el proceso de inscripcion, autenticacion y evaluacion dentro de la plataforma.
+  ##### Pantallas
+  * Registro de usuario
+  * Inicio de sesión federado
+  * Dashboard del candidato
+  * Selección de evaluación
+  * Verificación de identidad
+  * Ejecución de examen adaptativo
+  * Visualización de resultados
+  * Descarga de certificado
+  * Historial de evaluaciones
+  
+* #### Administrador SICA
+  Usuario encargado de administracion general de certificaciones, instituciones y configuraciones del sistema.
+  ##### Pantallas
+  * Inicio de sesión administrativo
+  * Dashboard administrativo
+  * Gestión de certificaciones
+  * Gestión de usuarios
+  * Gestión de instituciones
+  * Gestión de evaluaciones
+  * Auditoría y monitoreo
+  * Configuración del sistema
+
+* #### Universidad
+  Institucion academica integrada al sistema federado para sincronizacion y validacion de informacion academica.
+  ##### Pantallas
+  * Inicio de sesión institucional
+  * Dashboard universitario
+  * Gestión de estudiantes
+  * Validación de candidatos
+  * Sincronización de datos académicos
+  * Gestión de períodos académicos
+  * Estado de integraciones
+  * Reportes institucionales
+  
+* #### Ministerio/Dashboard General
+  Entidad encargada de supervisar métricas nacionales, indicadores y estadisticas agregadas del sistema.
+  ##### Pantallas
+  * Dashboard gerencial
+  * Métricas por país
+  * Estadísticas por carrera universitaria
+  * Indicadores por género
+  * Reportes agregados y anonimizados
+  * Visualización de tendencias
+  * Exportación de reportes
+  
+* #### Auditor
+  Usuario encargado de supervisar trazabilidad, integridad y cumplimiento de procesos dentro de la plataforma.
+  ##### Pantalla
+  * Inicio de sesión de auditoría
+  * Dashboard de auditoría
+  * Historial de certificaciones
+  * Verificación de integridad
+  * Validación de transacciones blockchain
+  * Reportes de auditoría
+  * Monitoreo de actividad
+
+* #### Verificador Externo  
+  Usuario externo encargado de validar la autenticidad de certificados emitidos por la plataforma.
+  ##### Pantalla
+  * Consulta de certificado
+  * Escaneo de código QR
+  * Verificación mediante hash o código
+  * Estado de autenticidad
+  * Visualización pública del certificado
 
 ---
 
