@@ -66,3 +66,32 @@ Ejemplos:
 ```
 
 ---
+
+# Evidencia del Tablero Kanban
+
+Para la gestión ágil del proyecto se utiliza un tablero Kanban en Trello correspondiente al proyecto AYD2_A_1S2026_PROYECTO_G6.
+
+## Herramienta utilizada
+
+Trello.
+
+## Columnas configuradas
+
+El tablero cuenta con las columnas mínimas requeridas para evidenciar el flujo de trabajo del proyecto:
+
+- To Do
+- Blocked
+- In Progress
+- Ready for Testing
+- Test/QA
+- Done
+
+## Evidencia
+
+La captura inicial del tablero se encuentra en:
+
+`kanban/tablero_kanban_inicial.png`
+
+## Observación
+
+El tablero debe utilizarse para representar historias de usuario y tareas relacionadas con el desarrollo arquitectónico de la Plataforma Regional de Certificación de Competencias Digitales. Se debe evitar que el backlog principal esté compuesto únicamente por tareas documentales.
