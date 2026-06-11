@@ -1231,6 +1231,7 @@ Se usa en el modulo de analitica para aplicar capas de anonimizacion y transform
 Permite agregar reglas de privacidad de formam modular y combinable, evitando clases monoliticas y facilitando extensiones.
 
 **Diagrama**
+![diagrama de clases -- decorator](./imagenes/decorator.png)
 
 ### Patrón 4 — Facade *(Estructural)*
 
