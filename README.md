@@ -88,9 +88,11 @@ El tablero cuenta con las columnas mínimas requeridas para evidenciar el flujo 
 
 ## Evidencia
 
-La captura inicial del tablero se encuentra en:
+La evidencia visual del tablero Kanban se muestra a continuación:
 
-`kanban/tablero_kanban_inicial.png`
+![Tablero Kanban - Vista general](imagenes/trello_kanban_01.jpg)
+
+![Tablero Kanban - Vista complementaria](imagenes/trello_kanban_02.jpg)
 
 ## Observación
 
