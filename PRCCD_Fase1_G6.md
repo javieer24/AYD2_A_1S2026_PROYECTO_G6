@@ -901,6 +901,7 @@ La orientacion a eventos aborda la auditoria inmutable y la captura de evidencia
 # 6. Vistas Arquitectonicas - Nivel de Sistema
 
 ## 6.1 Diagrama de bloques
+
 ![Diagrama de bloques](imagenes/DiagramadeBloques.png)
 
 ## 6.2 Descripcion del diagrama de bloques
@@ -935,11 +936,21 @@ Los Ministerios de Educacion y Trabajo acceden al sistema por dos vias: a traves
 
 ## 7.3 Diagrama de distribucion
 
-> *Diagrama pendiente de generacion en draw.io*
+![Diagrama de distribucion](imagenes/diagramadeDistribucion.png)
 
 ## 7.4 Justificacion de tecnologias y frameworks
 
-> *Pendiente*
+| Tecnologia         | Rol en el sistema                      | Justificacion                                                                                                                                   |
+| -------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Docker             | Contenedorizacion de microservicios    | Permite desplegar cada servicio de forma independiente on-premise y facilita la migracion a nube sin redisenar la arquitectura (R-03, R-04)     |
+| Kubernetes         | Orquestacion de contenedores           | Gestiona el escalado automatico de servicios durante los picos de la primera semana del mes (EaC-01)                                            |
+| Kafka              | Bus de eventos                         | Maneja grandes volumenes de mensajes de forma asincrona, garantiza que los eventos de auditoria no se pierdan ni se modifiquen (EaC-03, EaC-07) |
+| Nginx              | Balanceador de carga                   | Distribuye el trafico entre instancias durante los picos de certificacion. Open Source y ampliamente probado en produccion (R-02)               |
+| PostgreSQL         | Base de datos relacional               | Almacena usuarios, certificados y registros de auditoria. Open Source, robusto y con soporte de transacciones ACID (R-02)                       |
+| MongoDB            | Base de datos documental               | Almacena las preguntas y resultados de examenes por su estructura flexible y variable (R-02)                                                    |
+| Hyperledger Fabric | Blockchain para certificados           | Implementa el registro distribuido e inmutable de certificados emitidos con validez juridica transfronteriza (RF-04, R-07)                      |
+| Keycloak           | Gestion de identidad federada          | Maneja autenticacion con LDAP, SAML y OAuth2 desde un solo punto sin obligar a las universidades a cambiar sus sistemas (RF-01, R-08)           |
+| MinIO              | Almacenamiento de evidencia antifraude | Almacenamiento de objetos Open Source compatible con politicas WORM para retencion inmutable de 5 anos (R-06)                                   |
 
 ---
 
@@ -1256,4 +1267,79 @@ Cada validacion se mantiene independiente y desacoplada, facilitando agregar o m
 > *Tablero Kanban: https://trello.com/b/XWZkVwXY*
 
 > *Repositorio: AYD2\_A\_1S2026\_PROYECTO\_G6*
+> 
 
+---
+
+## 11.1 Control de Versiones y Flujo Git Flow
+
+Para el desarrollo de la fase uno del proyecto se utilizará una estrategia de ramas basada en Git Flow, con el objetivo de mantener un control ordenado de los cambios, separar el trabajo de cada integrante y asegurar que la documentación avance de forma controlada, revisable y coherente.
+
+### Ramas principales
+
+#### main
+
+La rama `main` representa la versión estable y final del proyecto. En esta rama solo se integrarán entregables revisados, aprobados y listos para ser presentados. No se debe trabajar directamente sobre esta rama.
+
+#### release
+
+La rama `release` se utilizará para preparar versiones candidatas de entrega. En esta rama se realizarán ajustes finales de redacción, formato, numeración, referencias internas y validación general antes de integrar los cambios a `main`.
+
+#### develop
+
+La rama `develop` será la rama principal de integración del trabajo del equipo. Todas las ramas de tipo `feature` deberán partir desde `develop` y, al finalizar una tarea, deberán integrarse nuevamente mediante Pull Request.
+
+#### docs
+
+La rama `docs` se utilizará como rama de integración específica para la documentación del proyecto. En esta rama se consolidarán los avances documentales antes de integrarlos a ramas principales del flujo de trabajo.
+
+### Ramas de trabajo para documentación
+
+Para cada tarea específica de documentación se utilizarán ramas con el formato `feature/docs-*`. Estas ramas deberán crearse a partir de `develop` o de `docs`, según la organización definida por el equipo.
+
+Ejemplos de ramas:
+
+- `feature/docs-gitflow`
+- `feature/docs-kanban`
+- `feature/docs-stakeholders`
+- `feature/docs-arquitectura`
+- `feature/docs-revision`
+- `feature/docs-consolidacion`
+
+### Regla de commits
+
+Cada commit deberá utilizar el siguiente formato:
+
+`carnet: mensaje del cambio`
+
+Ejemplo:
+
+`201801391: documentar flujo git flow para la fase uno`
+
+El mensaje del commit debe ser claro, breve y representar el cambio realizado. No se deben utilizar mensajes genéricos como “cambios”, “avance” o “documento final”.
+
+### Flujo de trabajo
+
+El flujo de trabajo será el siguiente:
+
+1. Actualizar la rama base con los últimos cambios del repositorio remoto.
+2. Crear una rama `feature/docs-*` para la tarea asignada.
+3. Realizar los cambios correspondientes en la documentación, diagramas o evidencias.
+4. Confirmar los cambios mediante commits con el formato establecido.
+5. Subir la rama al repositorio remoto.
+6. Crear un Pull Request hacia `docs` o `develop`, según corresponda.
+7. Solicitar revisión de al menos un integrante del equipo.
+8. Corregir observaciones si existieran.
+9. Integrar los cambios mediante merge.
+10. Eliminar la rama `feature` una vez integrada.
+
+### Criterios para integrar cambios
+
+Una rama podrá integrarse cuando cumpla con los siguientes criterios:
+
+- La sección asignada está completa.
+- El contenido está alineado con el enunciado del proyecto.
+- No existen conflictos con otras secciones.
+- El formato es consistente con el documento principal.
+- El commit respeta el formato definido.
+- El Pull Request fue revisado por otro integrante del equipo.
