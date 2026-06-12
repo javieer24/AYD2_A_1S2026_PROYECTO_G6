@@ -2865,6 +2865,17 @@ El campo hashBlockchain en la tabla Certificado almacena la referencia a la tran
   * Visualización pública del certificado
 
 ---
+## Prototipos de Interfaces UI/UX
+
+![Diagrama de bloques](imagenes/prototipo01.png)
+
+![Diagrama de bloques](imagenes/prototipo02.png)
+
+![Diagrama de bloques](imagenes/prototipo03.png)
+
+![Diagrama de bloques](imagenes/prototipo04.png)
+
+---
 
 # 10. Patrones de Diseño
 
