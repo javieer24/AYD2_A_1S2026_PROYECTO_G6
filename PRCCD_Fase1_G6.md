@@ -2538,15 +2538,15 @@ Los Ministerios de Educacion y Trabajo acceden al sistema por dos vias: a traves
 
 ## 7.1 Diagrama de componentes
 
-![Diagrama de componentes](imagenes/diagramadecomponentes.png)
+![Diagrama de componentes](imagenes/DiagramadeComponentes.png)
 
 ## 7.2 Diagrama de despliegue
 
-![Diagrama de despliegue](imagenes/diagramadeDespliegue.png)
+![Diagrama de despliegue](imagenes/DiagramadeDespliegue.png)
 
 ## 7.3 Diagrama de distribucion
 
-![Diagrama de distribucion](imagenes/diagramadeDistribucion.png)
+![Diagrama de distribucion](imagenes/DiagramadeDistribucion.png)
 
 ## 7.4 Justificacion de tecnologias y frameworks
 
