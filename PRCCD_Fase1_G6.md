@@ -2564,8 +2564,11 @@ Los Ministerios de Educacion y Trabajo acceden al sistema por dos vias: a traves
 
 ---
 
-# 8. Diseno de Datos
+# 8. Diseño de Datos
 ---
+
+# DER
+![Flujo autenticacion federada UES](imagenes/DER.png)
 
 ## 8.1 Entidades principales del modelo de datos
 
