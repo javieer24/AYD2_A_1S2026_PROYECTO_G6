@@ -71,6 +71,47 @@ Reglas de validación:
 
 ## 3. Configuración del entorno local
 
+### 3.0 Cada vez que haces pull del repo (LEER ANTES DE CUALQUIER COSA)
+
+Como el equipo ya tiene el repo en su máquina y trabaja con **GitKraken**, el flujo para recibir cambios nuevos y arrancar a trabajar es:
+
+**1. En GitKraken:** hacer Pull sobre `develop` para traer los últimos cambios.
+
+**2. Luego, en la terminal, desde `prccd-mvp/backend`:**
+
+```bash
+cd prccd-mvp/backend
+npm install
+```
+
+> Ejecutar `npm install` después de cada pull es importante porque alguien pudo haber agregado una nueva dependencia al `package.json`. Si no lo haces y falta un paquete, el servidor no arranca.
+
+**3. Solo si es la primera vez que tocas el proyecto en tu máquina (no tienes `.env`):**
+
+```bash
+# Dentro de prccd-mvp/backend/
+cp .env.example .env
+# Ese .env es tuyo, local. No lo commitees, ya está en el .gitignore.
+```
+
+**4. En GitKraken:** crear tu rama desde `develop` con el nombre que corresponda a tu tarea (ej: `feature/ingesta-service`, `feature/examen-adaptativo`, etc.) y trabajar sobre ella.
+
+---
+
+**¿Por qué no están `node_modules/` ni `.env` en el repo?**
+
+| Archivo / Carpeta | ¿Está en el repo? | Motivo |
+|-------------------|------------------|--------|
+| `node_modules/` | ❌ No | Pesa 100+ MB y cada quien lo genera con `npm install` |
+| `.env` | ❌ No | Tiene contraseñas — cada quien tiene el suyo local |
+| `.env.example` | ✅ Sí | Plantilla pública sin secretos, base para crear tu `.env` |
+| `dist/` (build del frontend) | ❌ No | Se genera con `npm run build`, no se versiona |
+| Todo el código fuente | ✅ Sí | Eso sí se versiona y comparte entre todos |
+
+> **Error típico si no corriste `npm install`:** `Error: Cannot find module 'express'` o `Cannot find module 'csv-parse'`. Solución: correr `npm install` en la carpeta `backend/`.
+
+---
+
 ### Opción A — Con Docker (recomendado, levanta todo)
 
 ```bash
