@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<expedientes>
+  <expediente>
+    <id>UES-ISC-2021-00312</id>
+    <nombre>Luis Enrique Martínez Bonilla</nombre>
+    <universidad>UES</universidad>
+    <carrera>Ingeniería en Sistemas Computacionales</carrera>
+    <cursos>
+      <curso><codigo>PRG101</codigo><nota>83</nota></curso>
+      <curso><codigo>MAT201</codigo><nota>77</nota></curso>
+      <curso><codigo>PRG202</codigo><nota>88</nota></curso>
+      <curso><codigo>BD301</codigo><nota>85</nota></curso>
+    </cursos>
+  </expediente>
+  <expediente>
+    <id>UES-ISC-2020-00187</id>
+    <nombre>Karla Patricia Gutiérrez Zelaya</nombre>
+    <universidad>UES</universidad>
+    <carrera>Ingeniería en Sistemas Computacionales</carrera>
+    <cursos>
+      <curso><codigo>PRG101</codigo><nota>90</nota></curso>
+      <curso><codigo>MAT201</codigo><nota>85</nota></curso>
+      <curso><codigo>PRG202</codigo><nota>93</nota></curso>
+      <curso><codigo>BD301</codigo><nota>91</nota></curso>
+      <curso><codigo>RED401</codigo><nota>88</nota></curso>
+    </cursos>
+  </expediente>
+  <expediente>
+    <id>UES-ISC-2022-00456</id>
+    <nombre>Héctor Alonso Rivas Orellana</nombre>
+    <universidad>UES</universidad>
+    <carrera>Ingeniería en Sistemas Computacionales</carrera>
+    <cursos>
+      <curso><codigo>PRG101</codigo><nota>72</nota></curso>
+      <curso><codigo>MAT201</codigo><nota>68</nota></curso>
+      <curso><codigo>PRG202</codigo><nota>75</nota></curso>
+    </cursos>
+  </expediente>
+</expedientes>
