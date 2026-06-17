@@ -18,6 +18,24 @@
 | API Gateway | Nginx |
 | Contenedores | Docker + Docker Compose |
 
+## Después de cada `git pull` (IMPORTANTE)
+
+`node_modules/` **no se versiona** (pesa demasiado y cada quien lo genera local). Esto significa que, cada vez que traigas cambios del repo, debes reinstalar dependencias si alguien tocó un `package.json`:
+
+```bash
+# Backend
+cd prccd-mvp/backend
+npm install
+
+# Frontend
+cd prccd-mvp/frontend
+npm install
+```
+
+> Si usas Docker (ver abajo), no necesitas correr `npm install` a mano: el `Dockerfile` del backend lo hace solo en cada `docker-compose up --build`.
+
+> Error típico si lo saltas: `Cannot find module 'xxx'` al levantar el servidor. Solución: correr `npm install` en la carpeta correspondiente.
+
 ## Levantar el entorno local
 
 ```bash
