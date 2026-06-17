@@ -17,8 +17,4 @@ function validateRequest(req, res, next) {
   next();
 }
 
-<<<<<<< HEAD
 module.exports = validateRequest;
-=======
-module.exports = validateRequest;
->>>>>>> feature/ingesta

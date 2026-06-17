@@ -54,8 +54,4 @@ const Candidato = sequelize.define(
   }
 );
 
-<<<<<<< HEAD
 module.exports = Candidato;
-=======
-module.exports = Candidato;
->>>>>>> feature/ingesta

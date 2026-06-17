@@ -23,8 +23,4 @@ function authMiddleware(req, res, next) {
   }
 }
 
-<<<<<<< HEAD
 module.exports = authMiddleware;
-=======
-module.exports = authMiddleware;
->>>>>>> feature/ingesta

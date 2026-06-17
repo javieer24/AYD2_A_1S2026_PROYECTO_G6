@@ -31,8 +31,4 @@ async function connectDB() {
   }
 }
 
-<<<<<<< HEAD
 module.exports = { sequelize, connectDB };
-=======
-module.exports = { sequelize, connectDB };
->>>>>>> feature/ingesta

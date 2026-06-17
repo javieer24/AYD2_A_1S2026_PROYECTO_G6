@@ -78,8 +78,4 @@ async function processUCR(rawData) {
   return { success: true, data, errors: allErrors };
 }
 
-<<<<<<< HEAD
 module.exports = { processUCR };
-=======
-module.exports = { processUCR };
->>>>>>> feature/ingesta

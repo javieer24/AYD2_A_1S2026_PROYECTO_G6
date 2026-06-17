@@ -10,10 +10,7 @@ const errorMiddleware = require('./middleware/error.middleware');
 const authMiddleware = require('./middleware/auth.middleware');
 const authRoutes = require('./routes/auth.routes');
 const ingestaRoutes = require('./routes/ingesta.routes');
-<<<<<<< HEAD
 const examenRoutes = require('./routes/examen.routes');
-=======
->>>>>>> feature/ingesta
 
 const app = express();
 
@@ -36,9 +33,5 @@ app.use('/api/ingest', authMiddleware, ingestaRoutes);
 // Error handler global — siempre al final
 app.use(errorMiddleware);
 
-<<<<<<< HEAD
 app.use('/api/examen', authMiddleware, examenRoutes);
 module.exports = app;
-=======
-module.exports = app;
->>>>>>> feature/ingesta

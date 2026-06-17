@@ -99,8 +99,4 @@ async function processUSAC(fileBuffer) {
   return { success: true, data, errors: allErrors };
 }
 
-<<<<<<< HEAD
 module.exports = { processUSAC };
-=======
-module.exports = { processUSAC };
->>>>>>> feature/ingesta
