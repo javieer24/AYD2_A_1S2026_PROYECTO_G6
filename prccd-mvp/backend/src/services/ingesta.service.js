@@ -88,4 +88,8 @@ async function procesarExpediente(fileBuffer, originalname, mimetype, universida
   };
 }
 
+<<<<<<< HEAD
 module.exports = { procesarExpediente };
+=======
+module.exports = { procesarExpediente };
+>>>>>>> feature/ingesta

@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+=======
+// Módulo: Punto de entrada del servidor
+// Responsable: Javier Andrés Monjes Solórzano — 202100081
+// Rama: feature/ingesta-usac
+// Tarea: F2-01
+
+>>>>>>> feature/ingesta
 require('dotenv').config();
 const app = require('./src/app');
 const { connectDB } = require('./src/config/database');
@@ -16,4 +24,8 @@ async function main() {
   }
 }
 
+<<<<<<< HEAD
 main();
+=======
+main();
+>>>>>>> feature/ingesta

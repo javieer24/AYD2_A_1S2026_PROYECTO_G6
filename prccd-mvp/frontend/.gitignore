@@ -1,0 +1,10 @@
+# Dependencias — cada quien hace npm install localmente
+node_modules/
+
+# Build de producción (se genera con npm run build)
+dist/
+.vite/
+
+# Variables de entorno
+.env
+.env.local

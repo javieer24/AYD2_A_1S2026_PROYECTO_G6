@@ -28,4 +28,8 @@ module.exports = {
     secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
     bucket: process.env.MINIO_BUCKET || 'evidencias',
   },
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> feature/ingesta

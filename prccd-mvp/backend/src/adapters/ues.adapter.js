@@ -118,4 +118,8 @@ async function processUES(xmlBuffer) {
   return { success: true, data, errors: allErrors };
 }
 
+<<<<<<< HEAD
 module.exports = { processUES };
+=======
+module.exports = { processUES };
+>>>>>>> feature/ingesta

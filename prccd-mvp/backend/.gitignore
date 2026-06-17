@@ -1,2 +1,15 @@
+<<<<<<< HEAD
 node_modules/
 .env
+=======
+# Dependencias — cada quien hace npm install localmente
+node_modules/
+
+# Variables de entorno reales (solo .env.example va al repo)
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+>>>>>>> feature/ingesta

@@ -77,4 +77,8 @@ router.get('/me', (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 module.exports = router;
+=======
+module.exports = router;
+>>>>>>> feature/ingesta

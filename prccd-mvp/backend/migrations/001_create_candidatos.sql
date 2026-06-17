@@ -21,4 +21,8 @@ CREATE INDEX IF NOT EXISTS idx_candidatos_universidad
   ON candidatos (universidad_origen);
 
 CREATE INDEX IF NOT EXISTS idx_candidatos_carrera
+<<<<<<< HEAD
   ON candidatos (carrera);
+=======
+  ON candidatos (carrera);
+>>>>>>> feature/ingesta

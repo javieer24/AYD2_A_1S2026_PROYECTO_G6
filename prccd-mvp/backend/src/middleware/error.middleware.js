@@ -13,4 +13,8 @@ function errorMiddleware(err, req, res, next) {
   });
 }
 
+<<<<<<< HEAD
 module.exports = errorMiddleware;
+=======
+module.exports = errorMiddleware;
+>>>>>>> feature/ingesta
