@@ -162,7 +162,7 @@ Vacaciones de junio 2026
 
 ## 1.2 Core del negocio
 
-El SICA necesita una plataforma regional (PRCCD) que evalúe y certifique competencias digitales mediante exámenes adaptativos, emita certificados con validez jurídica transfronteriza verificables criptográficamente, se integre con universidades heterogéneas (USAC, UCR, UES) sin obligarlas a cambiar, soporte picos masivos de tráfico durante la primera semana de cada mes, y provea analítica anonimizada a ministerios, todo bajo un presupuesto de USD 180,000 on-premise y con cumplimiento normativo multinacional.
+El SICA necesita una plataforma regional (PRCCD) que evalúe y certifique competencias digitales mediante exámenes adaptativos, emita certificados con validez jurídica transfronteriza verificables criptográficamente, se integre con universidades heterogéneas.
 
 ## 1.3 Caso de Uso de alto nivel
 
@@ -171,7 +171,7 @@ El SICA necesita una plataforma regional (PRCCD) que evalúe y certifique compet
 
 ## 1.4 Primera descomposicion
 
-![Diagrama CDU Alto Nivel](imagenes/1radescomposicion.png)
+![Diagrama CDU Alto Nivel](imagenes/IMG-20260616-WA0014.jpg)
 
 # 2. Caracteristicas del sistema y Drivers Arquitectonicos
 
@@ -247,7 +247,7 @@ El SICA necesita una plataforma regional (PRCCD) que evalúe y certifique compet
 
 
 
-![Diagrama de casos de uso expandidos GestionarCertificacion](imagenes/Gesitonarcertificacion.png)
+![Diagrama de casos de uso expandidos GestionarCertificacion](./imagenes/cdu01.png)
 
 
  

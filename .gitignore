@@ -35,3 +35,6 @@ desktop.ini
 *.tmp
 *.temp
 *.swp
+
+
+prccd-mvp/backend/node_modules/
