@@ -171,7 +171,7 @@ El SICA necesita una plataforma regional (PRCCD) que evalúe y certifique compet
 
 ## 1.4 Primera descomposicion
 
-![Diagrama CDU Alto Nivel](imagenes/1radescomposicion.png)
+![Diagrama CDU Alto Nivel](imagenes/IMG-20260616-WA0014.jpg)
 
 # 2. Caracteristicas del sistema y Drivers Arquitectonicos
 
@@ -247,7 +247,7 @@ El SICA necesita una plataforma regional (PRCCD) que evalúe y certifique compet
 
 
 
-![Diagrama de casos de uso expandidos GestionarCertificacion](imagenes/Gesitonarcertificacion.png)
+![Diagrama de casos de uso expandidos GestionarCertificacion](imagenes/cdu01.png)
 
 
  
@@ -457,7 +457,7 @@ El SICA necesita una plataforma regional (PRCCD) que evalúe y certifique compet
 ## Plataforma Regional de Certificación de Competencias Digitales (PRCCD)
 
 
-![Diagrama de casos de uso expandidos GestionarCertificacion](imagenes/Rendirexamen.png)
+![Diagrama de casos de uso expandidos GestionarCertificacion](imagenes/cdu02.png)
 
 
 
@@ -672,7 +672,7 @@ El SICA necesita una plataforma regional (PRCCD) que evalúe y certifique compet
 ## Plataforma Regional de Certificación de Competencias Digitales (PRCCD)
 
 
-![Diagrama de casos de uso expandidos EmitirCredenciales](imagenes/EmitirCredenciales.png)
+![Diagrama de casos de uso expandidos EmitirCredenciales](imagenes/cdu03.png)
 
 
 ---
@@ -1002,7 +1002,7 @@ El SICA necesita una plataforma regional (PRCCD) que evalúe y certifique compet
 # CDU 04 — Integrar Sistemas Universitarios
 ## Plataforma Regional de Certificación de Competencias Digitales (PRCCD)
 
-![Diagrama de casos de uso expandidos integrar](imagenes/IntegrarSistemas.png)
+![Diagrama de casos de uso expandidos integrar](imagenes/cdu04.png)
 
 
 ---
@@ -1358,7 +1358,7 @@ El SICA necesita una plataforma regional (PRCCD) que evalúe y certifique compet
 # CDU 05 — Consultar Analítica Regional
 ## Plataforma Regional de Certificación de Competencias Digitales (PRCCD)
 
-![Diagrama de casos de uso expandidos integrar](imagenes/ConsultarAnalitica.png)
+![Diagrama de casos de uso expandidos integrar](imagenes/cdu05.png)
 
 
 ---
@@ -1690,7 +1690,7 @@ El caso de uso se activa condicionalmente cuando UC-5.3 «Agregar métricas» ca
 
 # CDU 06 — Auditar Rastro Inmutable
 ## Plataforma Regional de Certificación de Competencias Digitales (PRCCD)
-![Diagrama de casos de uso AuditarRastro](imagenes/Diagrama%20en%20blanco%20-%20AuditarRastro.png)
+![Diagrama de casos de uso AuditarRastro](imagenes/cdu06.png)
 ---
 
 ## UC-6.1 — Consultar bitácoras
@@ -1902,314 +1902,9 @@ El caso de uso se activa condicionalmente cuando UC-5.3 «Agregar métricas» ca
 | Los Entes Regulatorios solicitan extensión del período de retención | El sistema actualiza la fecha de vencimiento según lo indicado, invoca UC-6.6 para registrar la nueva política aplicada y confirma la extensión a los Entes Regulatorios con el nuevo plazo. |
 | La fecha de vencimiento llega sin confirmación de los Entes Regulatorios | El sistema procede con la eliminación automática según la política original, genera la constancia de eliminación y la envía a los Entes Regulatorios como registro del evento. |
 
-
-
-
-
-# CDU 07 — Gestionar Infraestructura
-## Plataforma Regional de Certificación de Competencias Digitales (PRCCD)
-![Diagrama de casos de uso AuditarRastro](imagenes/GestionarInfraestructura.png)
-
 ---
 
-## UC-7.1 — Desplegar on-premise
-
-| | |
-|---|---|
-| **Nombre** | Desplegar on-premise |
-| **Actores** | Admin. TI |
-| **Propósito** | Instalar, configurar y poner en operación los componentes de la PRCCD sobre la infraestructura física existente del SICA, reutilizando los servidores disponibles dentro del presupuesto aprobado de USD 180,000. |
-
-**Resumen:** El caso de uso inicia cuando el Admin. TI recibe la aprobación para desplegar la primera versión del sistema. El sistema aprovisiona los servidores físicos disponibles, configura la red interna y deja la plataforma operativa. Invoca el monitoreo de rendimiento para verificar que el despliegue cumple con los parámetros operativos requeridos. Finaliza cuando todos los componentes están desplegados, operativos y siendo monitoreados.
-
-### Curso Normal de Eventos
-
-| Acción del actor | Respuesta del proceso de negocio |
-|---|---|
-| 1. El Admin. TI inicia el proceso de despliegue con los artefactos de la versión aprobada de la PRCCD. | 2. El sistema invoca UC-7.2 «Aprovisionar servidores físicos» para preparar los nodos de cómputo disponibles en la infraestructura del SICA. |
-| | 3. El sistema invoca UC-7.3 «Configurar red interna» para establecer la topología de red, las reglas de firewall y los canales de comunicación entre componentes. |
-| | 4. El sistema despliega los servicios de la plataforma en los servidores aprovisionados: API Gateway, motor de exámenes, servicios de certificación, base de datos y caché. |
-| | 5. El sistema ejecuta las pruebas de humo (smoke tests) para verificar que cada componente desplegado responde correctamente. |
-| | 6. El sistema invoca UC-7.4 «Monitorear rendimiento» para activar la recolección de métricas desde el momento del despliegue. |
-| 7. El Admin. TI recibe el reporte de despliegue con el estado de cada componente y los resultados de las pruebas de humo. | |
-
-### Cursos Alternos
-
-| Condición | Acción |
-|---|---|
-| En el paso 5 — prueba de humo falla en uno o más componentes | El sistema detiene el despliegue, registra el componente fallido con el detalle del error y notifica al Admin. TI para que corrija la configuración antes de reintentar. |
-| En el paso 2 — capacidad de servidores físicos insuficiente para el despliegue completo | El sistema despliega los componentes críticos primero (autenticación, motor de exámenes, certificación) y notifica al Admin. TI que los componentes secundarios requieren servidores adicionales. |
-| En el paso 4 — conflicto de puertos o recursos entre servicios | El sistema identifica el conflicto, sugiere una configuración alternativa al Admin. TI y espera su aprobación antes de continuar. |
-
----
-
-## UC-7.2 — Aprovisionar servidores físicos
-
-| | |
-|---|---|
-| **Nombre** | Aprovisionar servidores físicos |
-| **Actores** | Sistema *(invocado por UC-7.1)*, Admin. TI |
-| **Propósito** | Preparar y configurar los servidores físicos existentes del SICA para que puedan alojar los componentes de la PRCCD, optimizando el uso de los recursos disponibles dentro del presupuesto aprobado. |
-
-**Resumen:** El caso de uso es invocado al inicio del despliegue. El sistema realiza el inventario de servidores disponibles, evalúa su capacidad actual, aplica la configuración base requerida por la plataforma y los registra como nodos disponibles. Finaliza retornando el inventario de nodos aprovisionados al proceso UC-7.1.
-
-### Curso Normal de Eventos
-
-| Acción del actor | Respuesta del proceso de negocio |
-|---|---|
-| 1. El proceso UC-7.1 invoca este caso de uso con los requisitos mínimos de hardware de cada componente de la PRCCD. | 2. El sistema realiza el inventario de servidores físicos disponibles en la infraestructura del SICA: CPU, RAM, almacenamiento y conectividad de red. |
-| | 3. El sistema evalúa si la capacidad disponible cumple los requisitos mínimos para cada componente a desplegar. |
-| | 4. El sistema aplica la configuración base en cada servidor: sistema operativo actualizado, dependencias de runtime, ajustes de seguridad del kernel y configuración de usuarios de servicio. |
-| | 5. El sistema registra cada servidor como nodo disponible en el inventario de infraestructura con sus capacidades y rol asignado. |
-| | 6. El sistema retorna el mapa de nodos aprovisionados al proceso UC-7.1. |
-| 7. El Admin. TI puede verificar el inventario resultante desde el panel de infraestructura antes de continuar con el despliegue. | |
-
-### Cursos Alternos
-
-| Condición | Acción |
-|---|---|
-| En el paso 3 — un servidor no cumple los requisitos mínimos de un componente | El sistema lo excluye del rol asignado, redistribuye la carga entre los nodos que sí cumplen y registra la limitación para que el Admin. TI evalúe expansión de capacidad. |
-| En el paso 4 — fallo al aplicar la configuración base en un servidor | El sistema registra el error, marca el servidor como `NO_APROVISIONADO` y continúa con los demás nodos disponibles. |
-
----
-
-## UC-7.3 — Configurar red interna
-
-| | |
-|---|---|
-| **Nombre** | Configurar red interna |
-| **Actores** | Sistema *(invocado por UC-7.1)*, Admin. TI |
-| **Propósito** | Establecer la topología de red interna, las reglas de firewall, los balanceadores de carga y los canales cifrados de comunicación entre los componentes de la PRCCD desplegados en la infraestructura del SICA. |
-
-**Resumen:** El caso de uso es invocado durante el despliegue. El sistema configura las VLANs, las reglas de acceso entre servicios, los certificados TLS para comunicaciones internas y los balanceadores de carga. Finaliza cuando la red interna está operativa y todos los componentes pueden comunicarse entre sí de forma segura.
-
-### Curso Normal de Eventos
-
-| Acción del actor | Respuesta del proceso de negocio |
-|---|---|
-| 1. El proceso UC-7.1 invoca este caso de uso con el mapa de nodos aprovisionados y los requisitos de conectividad entre componentes. | 2. El sistema configura las VLANs para segmentar el tráfico: red de aplicación, red de base de datos y red de administración. |
-| | 3. El sistema aplica las reglas de firewall: permite solo el tráfico autorizado entre componentes y bloquea el acceso directo a los nodos de base de datos desde el exterior. |
-| | 4. El sistema emite y despliega los certificados TLS internos para cifrar las comunicaciones entre servicios. |
-| | 5. El sistema configura los balanceadores de carga para distribuir el tráfico entre los nodos del motor de exámenes durante los picos de la primera semana del mes. |
-| | 6. El sistema ejecuta las pruebas de conectividad entre todos los componentes y verifica que los puertos requeridos están accesibles. |
-| | 7. El sistema retorna la confirmación de red configurada al proceso UC-7.1. |
-
-### Cursos Alternos
-
-| Condición | Acción |
-|---|---|
-| En el paso 6 — prueba de conectividad falla entre dos componentes | El sistema identifica el par de nodos con fallo, registra el diagnóstico (puerto bloqueado, ruta inexistente, certificado inválido) y notifica al Admin. TI para corrección manual. |
-| En el paso 3 — conflicto con reglas de firewall existentes de la infraestructura del SICA | El sistema registra el conflicto y solicita al Admin. TI autorización para modificar las reglas existentes antes de proceder. |
-
----
-
-## UC-7.4 — Monitorear rendimiento
-
-| | |
-|---|---|
-| **Nombre** | Monitorear rendimiento |
-| **Actores** | Admin. TI, Ministerio |
-| **Propósito** | Recolectar, analizar y presentar continuamente las métricas de rendimiento de la infraestructura de la PRCCD para garantizar la disponibilidad del servicio, especialmente durante los picos de la primera semana de cada mes. |
-
-**Resumen:** El caso de uso se activa tras el despliegue y se ejecuta de forma continua. El sistema recolecta métricas de todos los componentes, genera reportes de disponibilidad y detecta condiciones que requieren escalado o intervención. Invoca el escalado automático durante picos de tráfico. El Ministerio puede consultar los reportes de disponibilidad. Finaliza cuando el sistema de monitoreo está activo y respondiendo a los eventos de la infraestructura.
-
-### Curso Normal de Eventos
-
-| Acción del actor | Respuesta del proceso de negocio |
-|---|---|
-| 1. El proceso UC-7.1 activa el monitoreo tras el despliegue exitoso, o el Admin. TI lo inicia manualmente. | 2. El sistema invoca UC-7.5 «Generar reporte disponibilidad» para establecer la línea base de métricas del sistema recién desplegado. |
-| | 3. El sistema activa los agentes de recolección de métricas en cada nodo: CPU, memoria RAM, uso de disco, latencia de red, tiempo de respuesta de servicios y errores por minuto. |
-| | 4. El sistema evalúa continuamente las métricas contra los umbrales de SLA definidos: disponibilidad mínima del 99.5%, latencia máxima de 200ms por petición. |
-| | 5. El sistema publica las métricas en el dashboard de monitoreo accesible para el Admin. TI y el Ministerio. |
-| 6. El Admin. TI revisa el estado del sistema desde el dashboard y puede ajustar los umbrales de alerta según la experiencia operativa. | |
-
-### Cursos Alternos
-
-| Condición | Acción |
-|---|---|
-| En el paso 4 — métricas superan el umbral de SLA | El sistema activa UC-7.6 «Escalar capacidad automát.» si el origen es carga excesiva, o genera una alerta al Admin. TI si el origen es un fallo de componente. |
-| En el paso 3 — agente de recolección no disponible en un nodo | El sistema marca el nodo como `SIN_TELEMETRIA`, notifica al Admin. TI y continúa monitoreando los nodos restantes. |
-| El Ministerio solicita el reporte de disponibilidad formal | El sistema invoca UC-7.5 «Generar reporte disponibilidad» con el rango de fechas solicitado para generar el documento descargable. |
-
----
-
-## UC-7.5 — Generar reporte disponibilidad
-
-| | |
-|---|---|
-| **Nombre** | Generar reporte disponibilidad |
-| **Actores** | Sistema *(invocado por UC-7.4)*, Admin. TI, Ministerio |
-| **Propósito** | Producir un reporte formal del nivel de disponibilidad y rendimiento de la infraestructura de la PRCCD durante un período determinado, para cumplimiento de SLA y rendición de cuentas ante el Ministerio. |
-
-**Resumen:** El caso de uso es invocado periódicamente o bajo demanda. El sistema consolida las métricas del período solicitado, calcula los indicadores de disponibilidad (uptime, latencia promedio, incidentes registrados) y genera el documento formal. Finaliza cuando el reporte está disponible para consulta del Admin. TI y del Ministerio.
-
-### Curso Normal de Eventos
-
-| Acción del actor | Respuesta del proceso de negocio |
-|---|---|
-| 1. El proceso UC-7.4 invoca este caso de uso al final de cada período mensual, o el Admin. TI o el Ministerio lo solicitan bajo demanda con un rango de fechas. | 2. El sistema recupera las métricas históricas del período solicitado desde el repositorio de telemetría. |
-| | 3. El sistema calcula los indicadores de disponibilidad: porcentaje de uptime, latencia promedio y percentil 95, número y duración de incidentes, tiempo medio de recuperación (MTTR). |
-| | 4. El sistema compara los indicadores calculados contra los compromisos de SLA establecidos e identifica los períodos de incumplimiento. |
-| | 5. El sistema genera el reporte con gráficas de tendencia, tabla de incidentes y comparativa contra los objetivos de SLA. |
-| | 6. El sistema publica el reporte en el panel de monitoreo y lo envía al Admin. TI y al Ministerio por correo. |
-| 7. El Ministerio y el Admin. TI reciben el reporte y pueden descargarlo para sus registros internos. | |
-
-### Cursos Alternos
-
-| Condición | Acción |
-|---|---|
-| En el paso 2 — métricas históricas incompletas por fallo previo de telemetría | El sistema indica las ventanas de tiempo sin datos, genera el reporte con las métricas disponibles y marca el período incompleto con una nota aclaratoria. |
-| En el paso 4 — SLA incumplido durante el período | El sistema resalta el incumplimiento en el reporte, calcula el impacto porcentual y genera una sección de causa raíz con los incidentes que contribuyeron al incumplimiento. |
-
----
-
-## UC-7.6 — Escalar capacidad automát.
-
-| | |
-|---|---|
-| **Nombre** | Escalar capacidad automát. |
-| **Actores** | Sistema *(automático — `«extend»` desde UC-7.4)*, Admin. TI |
-| **Propósito** | Aumentar dinámicamente los recursos de cómputo disponibles para los componentes críticos de la PRCCD cuando las métricas de rendimiento indican que la carga actual supera la capacidad configurada, especialmente durante los picos de certificación de la primera semana del mes. |
-
-**Resumen:** El caso de uso se activa cuando UC-7.4 detecta que las métricas de un componente superan el umbral de escalado. El sistema evalúa la capacidad disponible, aplica el escalado horizontal o vertical según corresponda y notifica al Admin. TI del cambio realizado. Finaliza cuando los recursos adicionales están activos y las métricas vuelven a niveles normales.
-
-### Curso Normal de Eventos
-
-| Acción del actor | Respuesta del proceso de negocio |
-|---|---|
-| 1. El proceso UC-7.4 detecta que el CPU o la memoria de un componente supera el 80% de uso sostenido por más de 5 minutos e invoca este caso de uso. | 2. El sistema identifica el componente con carga excesiva y evalúa el tipo de escalado aplicable: horizontal (más instancias) o vertical (más recursos por instancia). |
-| | 3. El sistema verifica la capacidad disponible en los servidores físicos del SICA para determinar si el escalado es factible dentro de la infraestructura on-premise. |
-| | 4. El sistema aplica el escalado: inicia nuevas instancias del componente en los nodos disponibles o reasigna recursos de nodos con menor carga. |
-| | 5. El sistema actualiza el balanceador de carga para distribuir el tráfico entre las instancias originales y las nuevas. |
-| | 6. El sistema verifica que las métricas del componente escalado vuelven a niveles normales en los siguientes 3 minutos. |
-| | 7. El sistema notifica al Admin. TI del escalado realizado con el detalle: componente, tipo de escalado, recursos añadidos y métricas antes y después. |
-
-### Cursos Alternos
-
-| Condición | Acción |
-|---|---|
-| En el paso 3 — no hay capacidad disponible en la infraestructura on-premise para escalar | El sistema notifica al Admin. TI y al Ministerio que se ha alcanzado el límite de capacidad física, registra el evento como `CAPACIDAD_MAXIMA_ALCANZADA` y activa UC-7.7 «Planificar migración nube» para acelerar la evaluación de migración. |
-| En el paso 6 — las métricas no mejoran tras el escalado | El sistema escala un nivel adicional si hay recursos disponibles. Si no hay recursos y las métricas siguen críticas, alerta al Admin. TI para intervención manual inmediata. |
-
----
-
-## UC-7.7 — Planificar migración nube
-
-| | |
-|---|---|
-| **Nombre** | Planificar migración nube |
-| **Actores** | Admin. TI, Ministerio |
-| **Propósito** | Diseñar y documentar el plan estratégico para la migración transparente de la PRCCD desde la infraestructura on-premise actual hacia una solución en la nube, garantizando continuidad del servicio y preparando la arquitectura para la transición. |
-
-**Resumen:** El caso de uso inicia cuando el Admin. TI o el Ministerio solicitan iniciar la planificación de migración. El sistema evalúa la compatibilidad de los componentes actuales con la nube, estima los costos y define el plan de migración por fases. El Ministerio aprueba el presupuesto. Finaliza cuando el plan de migración queda documentado, aprobado y listo para ejecución.
-
-### Curso Normal de Eventos
-
-| Acción del actor | Respuesta del proceso de negocio |
-|---|---|
-| 1. El Admin. TI o el Ministerio solicitan iniciar la planificación de migración a la nube. | 2. El sistema invoca UC-7.8 «Evaluar compatibilidad nube» para analizar qué componentes de la arquitectura actual son directamente portables y cuáles requieren adaptación. |
-| | 3. El sistema invoca UC-7.9 «Estimar costos migración» para calcular el presupuesto requerido para la migración y los costos operativos en la nube. |
-| | 4. El sistema genera el plan de migración por fases: fase 1 (componentes stateless: API Gateway, motor de exámenes), fase 2 (datos y almacenamiento), fase 3 (servicios de blockchain y PKI). |
-| | 5. El sistema invoca UC-7.10 «Aprobar presupuesto migración» para que el Ministerio valide la inversión requerida. |
-| | 6. El sistema documenta el plan aprobado con cronograma, recursos requeridos, criterios de éxito por fase y plan de rollback. |
-| 7. El Admin. TI y el Ministerio reciben el plan de migración aprobado listo para su ejecución en las fases definidas. | |
-
-### Cursos Alternos
-
-| Condición | Acción |
-|---|---|
-| En el paso 2 — componentes con dependencias bloqueantes para migración | El sistema identifica las dependencias, propone una estrategia de refactorización mínima para desbloquear la migración y ajusta el cronograma de fases según el esfuerzo estimado. |
-| En el paso 5 — Ministerio rechaza el presupuesto estimado | El sistema genera escenarios alternativos de migración con menor costo (migración parcial, migración diferida) y los presenta al Ministerio para una nueva evaluación. |
-
----
-
-## UC-7.8 — Evaluar compatibilidad nube
-
-| | |
-|---|---|
-| **Nombre** | Evaluar compatibilidad nube |
-| **Actores** | Sistema *(invocado por UC-7.7)*, Admin. TI |
-| **Propósito** | Analizar el nivel de compatibilidad de cada componente de la arquitectura on-premise de la PRCCD con las plataformas de nube objetivo, identificando los que son directamente portables y los que requieren adaptación. |
-
-**Resumen:** El caso de uso es invocado durante la planificación de migración. El sistema realiza un análisis de compatibilidad técnica de cada componente contra los servicios equivalentes en la nube, identifica dependencias bloqueantes y genera el mapa de portabilidad. Finaliza retornando el análisis de compatibilidad al proceso UC-7.7.
-
-### Curso Normal de Eventos
-
-| Acción del actor | Respuesta del proceso de negocio |
-|---|---|
-| 1. El proceso UC-7.7 invoca este caso de uso con el inventario de componentes desplegados en la infraestructura on-premise actual. | 2. El sistema analiza cada componente contra los requisitos de las plataformas de nube objetivo: contenedorización, stateless design, dependencias de hardware específico. |
-| | 3. El sistema clasifica cada componente: `PORTABLE_DIRECTO` (funciona sin cambios en nube), `PORTABLE_CON_ADAPTACION` (requiere cambios menores) o `REQUIERE_REDISEÑO` (cambios arquitectónicos significativos). |
-| | 4. El sistema identifica las dependencias del sistema de blockchain y PKI con hardware específico (HSM físico) que pueden representar bloqueantes para la migración. |
-| | 5. El sistema genera el mapa de compatibilidad con el esfuerzo estimado de adaptación para cada componente no portable directamente. |
-| | 6. El sistema retorna el análisis de compatibilidad al proceso UC-7.7. |
-| 7. El Admin. TI puede revisar el análisis detallado y agregar anotaciones técnicas antes de que se incorpore al plan de migración. | |
-
-### Cursos Alternos
-
-| Condición | Acción |
-|---|---|
-| En el paso 4 — dependencia crítica de HSM físico sin equivalente en nube | El sistema propone la opción de HSM como servicio (HSMaaS) de proveedores cloud certificados como alternativa y la incluye en el análisis de costos de migración. |
-| En el paso 3 — componente clasificado como `REQUIERE_REDISEÑO` es crítico para el negocio | El sistema marca ese componente como bloqueante de la fase de migración que lo involucra y ajusta el plan de fases para posponer su migración hasta que el rediseño esté completado. |
-
----
-
-## UC-7.9 — Estimar costos migración
-
-| | |
-|---|---|
-| **Nombre** | Estimar costos migración |
-| **Actores** | Sistema *(invocado por UC-7.7)*, Admin. TI, Ministerio |
-| **Propósito** | Calcular el presupuesto total requerido para la migración a la nube, incluyendo costos de adaptación técnica, servicios cloud recurrentes y costos operativos comparados con la infraestructura on-premise actual. |
-
-**Resumen:** El caso de uso es invocado durante la planificación de migración. El sistema consolida los costos de los componentes a adaptar, los costos de servicios cloud equivalentes y los costos operativos proyectados. Genera un análisis comparativo con el costo actual on-premise. Finaliza retornando el estimado de costos al proceso UC-7.7 para inclusión en el plan de migración.
-
-### Curso Normal de Eventos
-
-| Acción del actor | Respuesta del proceso de negocio |
-|---|---|
-| 1. El proceso UC-7.7 invoca este caso de uso con el mapa de compatibilidad generado por UC-7.8. | 2. El sistema calcula el costo de adaptación técnica para los componentes clasificados como `PORTABLE_CON_ADAPTACION` o `REQUIERE_REDISEÑO` en horas de desarrollo estimadas. |
-| | 3. El sistema consulta las tarifas vigentes de los servicios cloud equivalentes (cómputo, almacenamiento, red, blockchain como servicio) y proyecta el costo mensual en la nube. |
-| | 4. El sistema calcula el costo total de migración: costo de adaptación (único) más proyección de costos operativos en nube a 12, 24 y 36 meses. |
-| | 5. El sistema genera el análisis comparativo: costo actual on-premise vs. costo proyectado en nube con el punto de equilibrio (break-even) de la inversión. |
-| | 6. El sistema retorna el estimado de costos al proceso UC-7.7. |
-| 7. El Admin. TI y el Ministerio pueden revisar el detalle del estimado antes de la aprobación de presupuesto. | |
-
-### Cursos Alternos
-
-| Condición | Acción |
-|---|---|
-| En el paso 3 — tarifas cloud no disponibles o desactualizadas | El sistema utiliza las últimas tarifas registradas en el catálogo interno, marca el estimado como `BASADO_EN_TARIFAS_HISTORICAS` e indica al Admin. TI que debe verificar las tarifas vigentes antes de la aprobación. |
-| En el paso 5 — el costo en nube supera significativamente el presupuesto disponible | El sistema genera escenarios alternativos con menor costo: migración parcial de componentes no críticos, uso de instancias reservadas o modelos de pago por uso para componentes estacionales. |
-
----
-
-## UC-7.10 — Aprobar presupuesto migración
-
-| | |
-|---|---|
-| **Nombre** | Aprobar presupuesto migración |
-| **Actores** | Ministerio *(— `«include»` desde UC-7.7)*, Admin. TI |
-| **Propósito** | Obtener la aprobación formal del Ministerio sobre el presupuesto estimado para la migración a la nube, validando que la inversión se alinea con las políticas financieras y los objetivos estratégicos del SICA. |
-
-**Resumen:** El caso de uso es invocado durante la planificación de migración, una vez disponible el estimado de costos. El sistema presenta el resumen ejecutivo del presupuesto al Ministerio para su revisión y aprobación formal. Finaliza cuando el Ministerio emite su decisión (aprobación o rechazo con observaciones) y el sistema registra la resolución en el plan de migración.
-
-### Curso Normal de Eventos
-
-| Acción del actor | Respuesta del proceso de negocio |
-|---|---|
-| 1. El proceso UC-7.7 invoca este caso de uso con el estimado de costos de migración y el plan de fases propuesto. | 2. El sistema genera el resumen ejecutivo del presupuesto: inversión total, desglose por fase, costo operativo mensual proyectado y análisis de retorno de inversión. |
-| | 3. El sistema presenta el resumen al Ministerio a través del panel de aprobaciones con un plazo de respuesta de 10 días hábiles. |
-| 4. El Ministerio revisa el resumen ejecutivo, puede solicitar aclaraciones al Admin. TI y emite su decisión de aprobación o rechazo. | 5. El sistema registra la decisión del Ministerio con la firma electrónica del aprobador y el timestamp de la resolución. |
-| | 6. Si la decisión es `APROBADO`, el sistema actualiza el plan de migración con el presupuesto confirmado y notifica al Admin. TI para iniciar la ejecución. |
-| | 7. El sistema registra la aprobación presupuestaria en la bitácora de decisiones administrativas de la plataforma. |
-
-### Cursos Alternos
-
-| Condición | Acción |
-|---|---|
-| En el paso 4 — Ministerio rechaza el presupuesto | El sistema registra el rechazo con las observaciones del Ministerio, notifica al Admin. TI y retorna el flujo a UC-7.9 para generar un estimado revisado según las observaciones recibidas. |
-| En el paso 3 — no se recibe respuesta del Ministerio en el plazo de 10 días hábiles | El sistema envía un recordatorio al Ministerio con la alerta de que el plan de migración no puede avanzar sin la aprobación presupuestaria, e incluye al Administrador SICA como destinatario del recordatorio. |
-
+#
 # 4. Matrices de trazabilidad
 
 
@@ -2219,14 +1914,7 @@ La matriz de trazabilidad Stakeholders vs Requerimientos permite identificar qu�
 
 Esta matriz también facilita el análisis de impacto: si cambia un requisito funcional, el equipo puede identificar rápidamente qué stakeholder debe ser consultado o qué área del negocio se verá afectada. Por esa razón, se utiliza como evidencia de alineación entre las necesidades del negocio, la arquitectura propuesta y los requisitos funcionales definidos para la solución.
 
-## Leyenda
 
-| Símbolo | Significado |
-|---|---|
-| **E** | El stakeholder exige directamente el requisito. |
-| **I** | El stakeholder se ve impactado por el requisito. |
-| **V** | El stakeholder valida o consulta el resultado del requisito. |
-| *(vacío)* | No existe una relación directa relevante para esta matriz. |
 
 ## Stakeholders considerados
 
@@ -2265,17 +1953,17 @@ Esta matriz también facilita el análisis de impacto: si cambia un requisito fu
 
 | Stakeholder | RF-01 | RF-02 | RF-03 | RF-04 | RF-05 | RF-06 | RF-07 | RF-08 | RF-09 | RF-10 | RF-11 | RF-12 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| ST-01 - Secretaría General del SICA | I | E | I | E | E | I | E | E | I | I | I | E |
-| ST-02 - Alta dirección del SICA | I | E | I | E | E | I | E | E | I | I | I | E |
-| ST-03 - Dirección financiera |  |  |  | I | E |  |  | I | I | I | I | I |
-| ST-04 - Administradores de TI / Soporte operativo | I | I | I | I | I | I | I |  | I | I | E | I |
-| ST-05 - Universidades integradas: USAC, UCR y UES | E | I |  |  |  | E | E | I | I |  | I | I |
-| ST-06 - Ministerios de educación |  |  |  | I | I |  |  | E | E | I |  |  |
-| ST-07 - Ministerios de trabajo |  |  |  | I | E |  |  | E | E | I |  |  |
-| ST-08 - Candidatos / estudiantes / profesionales | I | E | I | I |  |  |  |  |  | I |  | I |
-| ST-09 - Entes reguladores y autoridades de protección de datos |  |  | I | I | E |  |  | I | E | I |  |  |
-| ST-10 - Auditores |  |  | E | I | E |  |  |  | I | I |  |  |
-| ST-11 - Verificadores externos de certificados |  |  |  | I | I |  |  |  |  | E |  |  |
+| ST-01 - Secretaría General del SICA | X | X | X | X | X | X | X | X | X | X | X | X |
+| ST-02 - Alta dirección del SICA | X | X | X | X | X | X | X | X | X | X | X | X |
+| ST-03 - Dirección financiera |  |  |  | X | X |  |  | X | X | X | X | X |
+| ST-04 - Administradores de TI / Soporte operativo | X | X | X | X| X | X | X |  | X | X | X | X |
+| ST-05 - Universidades integradas: USAC, UCR y UES | X | X |  |  |  | X | X | X | X |  | X | X |
+| ST-06 - Ministerios de educación |  |  |  | X | X |  |  | X | X | X |  |  |
+| ST-07 - Ministerios de trabajo |  |  |  | X | X |  |  | X | X | X |  |  |
+| ST-08 - Candidatos / estudiantes / profesionales | X | X | X | X |  |  |  |  |  | X |  | X |
+| ST-09 - Entes reguladores y autoridades de protección de datos |  |  | X | X | X |  |  | X | X | X |  |  |
+| ST-10 - Auditores |  |  | X | X | X |  |  |  | X | X |  |  |
+| ST-11 - Verificadores externos de certificados |  |  |  | X | X |  |  |  |  | X |  |  |
 
 ## Justificación de trazabilidad
 
@@ -2305,30 +1993,22 @@ La presente matriz de trazabilidad relaciona los stakeholders identificados para
 
 Esta matriz complementa la trazabilidad Stakeholders vs Requerimientos al mostrar cómo dichas necesidades se materializan en funcionalidades concretas del sistema.
 
-### Leyenda
-
-| Símbolo   | Significado                                                               |
-| --------- | ------------------------------------------------------------------------- |
-| E         | El stakeholder exige directamente el caso de uso.                         |
-| I         | El stakeholder se ve impactado por el caso de uso.                        |
-| V         | El stakeholder valida, supervisa o consulta el resultado del caso de uso. |
-| *(vacío)* | No existe relación significativa.                                         |
 
 ### Matriz Stakeholders vs Casos de Uso del Sistema
 
 | Stakeholder                           | CUS-01 | CUS-02 | CUS-03 | CUS-03.1 | CUS-04 | CUS-05 | CUS-06 | CUS-07 | CUS-07.1 | CUS-08 | CUS-09 | CUS-10 | CUS-11 | CUS-12 |
 | ------------------------------------- | ------ | ------ | ------ | -------- | ------ | ------ | ------ | ------ | -------- | ------ | ------ | ------ | ------ | ------ |
-| ST-01 Secretaría General del SICA     | I      | I      | E      | I        | I      | E      | E      | I      | E        | I      | E      | I      | I      | E      |
-| ST-02 Alta Dirección del SICA         | I      | I      | E      | I        | I      | E      | E      | I      | E        | I      | E      | I      | I      | E      |
-| ST-03 Dirección Financiera            |        | I      |        |          |        | I      | E      |        |          |        | I      | I      | I      | I      |
-| ST-04 Administradores TI / Operativos | E      | E      | I      | E        | I      | I      | I      | I      | E        | I      |        |        | I      | E      |
-| ST-05 Universidades USAC / UCR / UES  | E      |        | I      |          |        |        |        | E      | E        | E      |        |        |        |        |
-| ST-06 Ministerios de Educación        |        |        |        |          |        | I      | I      |        |          |        | E      | E      | V      |        |
-| ST-07 Ministerios de Trabajo          |        |        |        |          |        | I      | I      |        |          |        | E      | E      | V      |        |
-| ST-08 Candidatos / Profesionales      | E      |        | E      |          | I      | E      |        |        |          |        |        |        | V      | I      |
-| ST-09 Entes Regulatorios              |        |        |        |          | I      | I      | E      |        |          |        | I      | E      | V      |        |
-| ST-10 Auditores                       |        |        |        |          | E      | I      | E      |        |          |        |        | I      | V      |        |
-| ST-11 Verificadores Externos          |        |        |        |          |        |        |        |        |          |        |        |        | E      |        |
+| ST-01 Secretaría General del SICA     | X      | X      | X      | X        | X      | X      | X      | X      | X        | X      | X      | X      | X      | X      |
+| ST-02 Alta Dirección del SICA         | X      | X      | X      | X        | X      | X      | X      | X      | X        | X      | X      | X      | X      | X      |
+| ST-03 Dirección Financiera            |        | X      |        |          |        | X      | X      |        |          |        | X      | X      | X      | X      |
+| ST-04 Administradores TI / Operativos | X      | X      | X      | X        | X      | X      | X      | X      | X        | X      |        |        | X      | X      |
+| ST-05 Universidades USAC / UCR / UES  | X      |        | X      |          |        |        |        | X      | X        | X      |        |        |        |        |
+| ST-06 Ministerios de Educación        |        |        |        |          |        | X     | X      |        |          |        | X      | X      | X      |        |
+| ST-07 Ministerios de Trabajo          |        |        |        |          |        | X     | X      |        |          |        | X      | X      | X      |        |
+| ST-08 Candidatos / Profesionales      | X      |        | X      |          | X      | X      |        |        |          |        |        |        | X      | X      |
+| ST-09 Entes Regulatorios              |        |        |        |          | X      | X      | X      |        |          |        | X      | X      | X      |        |
+| ST-10 Auditores                       |        |        |        |          | X      | X      | X      |        |          |        |        | X      | X      |        |
+| ST-11 Verificadores Externos          |        |        |        |          |        |        |        |        |          |        |        |        | X      |        |
 
 ### Resumen de Participación por Stakeholder
 
@@ -2538,15 +2218,15 @@ Los Ministerios de Educacion y Trabajo acceden al sistema por dos vias: a traves
 
 ## 7.1 Diagrama de componentes
 
-![Diagrama de componentes](imagenes/DiagramadeComponentes.png)
+![Diagrama de componentes](imagenes/componentes_uml.png)
 
 ## 7.2 Diagrama de despliegue
 
-![Diagrama de despliegue](imagenes/DiagramadeDespliegue.png)
+![Diagrama de despliegue](imagenes/despliegue_uml.png)
 
 ## 7.3 Diagrama de distribucion
 
-![Diagrama de distribucion](imagenes/DiagramadeDistribucion.png)
+![Diagrama de distribucion](imagenes/distribucion_uml.png)
 
 ## 7.4 Justificacion de tecnologias y frameworks
 
