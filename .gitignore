@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-node_modules/
-.env
-dist/
-build/
-=======
 # ── Node.js ─────────────────────────────────────────────────────────────────
 node_modules/
 npm-debug.log*
@@ -16,6 +10,10 @@ pnpm-debug.log*
 .env.local
 .env.*.local
 
+# ── Build ──────────────────────────────────────────────────────────────────
+dist/
+build/
+
 # ── Frontend — build de producción ──────────────────────────────────────────
 prccd-mvp/frontend/dist/
 prccd-mvp/frontend/.vite/
@@ -25,6 +23,10 @@ prccd-mvp/docker/data/
 prccd-mvp/postgres-data/
 prccd-mvp/mongo-data/
 prccd-mvp/minio-data/
+
+# ── PKI — claves privadas (NUNCA commitear material criptográfico privado) ──
+prccd-mvp/backend/data/pki/*-private.pem
+prccd-mvp/backend/data/pki/*.key
 
 # ── Sistema operativo ────────────────────────────────────────────────────────
 .DS_Store
@@ -41,4 +43,3 @@ desktop.ini
 *.tmp
 *.temp
 *.swp
->>>>>>> feature/ingesta

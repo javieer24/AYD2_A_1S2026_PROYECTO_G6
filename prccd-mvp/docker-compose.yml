@@ -2,12 +2,11 @@
 # Responsable: Oswaldo Antonio Choc Cuteres — 201901844
 # Tarea: F2-26
 
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
     container_name: prccd_postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: prccd_db
       POSTGRES_USER: prccd_user
@@ -17,12 +16,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prccd_user -d prccd_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - prccd_network
 
   mongodb:
     image: mongo:6-jammy
     container_name: prccd_mongo
+    restart: unless-stopped
     environment:
       MONGO_INITDB_DATABASE: prccd_docs
     ports:
@@ -35,6 +40,7 @@ services:
   minio:
     image: minio/minio:latest
     container_name: prccd_minio
+    restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
@@ -52,6 +58,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: prccd_backend
+    restart: unless-stopped
     environment:
       PORT: 3000
       NODE_ENV: development
@@ -70,9 +77,12 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - postgres
-      - mongodb
-      - minio
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      minio:
+        condition: service_started
     networks:
       - prccd_network
     volumes:
@@ -82,6 +92,7 @@ services:
   nginx:
     image: nginx:alpine
     container_name: prccd_nginx
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
@@ -98,4 +109,4 @@ volumes:
 
 networks:
   prccd_network:
-    driver: bridges
+    driver: bridge

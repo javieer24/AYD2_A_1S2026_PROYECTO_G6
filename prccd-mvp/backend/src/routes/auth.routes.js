@@ -7,6 +7,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body } = require('express-validator');
 const validateRequest = require('../middleware/validate.middleware');
+const Candidato = require('../models/candidato.model');
 
 const router = express.Router();
 
@@ -56,6 +57,54 @@ router.post(
       token,
       usuario: payload,
     });
+  }
+);
+
+/**
+ * POST /api/auth/confirmar-identidad
+ * Login federado de candidatos (USAC/UCR/UES) — F2-28.
+ * Prototipo: no existe registro ni creación de cuenta. La confirmación de
+ * identidad se hace contra los datos académicos ya ingeridos por los
+ * adaptadores (id_candidato + nombre_completo + universidad_origen), que es
+ * lo que en producción devolvería el LDAP/SAML/OAuth2 de cada universidad.
+ * Body: { id_candidato, nombre_completo, universidad_origen }
+ */
+router.post(
+  '/confirmar-identidad',
+  [
+    body('id_candidato').notEmpty().withMessage('El campo id_candidato es obligatorio'),
+    body('nombre_completo').notEmpty().withMessage('El campo nombre_completo es obligatorio'),
+    body('universidad_origen').notEmpty().withMessage('El campo universidad_origen es obligatorio'),
+  ],
+  validateRequest,
+  async (req, res, next) => {
+    try {
+      const { id_candidato, nombre_completo, universidad_origen } = req.body;
+
+      const candidato = await Candidato.findOne({ where: { id_candidato } });
+
+      const confirmado = candidato
+        && candidato.estado === 'ACTIVO'
+        && candidato.nombre_completo.trim().toLowerCase() === String(nombre_completo).trim().toLowerCase()
+        && candidato.universidad_origen.trim().toUpperCase() === String(universidad_origen).trim().toUpperCase();
+
+      if (!confirmado) {
+        return res.status(401).json({ status: 'error', message: 'No se pudo confirmar la identidad del candidato' });
+      }
+
+      const payload = {
+        id_candidato: candidato.id_candidato,
+        nombre: candidato.nombre_completo,
+        rol: 'ESTUDIANTE',
+        universidad: candidato.universidad_origen,
+      };
+
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+
+      return res.status(200).json({ status: 'ok', token, usuario: payload });
+    } catch (err) {
+      next(err);
+    }
   }
 );
 
