@@ -1,15 +1,11 @@
-<<<<<<< HEAD
-node_modules/
-.env
-dist/
-build/
-=======
 # ── Node.js ─────────────────────────────────────────────────────────────────
 node_modules/
 npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 *.log
+dist/
+build/
 
 # ── Variables de entorno (NUNCA commitear .env con secretos reales) ──────────
 .env
@@ -26,6 +22,9 @@ prccd-mvp/postgres-data/
 prccd-mvp/mongo-data/
 prccd-mvp/minio-data/
 
+# ── PKI — llaves criptográficas locales (NUNCA commitear llaves privadas) ───
+prccd-mvp/backend/data/pki/
+
 # ── Sistema operativo ────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
@@ -41,4 +40,3 @@ desktop.ini
 *.tmp
 *.temp
 *.swp
->>>>>>> feature/ingesta
