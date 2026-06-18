@@ -1,122 +1,83 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import "./index.css";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+    <main className="app">
+      <section className="hero">
+        <nav className="topbar">
+          <div>
+            <strong>PRCCD</strong>
+            <span>Certificación Regional SICA</span>
+          </div>
+          <span className="badge">MVP Fase 2</span>
+        </nav>
+
+        <div className="heroContent">
+          <p className="eyebrow">Plataforma Regional de Certificación de Competencias Digitales</p>
+          <h1>Arquitectura PRCCD materializada en un MVP funcional</h1>
+          <p className="description">
+            Prototipo de implementación para validar ingesta universitaria, examen adaptativo,
+            evidencia antifraude, emisión de credenciales inmutables, analítica anonimizada
+            y verificación pública de certificados.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+          <div className="actions">
+            <a href="/examen" className="primary">Iniciar examen adaptativo</a>
+            <a href="/dashboard" className="secondary">Ver dashboard regional</a>
+          </div>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <section className="modules">
+        <Module
+          title="Ingesta universitaria"
+          route="/ingesta"
+          tag="USAC · UCR · UES"
+          text="Carga de expedientes académicos en CSV, JSON o XML hacia el modelo canónico interno."
+        />
+        <Module
+          title="Examen adaptativo"
+          route="/examen"
+          tag="Motor IRT activo"
+          text="Flujo de evaluación con dificultad básica, intermedia y avanzada según la respuesta previa."
+        />
+        <Module
+          title="Evidencia antifraude"
+          route="/auditoria"
+          tag="Retención 5 años"
+          text="Simulación de telemetría, hashes de integridad y bitácora de auditoría."
+        />
+        <Module
+          title="Credencial inmutable"
+          route="/certificado"
+          tag="PKI + Hyperledger"
+          text="Emisión de certificado con SHA-256, firma digital y registro inmutable."
+        />
+        <Module
+          title="Dashboard regional"
+          route="/dashboard"
+          tag="Datos anonimizados"
+          text="Indicadores agregados por país, carrera universitaria y género."
+        />
+        <Module
+          title="Verificación pública"
+          route="/verificar"
+          tag="QR / Hash"
+          text="Validación externa de certificados sin exponer datos personales sensibles."
+        />
+      </section>
+    </main>
+  );
 }
 
-export default App
+function Module({ title, route, tag, text }) {
+  return (
+    <a className="card" href={route}>
+      <span>{tag}</span>
+      <h2>{title}</h2>
+      <p>{text}</p>
+    </a>
+  );
+}
+
+export default App;
