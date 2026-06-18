@@ -36,6 +36,38 @@ router.post('/responder', async (req, res, next) => {
   }
 });
 
+// GET /api/examen/preguntas?nivel=Medio
+
+router.get('/preguntas', async (req, res, next) => {
+  try {
+    const { sequelize } = require('../config/database');
+    const { QueryTypes } = require('sequelize');
+    const { nivel } = req.query;
+
+    let query = 'SELECT id, numero, nivel, categoria, pregunta FROM preguntas';
+    const replacements = {};
+
+    if (nivel) {
+      query += ' WHERE nivel = :nivel';
+      replacements.nivel = nivel;
+    }
+
+    query += ' ORDER BY nivel, numero';
+
+    const preguntas = await sequelize.query(query, {
+      replacements,
+      type: QueryTypes.SELECT
+    });
+
+    res.json({
+      total: preguntas.length,
+      preguntas
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/examen/sesion/:id  — ver estado de una sesión
 router.get('/sesion/:id', async (req, res, next) => {
   try {
