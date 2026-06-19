@@ -29,6 +29,8 @@ prccd-mvp/minio-data/
 # ── PKI — claves privadas (NUNCA commitear material criptográfico privado) ──
 prccd-mvp/backend/data/pki/*-private.pem
 prccd-mvp/backend/data/pki/*.key
+prccd-mvp/services/certificado-service/data/pki/*-private.pem
+prccd-mvp/services/certificado-service/data/pki/*.key
 
 # ── Sistema operativo ────────────────────────────────────────────────────────
 .DS_Store
