@@ -11,6 +11,7 @@ const authMiddleware = require('./middleware/auth.middleware');
 const authRoutes = require('./routes/auth.routes');
 const ingestaRoutes = require('./routes/ingesta.routes');
 const examenRoutes = require('./routes/examen.routes');
+const telemetriaRoutes = require('./routes/telemetria.routes');
 
 const app = express();
 
@@ -34,4 +35,6 @@ app.use('/api/ingest', authMiddleware, ingestaRoutes);
 app.use(errorMiddleware);
 
 app.use('/api/examen', authMiddleware, examenRoutes);
+app.use('/api/telemetria', authMiddleware, telemetriaRoutes);
+
 module.exports = app;
