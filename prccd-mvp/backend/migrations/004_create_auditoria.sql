@@ -17,4 +17,3 @@ CREATE INDEX IF NOT EXISTS idx_auditoria_sesion
 
 CREATE INDEX IF NOT EXISTS idx_auditoria_candidato
   ON auditoria (id_candidato);
-  

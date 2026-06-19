@@ -12,6 +12,10 @@ build/
 .env.local
 .env.*.local
 
+# ── Build ──────────────────────────────────────────────────────────────────
+dist/
+build/
+
 # ── Frontend — build de producción ──────────────────────────────────────────
 prccd-mvp/frontend/dist/
 prccd-mvp/frontend/.vite/
@@ -22,8 +26,9 @@ prccd-mvp/postgres-data/
 prccd-mvp/mongo-data/
 prccd-mvp/minio-data/
 
-# ── PKI — llaves criptográficas locales (NUNCA commitear llaves privadas) ───
-prccd-mvp/backend/data/pki/
+# ── PKI — claves privadas (NUNCA commitear material criptográfico privado) ──
+prccd-mvp/backend/data/pki/*-private.pem
+prccd-mvp/backend/data/pki/*.key
 
 # ── Sistema operativo ────────────────────────────────────────────────────────
 .DS_Store

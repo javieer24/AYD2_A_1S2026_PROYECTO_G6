@@ -1,0 +1,156 @@
+{
+  "info": {
+    "name": "PRCCD-SICA — Backend MVP",
+    "description": "Colección para probar el backend (auth staff, login federado de candidatos F2-28, ingesta, examen adaptativo). Importar en Postman junto con el environment base_url=http://localhost:3000 (o http://localhost si se prueba vía nginx).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000" },
+    { "key": "admin_token", "value": "" },
+    { "key": "estudiante_token", "value": "" },
+    { "key": "sesion_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/health"
+      }
+    },
+    {
+      "name": "1. Login staff (admin)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const data = pm.response.json();",
+              "if (data.token) pm.collectionVariables.set('admin_token', data.token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+        },
+        "url": "{{base_url}}/api/auth/login"
+      }
+    },
+    {
+      "name": "2. Ingesta USAC (requiere admin_token)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "universidad", "value": "USAC", "type": "text" },
+            { "key": "archivo", "type": "file", "src": [] }
+          ]
+        },
+        "url": "{{base_url}}/api/ingest",
+        "description": "Adjuntar un CSV con columnas: student_id,full_name,institution,program,courses"
+      }
+    },
+    {
+      "name": "3. Confirmar identidad (login candidato — F2-28)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const data = pm.response.json();",
+              "if (data.token) pm.collectionVariables.set('estudiante_token', data.token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id_candidato\": \"USAC-2024-001\",\n  \"nombre_completo\": \"Maria Lopez\",\n  \"universidad_origen\": \"USAC\"\n}"
+        },
+        "url": "{{base_url}}/api/auth/confirmar-identidad"
+      }
+    },
+    {
+      "name": "4. Iniciar examen (con estudiante_token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const data = pm.response.json();",
+              "if (data.sesion_id) pm.collectionVariables.set('sesion_id', data.sesion_id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{estudiante_token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id_candidato\": \"USAC-2024-001\"\n}"
+        },
+        "url": "{{base_url}}/api/examen/iniciar"
+      }
+    },
+    {
+      "name": "5. Responder pregunta",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{estudiante_token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sesion_id\": {{sesion_id}},\n  \"pregunta_id\": 1,\n  \"respuesta\": \"A\"\n}"
+        },
+        "url": "{{base_url}}/api/examen/responder"
+      }
+    },
+    {
+      "name": "6. Ver mi sesión",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{estudiante_token}}" }],
+        "url": "{{base_url}}/api/examen/sesion/{{sesion_id}}"
+      }
+    },
+    {
+      "name": "7. [Negativo] Iniciar examen de OTRO candidato (debe dar 403)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{estudiante_token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id_candidato\": \"USAC-2024-002\"\n}"
+        },
+        "url": "{{base_url}}/api/examen/iniciar"
+      }
+    },
+    {
+      "name": "GET /api/auth/me",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+        "url": "{{base_url}}/api/auth/me"
+      }
+    }
+  ]
+}
