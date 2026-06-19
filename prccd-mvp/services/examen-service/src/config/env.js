@@ -11,4 +11,8 @@ module.exports = {
     user: process.env.DB_USER || 'prccd_user',
     password: process.env.DB_PASSWORD || 'prccd_pass',
   },
+
+  mongo: {
+    uri: process.env.MONGO_URI || 'mongodb://localhost:27017/prccd_docs',
+  },
 };

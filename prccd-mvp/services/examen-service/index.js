@@ -1,11 +1,13 @@
 require('dotenv').config();
 const app = require('./src/app');
 const { connectDB } = require('./src/config/database');
+const { connectMongo } = require('./src/config/mongo');
 const env = require('./src/config/env');
 
 async function main() {
   try {
     await connectDB();
+    await connectMongo();
     app.listen(env.port, () => {
       console.log(`Examen service corriendo en http://localhost:${env.port}`);
       console.log(`Health check: http://localhost:${env.port}/health`);

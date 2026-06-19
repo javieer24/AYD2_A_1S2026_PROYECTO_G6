@@ -1,29 +1,30 @@
 // Módulo: Lógica del motor adaptativo
 const { sequelize } = require('../config/database');
 const { QueryTypes } = require('sequelize');
+const { getPreguntasCollection } = require('../config/mongo');
 
 const NIVEL_ACIERTO = { 'Básico': 'Medio', 'Medio': 'Avanzado', 'Avanzado': 'Avanzado' };
 const NIVEL_FALLO   = { 'Básico': 'Básico', 'Medio': 'Básico',  'Avanzado': 'Medio' };
 const TOTAL_PREGUNTAS = 10;
 const PESOS = { 'Básico': 1, 'Medio': 2, 'Avanzado': 3 };
 
+// Banco de preguntas en MongoDB (colección "preguntas", BD prccd_docs) — el
+// id entero (campo "id") se conserva para seguir siendo compatible con
+// sesiones_examen.preguntas_ids (INTEGER[] en Postgres).
 async function getPregunta(nivel, excluirIds = []) {
-  let query, replacements;
+  const filtro = excluirIds.length === 0
+    ? { nivel }
+    : { nivel, id: { $nin: excluirIds } };
 
-  if (excluirIds.length === 0) {
-    query = `SELECT * FROM preguntas WHERE nivel = :nivel ORDER BY RANDOM() LIMIT 1`;
-    replacements = { nivel };
-  } else {
-    query = `SELECT * FROM preguntas WHERE nivel = :nivel AND id NOT IN (:excluir) ORDER BY RANDOM() LIMIT 1`;
-    replacements = { nivel, excluir: excluirIds };
-  }
+  const [pregunta] = await getPreguntasCollection()
+    .aggregate([{ $match: filtro }, { $sample: { size: 1 } }])
+    .toArray();
 
-  const rows = await sequelize.query(query, {
-    replacements,
-    type: QueryTypes.SELECT
-  });
+  return pregunta || null;
+}
 
-  return rows[0] || null;
+async function getPreguntaPorId(id) {
+  return getPreguntasCollection().findOne({ id });
 }
 
 async function iniciarExamen(id_candidato) {
@@ -60,11 +61,8 @@ async function responderPregunta(sesion_id, pregunta_id, respuesta) {
   if (!sesion) throw new Error('Sesión no encontrada');
   if (sesion.completado) throw new Error('El examen ya fue completado');
 
-  // Cargar pregunta actual
-  const [preguntaActual] = await sequelize.query(
-    `SELECT * FROM preguntas WHERE id = :id`,
-    { replacements: { id: pregunta_id }, type: QueryTypes.SELECT }
-  );
+  // Cargar pregunta actual (banco de preguntas en MongoDB)
+  const preguntaActual = await getPreguntaPorId(pregunta_id);
   if (!preguntaActual) throw new Error('Pregunta no encontrada');
 
   // Evaluar respuesta
@@ -155,9 +153,9 @@ function calcularDictamen(historial) {
   };
 }
 
-// Nunca enviar la respuesta correcta al frontend
+// Nunca enviar la respuesta correcta ni el _id interno de Mongo al frontend
 function ocultarRespuesta(pregunta) {
-  const { respuesta_correcta, ...rest } = pregunta;
+  const { respuesta_correcta, _id, ...rest } = pregunta;
   return rest;
 }
 

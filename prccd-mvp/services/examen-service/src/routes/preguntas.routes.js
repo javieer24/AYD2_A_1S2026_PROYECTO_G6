@@ -1,10 +1,8 @@
 // Módulo: Rutas REST — Banco de Preguntas (motor adaptativo)
-// No existía una API HTTP para el banco de preguntas (solo el script de carga
-// scripts/seedPreguntas.js); se agrega un CRUD básico para que el staff
-// (ADMIN/EVALUADOR) pueda administrar el banco sin acceso directo a la BD.
+// Banco de preguntas en MongoDB (decisión de arquitectura de Fase 1: esquema
+// documental flexible, sin joins relacionales durante el examen activo).
 const router = require('express').Router();
-const { sequelize } = require('../config/database');
-const { QueryTypes } = require('sequelize');
+const { getPreguntasCollection } = require('../config/mongo');
 
 const NIVELES_VALIDOS = ['Básico', 'Medio', 'Avanzado'];
 
@@ -16,13 +14,11 @@ function esStaff(req) {
 router.get('/', async (req, res, next) => {
   try {
     const { nivel } = req.query;
-    const preguntas = await sequelize.query(
-      `SELECT id, numero, nivel, categoria, pregunta, opcion_a, opcion_b, opcion_c, opcion_d
-       FROM preguntas
-       ${nivel ? 'WHERE nivel = :nivel' : ''}
-       ORDER BY numero ASC`,
-      { replacements: { nivel }, type: QueryTypes.SELECT }
-    );
+    const filtro = nivel ? { nivel } : {};
+    const preguntas = await getPreguntasCollection()
+      .find(filtro, { projection: { _id: 0, respuesta_correcta: 0 } })
+      .sort({ numero: 1 })
+      .toArray();
     res.json({ status: 'ok', total: preguntas.length, preguntas });
   } catch (err) {
     next(err);
@@ -36,7 +32,7 @@ router.post('/', async (req, res, next) => {
     if (!esStaff(req)) {
       return res.status(403).json({ status: 'error', message: 'Solo ADMIN o EVALUADOR pueden administrar el banco de preguntas' });
     }
-    const { numero, nivel, categoria, pregunta, opcion_a, opcion_b, opcion_c, opcion_d, respuesta_correcta } = req.body;
+    const { numero, nivel, categoria, pregunta, opcion_a, opcion_b, opcion_c, opcion_d, respuesta_correcta, metadatos } = req.body;
     if (!nivel || !NIVELES_VALIDOS.includes(nivel)) {
       return res.status(400).json({ status: 'error', message: `nivel debe ser uno de: ${NIVELES_VALIDOS.join(', ')}` });
     }
@@ -47,19 +43,25 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ status: 'error', message: 'respuesta_correcta debe ser A, B, C o D' });
     }
 
-    const [nueva] = await sequelize.query(
-      `INSERT INTO preguntas (numero, nivel, categoria, pregunta, opcion_a, opcion_b, opcion_c, opcion_d, respuesta_correcta)
-       VALUES (:numero, :nivel, :categoria, :pregunta, :opcion_a, :opcion_b, :opcion_c, :opcion_d, :respuesta_correcta)
-       RETURNING id, numero, nivel`,
-      {
-        replacements: {
-          numero, nivel, categoria, pregunta, opcion_a, opcion_b, opcion_c, opcion_d,
-          respuesta_correcta: respuesta_correcta.toUpperCase(),
-        },
-        type: QueryTypes.INSERT,
-      }
-    );
-    res.status(201).json({ status: 'ok', pregunta: nueva[0] });
+    const coleccion = getPreguntasCollection();
+    const [ultima] = await coleccion.find().sort({ id: -1 }).limit(1).toArray();
+    const nuevoId = ultima ? ultima.id + 1 : 1;
+
+    const documento = {
+      id: nuevoId,
+      numero: numero || nuevoId,
+      nivel,
+      categoria: categoria || null,
+      pregunta,
+      opcion_a, opcion_b, opcion_c, opcion_d,
+      respuesta_correcta: respuesta_correcta.toUpperCase(),
+      // Campo flexible: el modelo documental permite agregar atributos
+      // heterogeneos (ej. parametros IRT, tipo de pregunta) sin migracion.
+      metadatos: metadatos || {},
+    };
+    await coleccion.insertOne(documento);
+
+    res.status(201).json({ status: 'ok', pregunta: { id: nuevoId, numero: documento.numero, nivel } });
   } catch (err) {
     next(err);
   }
