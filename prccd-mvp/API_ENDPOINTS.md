@@ -90,7 +90,8 @@ Estado de una sesión: `{ id, id_candidato, numero_pregunta, completado, dictame
 
 ### `GET /api/examen/preguntas?nivel=Medio` — requiere token
 Lista el banco de preguntas (nunca incluye `respuesta_correcta`). `nivel` es
-opcional (`Básico`|`Medio`|`Avanzado`).
+opcional (`Básico`|`Medio`|`Avanzado`). El banco vive en MongoDB; cada
+pregunta trae un campo `metadatos: {}` libre para datos futuros.
 
 ### `POST /api/examen/preguntas` — requiere token de `ADMIN` o `EVALUADOR`
 Agrega una pregunta al banco.
@@ -163,6 +164,26 @@ dictamen='Suspendido'` automáticamente — el frontend debe revisar
 
 ### `GET /api/telemetria/:sesion_id` — requiere token
 Lista los eventos de esa sesión (el candidato solo puede ver la suya).
+
+### `POST /api/telemetria/evidencia` — requiere token
+Sube un archivo de evidencia (captura de pantalla, video, log de tecleo). Se
+cifra (AES-256-GCM) antes de subirse a MinIO con retención WORM de 5 años;
+ningún endpoint permite borrarlo.
+```
+multipart/form-data: archivo (File), sesion_id, tipo
+tipo: "CAPTURA_PANTALLA" | "VIDEO" | "LOG_TECLEO" | "OTRO"
+```
+```json
+// 201
+{ "status": "ok", "evidencia": { "id": "...", "tipo": "LOG_TECLEO", "size_bytes": 54, "hash_archivo": "...", "timestamp_captura": "...", "retencion_hasta": "..." } }
+```
+
+### `GET /api/telemetria/evidencia/:sesion_id` — requiere token
+Lista los metadatos de evidencia de una sesión (sin el archivo).
+
+### `GET /api/telemetria/evidencia/descargar/:id` — requiere token de staff (`ADMIN`/`EVALUADOR`/`COORDINADOR`)
+Descarga el archivo descifrado. Verifica el hash SHA-256 antes de servirlo;
+si no coincide responde `409`.
 
 ---
 

@@ -19,9 +19,9 @@ heterogénea con USAC/UCR/UES (EaC-04) y contenedorización on-premise (R-03).
 |---|---|---|---|
 | `auth-service` | 3001 | Autenticación staff + login federado de candidatos | `candidatos` (lectura) |
 | `ingesta-service` | 3002 | Adaptadores USAC (CSV) / UCR (JSON) / UES (XML) | `candidatos` (escritura) |
-| `examen-service` | 3003 | Motor adaptativo + banco de preguntas | `preguntas`, `sesiones_examen` |
+| `examen-service` | 3003 | Motor adaptativo + banco de preguntas | `sesiones_examen` (Postgres), `preguntas` (**MongoDB**, colección `prccd_docs.preguntas`) |
 | `certificado-service` | 3004 | Emisión simple (F2-27) + PKI/log inmutable (F2-17/18) | `certificados`, `certificados_pki` |
-| `telemetria-service` | 3005 | Antifraude del examen (eventos sospechosos) | `auditoria`, `sesiones_examen` (lectura) |
+| `telemetria-service` | 3005 | Antifraude del examen + evidencia (F2-13/F2-14) | `auditoria`, `sesiones_examen` (lectura), `evidencia_antifraude` (Postgres) + objetos cifrados en **MinIO** (bucket `evidencias`) |
 | `auditoria-service` | 3006 | Bitácora general, retención 5 años | `auditoria` |
 | `dashboard-service` | 3007 | BI agregado y anonimizado | `candidatos`, `sesiones_examen`, `certificados` (lectura) |
 
@@ -69,6 +69,36 @@ Se decidió **exponer ambas en paralelo** en `certificado-service` (ver
 entrega: decidir con el equipo cuál es la oficial de cara al frontend, o
 unificarlas.
 
+## MongoDB — banco de preguntas
+
+Siguiendo la decisión de Fase 1 (esquema documental flexible, sin joins
+relacionales durante el examen activo), el banco de preguntas ya no vive en
+la tabla Postgres `preguntas` sino en MongoDB (`prccd_docs.preguntas`,
+conexión vía `MONGO_URI` en `examen-service`). El campo entero `id` se
+conserva igual que el `SERIAL` original de Postgres para no romper
+`sesiones_examen.preguntas_ids` (`INTEGER[]`, que sigue en Postgres). Cada
+documento tiene un campo `metadatos: {}` libre para extender el esquema sin
+migraciones (ej. parámetros IRT a futuro).
+
+Para sembrar el banco desde el Excel de origen:
+```bash
+docker compose exec examen-service node scripts/seedPreguntas.js
+```
+La tabla Postgres `preguntas` queda como tabla legada (no se borra, pero
+`examen-service` ya no la consulta).
+
+## MinIO — evidencia antifraude
+
+`telemetria-service` ahora implementa F2-14: los archivos de evidencia
+(capturas, video, logs de tecleo) se cifran en la aplicación con AES-256-GCM
+antes de subirse a MinIO (bucket `evidencias`, creado con Object Lock/WORM
+habilitado) — el cifrado no depende de que el servidor MinIO tenga SSE
+configurado. Cada objeto subido recibe retención `GOVERNANCE` de 5 años vía
+`putObjectRetention`; los metadatos (incluido el hash SHA-256 del archivo
+original, para verificar integridad al descargar) se guardan en la tabla
+Postgres `evidencia_antifraude` (migración `007`). No existe endpoint de
+borrado — es intencional, coherente con WORM.
+
 ## Gateway (Nginx)
 
 Un upstream por servicio, ruteo por prefijo de path. Ver
@@ -100,9 +130,14 @@ curl http://localhost/health/examen
 
 ## Pendientes conocidos (fuera de alcance de esta rama)
 
-- Separar base de datos por servicio (actualmente compartida).
+- Separar base de datos relacional por servicio (Postgres sigue compartida).
 - Reemplazar lecturas cruzadas de tablas (certificado/telemetria/dashboard)
   por llamadas HTTP entre servicios o un bus de eventos (Kafka, mencionado en
   Fase 1 pero no integrado todavía).
 - Decidir cuál implementación de certificados es la oficial.
 - Borrar `prccd-mvp/backend/` cuando el equipo lo confirme.
+- Parámetros IRT reales en el banco de preguntas de MongoDB (hoy el campo
+  `metadatos` existe pero va vacío; no se calibró ningún modelo IRT en este MVP).
+- Captura real de evidencia desde el frontend (pantallazos/video/keylog) —
+  esta rama solo construyó el endpoint backend de subida/descarga; falta que
+  el frontend dispare la captura y haga el POST.

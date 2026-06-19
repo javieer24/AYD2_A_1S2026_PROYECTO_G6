@@ -37,7 +37,7 @@ async function ensureBucket() {
 // registrando la obligación legal de conservación.
 async function intentarFijarRetencion(objectName, retentionDate) {
   try {
-    await minioClient.setObjectRetention(env.minio.bucket, objectName, {
+    await minioClient.putObjectRetention(env.minio.bucket, objectName, {
       mode: 'GOVERNANCE',
       retainUntilDate: retentionDate.toISOString(),
     });
