@@ -1,21 +1,21 @@
 {
   "info": {
-    "name": "PRCCD-SICA — Backend MVP",
-    "description": "Colección para probar el backend (auth staff, login federado de candidatos F2-28, ingesta, examen adaptativo). Importar en Postman junto con el environment base_url=http://localhost:3000 (o http://localhost si se prueba vía nginx).",
+    "name": "PRCCD-SICA — Microservicios MVP",
+    "description": "Colección para probar los microservicios (auth, ingesta, examen adaptativo, certificado, telemetria, auditoria, dashboard) detrás del gateway Nginx. Ver prccd-mvp/API_ENDPOINTS.md para el detalle completo de cada endpoint.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "base_url", "value": "http://localhost:3000" },
+    { "key": "base_url", "value": "http://localhost" },
     { "key": "admin_token", "value": "" },
     { "key": "estudiante_token", "value": "" },
     { "key": "sesion_id", "value": "" }
   ],
   "item": [
     {
-      "name": "Health check",
+      "name": "Health check (auth-service, vía gateway)",
       "request": {
         "method": "GET",
-        "url": "{{base_url}}/health"
+        "url": "{{base_url}}/health/auth"
       }
     },
     {
