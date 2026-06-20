@@ -140,10 +140,16 @@
 
 ---
 
-## 2. Sección de infraestructura y módulos de negocio (Oswaldo, lead infra)
+## 2. Sección de infraestructura y módulos de negocio (Oswaldo Choc, 201901844, lead infra)
 
-> Guion sugerido para Oswaldo — ajustar con su propia voz, basado en lo que
-> implementó según `Tareas_Fase2_G6.xlsx` y los commits `201901844:*`.
+> Guion para Oswaldo — autocontenido: si solo te toca defender tu parte, con
+> leer esta sección y la tabla de preguntas 2.6 alcanza. Basado en lo que
+> implementaste según `Tareas_Fase2_G6.xlsx` (tareas #4, #10, #15, #19,
+> #22, #23, #26, #27, #29) y los commits `201901844:*`. Código real en
+> `prccd-mvp/services/dashboard-service/src/routes/dashboard.routes.js`,
+> `auditoria-service/src/routes/auditoria.routes.js` y
+> `certificado-service/src/routes/certificado.routes.js` (rutas `/issue`,
+> `/verify`).
 
 ### 2.1 Infraestructura: Docker Compose, migraciones, gateway
 
@@ -158,28 +164,74 @@
 > Nginx, con ruteo por prefijo de path hacia cada microservicio, de forma
 > que todo el tráfico externo entra por un solo punto (`http://localhost`)
 > y el frontend nunca necesita conocer los puertos internos de cada
-> servicio."
+> servicio (3001-3007 quedan expuestos solo para debugging del backend)."
 
-### 2.2 Endpoints de auditoría, certificado simple y dashboard
+### 2.2 Endpoint de auditoría — retención de 5 años calculada en cada registro
 
-> "Además de infraestructura, construí los endpoints REST de varios
-> dominios de negocio: el endpoint de auditoría (`/api/audit/trail`) que
-> responde a RF-05 — rastro de auditoría inmutable por certificado — y los
-> endpoints de certificado simple (`/api/certificate/issue` y `/verify`),
-> con hash y firma vía el módulo `crypto` de Node. La decisión de hacer
-> esta versión simple, además de la versión PKI de Javier, fue dar al
-> equipo una opción ligera y rápida de verificar mientras se definía cuál
-> sería la oficial — priorizamos tener **algo funcionando pronto** sobre
-> bloquear el avance esperando una decisión de diseño que no era urgente
-> para el MVP.
+> "Construí `auditoria-service`, que expone `GET /api/audit/trail` y
+> `POST /api/audit/trail`. Esto responde a RF-05 (rastro de auditoría
+> inmutable por certificado) y a R-06 (retención inalterable mínima de 5
+> años). La parte que quiero resaltar técnicamente: cada vez que se inserta
+> un evento, el servicio calcula `fecha_retencion` sumando 5 años a la
+> fecha actual y la guarda junto al registro —
+> `fecha_retencion.setFullYear(fecha_retencion.getFullYear() + 5)` — para
+> que la obligación de retención quede explícita por fila, no como una
+> regla solo documentada aparte. En la práctica, el flujo normal del
+> sistema no escribe aquí directo: `telemetria-service` es quien
+> normalmente alimenta esta misma tabla cuando ocurre un evento
+> antifraude, y este endpoint queda como punto de consulta general del
+> rastro de auditoría por sesión."
+
+### 2.3 Certificados simples (F2-27) — hash + firma con `crypto`, sin PKI
+
+> "Implementé la primera versión de emisión de certificados:
+> `POST /api/certificate/issue` y `GET /api/certificate/verify?hash=`.
+> La lógica es deliberadamente simple: tomo los datos del certificado
+> (`id_candidato`, `sesion_id`, `datos_certificado`), genero un hash
+> SHA-256 del contenido para identificarlo de forma única, y genero una
+> 'firma digital' con SHA-512 sobre el contenido **más el secreto JWT del
+> sistema** (`crypto.createHash('sha512').update(contenido +
+> process.env.JWT_SECRET)`) — esto no es una firma asimétrica como la PKI
+> de Javier, es un HMAC artesanal: solo alguien que conoce el secreto del
+> sistema pudo haber generado esa firma, lo cual da integridad básica sin
+> necesidad de generar y custodiar un par de llaves RSA.
 >
-> También implementé el servicio de agregación y anonimización para el
-> dashboard BI — RF-09, que exige anonimizar y agregar datos antes de
-> exponerlos en interfaces gerenciales — y el endpoint
-> `/api/dashboard/stats`, que solo devuelve conteos y totales, nunca datos
-> individuales identificables."
+> La decisión de construir esta versión, **antes** de saber que Javier
+> tenía en paralelo una versión con PKI real, fue priorizar tener algo
+> funcionando pronto sobre bloquear el avance del equipo esperando una
+> decisión de diseño criptográfico que no era urgente para validar el
+> resto del flujo del MVP (examen → certificado → verificación). Cuando se
+> descubrió la duplicidad al migrar a microservicios, decidimos entre
+> todos no descartar ninguna de las dos bajo presión de tiempo: la mía
+> sigue viva en `/issue` y `/verify` sobre la tabla `certificados`; la de
+> Javier vive en `/emitir`, `/verificar/:id` y `/cadena/verificar` sobre
+> `certificados_pki`."
 
-### 2.3 Por qué base de datos compartida (decisión consciente, no descuido)
+### 2.4 Dashboard BI — agregación anonimizada (RF-08, RF-09)
+
+> "Implementé `GET /api/dashboard/stats` en `dashboard-service`. RF-09
+> exige anonimizar y agregar los datos antes de exponerlos en interfaces
+> gerenciales, así que cada consulta que escribí usa `COUNT(*)` y
+> `GROUP BY` — nunca selecciono una fila individual de un candidato.
+> Devuelvo cuatro bloques: candidatos por universidad, candidatos por
+> carrera (con filtro opcional `?carrera=`), estadísticas de exámenes
+> (total de sesiones, aprobados, reprobados, en progreso) y total de
+> certificados emitidos/vigentes. La respuesta incluye literalmente una
+> nota: *'Datos agregados y anonimizados — sin datos personales
+> identificables'*, para que quede explícito en el contrato de la API, no
+> solo en la documentación.
+>
+> Quiero ser transparente en un punto: la query de exámenes compara
+> `UPPER(dictamen) = 'APROBADO'`. La usé en mayúsculas a propósito porque
+> en algún momento de la integración detectamos que el valor real
+> guardado en la base es `'Aprobado'` (con mayúscula inicial solamente) —
+> compararlo en minúsculas o con case sensible nunca daba match. Es un
+> ejemplo concreto de un bug de integración entre el dato que produce
+> `examen-service` y el dato que consume `dashboard-service`, que se
+> corrigió forzando `UPPER()` en la comparación en vez de asumir un
+> formato exacto."
+
+### 2.5 Por qué base de datos compartida (decisión consciente, no descuido)
 
 > "Una decisión de arquitectura que quiero explicar directamente: los 7
 > microservicios se conectan al mismo PostgreSQL. No hicimos 'database per
@@ -187,52 +239,121 @@
 > de alcance: separar la base de datos implicaba además reemplazar las
 > lecturas cruzadas entre dominios (`certificado-service`,
 > `telemetria-service` y `dashboard-service` leen tablas de otros dominios
-> directo) por llamadas HTTP o eventos entre servicios, y eso es trabajo de
-> una fase posterior, no de este MVP. Lo que sí logramos — y es lo que
-> pedían los drivers EaC-02 y R-03 — es que cada dominio se despliega, se
-> reinicia y escala como proceso independiente. Está documentado como
-> pendiente explícito en `ARQUITECTURA.md`."
+> directo, como hice yo mismo en `dashboard-service` leyendo `candidatos`,
+> `sesiones_examen` y `certificados`) por llamadas HTTP o eventos entre
+> servicios, y eso es trabajo de una fase posterior, no de este MVP. Lo que
+> sí logramos — y es lo que pedían los drivers EaC-02 y R-03 — es que cada
+> dominio se despliega, se reinicia y escala como proceso independiente.
+> Está documentado como pendiente explícito en `ARQUITECTURA.md`."
+
+### 2.6 Preguntas probables sobre mi parte (Oswaldo)
+
+| Pregunta probable | Respuesta corta y honesta |
+|---|---|
+| "¿Por qué la firma de tus certificados no usa PKI?" | Es una firma HMAC con SHA-512 sobre el secreto del sistema, no una firma asimétrica. Da integridad básica y fue rápida de implementar para no bloquear el avance del equipo mientras se decidía el esquema criptográfico definitivo. |
+| "¿Por qué hay dos formas de emitir certificados?" | Se construyeron en paralelo sin saberlo (yo hice la simple, Javier la PKI). Al encontrarlo durante la migración a microservicios, decidimos exponer ambas en vez de descartar trabajo válido bajo presión de tiempo. |
+| "¿El dashboard puede filtrar por género como pide RF-08?" | No — `candidatos` no tiene campo de género en este MVP, así que el dashboard solo segmenta por universidad y carrera. Es una brecha documentada, no implementada. |
+| "¿Por qué Postgres es compartido entre todos los servicios?" | Separar la BD requiere antes reemplazar las lecturas cruzadas (mi propio `dashboard-service` lee tablas de 3 dominios distintos) por HTTP/eventos. Se priorizó el despliegue/escalado independiente por proceso para esta entrega. |
+| "¿Cómo garantizas la retención de 5 años en auditoría?" | Cada fila de la tabla `auditoria` guarda su propia `fecha_retencion`, calculada al insertarse (fecha actual + 5 años), no solo documentada aparte. |
 
 ---
 
-## 3. Sección de motor adaptativo y banco de preguntas (Jencer, lead motor adaptativo)
+## 3. Sección de motor adaptativo y banco de preguntas (Jencer Hernández, 202002141, lead motor adaptativo)
 
-> Guion sugerido para Jencer — ajustar con su propia voz, basado en
+> Guion para Jencer — autocontenido: si solo te toca defender tu parte, con
+> leer esta sección y la tabla de preguntas 3.5 alcanza. Basado en
 > `Tareas_Fase2_G6.xlsx` (tareas #7, #8, #9) y los commits `202002141:*`.
+> Código real en
+> `prccd-mvp/services/examen-service/src/services/examen.service.js`.
 
-### 3.1 Por qué un algoritmo adaptativo simple en vez de IRT calibrado desde el inicio
+### 3.1 El banco de preguntas y por qué se carga por nivel, no por orden fijo
+
+> "Construí el servicio de banco de preguntas: la carga inicial desde el
+> origen de datos (Excel/JSON) y la función `getPregunta(nivel,
+> excluirIds)` que trae una pregunta al azar de un nivel específico
+> (`Básico`, `Medio` o `Avanzado`) excluyendo las que el candidato ya
+> respondió en esa sesión. Esto responde a RF-02: el motor adaptativo
+> necesita poder pedir 'una pregunta de este nivel que el candidato no haya
+> visto' en cualquier momento del examen, no recorrer una lista fija. En
+> Mongo esto se resuelve con un `$match` por nivel e id excluido, más un
+> `$sample: { size: 1 }` para tomarla al azar — así dos candidatos en el
+> mismo nivel no necesariamente ven la misma secuencia de preguntas."
+
+### 3.2 El algoritmo adaptativo: tablas de transición de nivel
 
 > "Mi parte fue el corazón funcional del sistema: el motor de examen
 > adaptativo. RF-02 exige que el sistema ajuste la dificultad en tiempo
 > real según las respuestas previas del candidato, y EaC-05 exige que ese
-> ajuste tome menos de 2 segundos. Implementé el algoritmo de selección de
-> preguntas: el candidato inicia en nivel Intermedio, y según acierte o
-> falle, el sistema sube o baja de nivel para la siguiente pregunta — la
-> lógica vive en `examen-service`, es síncrona y en memoria, así que cumple
-> el umbral de tiempo en la práctica sin necesidad de infraestructura
-> adicional.
+> ajuste tome menos de 2 segundos. El examen siempre **inicia en nivel
+> Medio** — ninguna sesión arranca en Básico ni en Avanzado, para no
+> penalizar ni favorecer de entrada a nadie. Después de cada respuesta, el
+> nivel de la siguiente pregunta se calcula con dos tablas fijas:
+>
+> - **Si acierta:** Básico → Medio, Medio → Avanzado, Avanzado se mantiene
+>   en Avanzado (ya es el techo).
+> - **Si falla:** Medio → Básico, Avanzado → Medio, Básico se mantiene en
+>   Básico (ya es el piso).
+>
+> Es decir, un acierto siempre sube (o te deja en el techo) y un fallo
+> siempre baja (o te deja en el piso) — nunca se salta dos niveles de
+> golpe. La lógica vive en `examen-service`, es síncrona y en memoria (dos
+> objetos de mapeo, no un cálculo pesado), así que cumple el umbral de
+> menos de 2 segundos en la práctica sin necesidad de infraestructura
+> adicional como colas o cachés.
 >
 > Soy transparente sobre el alcance: esto **no es un modelo IRT calibrado**
 > (Teoría de Respuesta al Ítem, con parámetros de discriminación,
-> dificultad y adivinanza por pregunta). Calibrar un modelo IRT real
-> requiere un banco de datos históricos de respuestas que un MVP de curso
-> no tiene. Por eso diseñamos el esquema de Mongo con un campo
-> `metadatos: {}` vacío pero ya preparado para recibir esos parámetros el
-> día que se calibre un modelo real — la decisión de usar MongoDB en vez de
-> Postgres para el banco de preguntas, que implementó Javier, nace
-> precisamente de esta necesidad de flexibilidad futura."
+> dificultad y adivinanza por pregunta) — es una máquina de estados de tres
+> niveles. Calibrar un modelo IRT real requiere un banco de datos
+> históricos de respuestas que un MVP de curso no tiene. Por eso el equipo
+> diseñó el esquema de Mongo con un campo `metadatos: {}` vacío pero ya
+> preparado para recibir esos parámetros el día que se calibre un modelo
+> real — la decisión de usar MongoDB en vez de Postgres para el banco de
+> preguntas, que implementó Javier, nace precisamente de esta necesidad de
+> flexibilidad futura."
 
-### 3.2 Cálculo de ponderación y dictamen final
+### 3.3 Ponderación por nivel y el umbral de aprobación
 
-> "También implementé el cálculo de ponderación por nivel de dificultad y
-> el dictamen final de Aprobado/Reprobado al completar las 10 preguntas de
-> la sesión. Cada nivel de dificultad pesa distinto en el puntaje final, y
-> el sistema compara el puntaje contra un umbral mínimo configurado para
-> decidir el dictamen. Este cálculo alimenta directamente tanto el
-> certificado — solo se puede emitir un certificado de una sesión
-> `completado=true` y `dictamen='Aprobado'` — como el dashboard gerencial,
-> que reporta cuántos candidatos aprobaron o reprobaron por universidad y
-> carrera."
+> "También implementé el cálculo de dictamen final al completar las 10
+> preguntas de la sesión (`TOTAL_PREGUNTAS = 10`). Cada nivel de
+> dificultad pesa distinto en el puntaje: **Básico vale 1 punto, Medio vale
+> 2, Avanzado vale 3** — no todas las preguntas valen igual, porque no
+> cuesta lo mismo acertar una pregunta fácil que una difícil. Sumo los
+> puntos de las preguntas correctas (`puntaje`) contra el máximo posible
+> según los niveles que realmente le tocaron al candidato (`maxPuntaje`,
+> que varía persona por persona porque cada uno recorre un camino de
+> niveles distinto), calculo el porcentaje, y si ese porcentaje es **mayor
+> o igual a 60%, el dictamen es `Aprobado`**; si no, `Reprobado`.
+>
+> Este cálculo es la puerta de entrada al resto del flujo: solo se puede
+> emitir un certificado — en cualquiera de las dos implementaciones, la de
+> Oswaldo o la de Javier — de una sesión con `completado=true` y
+> `dictamen='Aprobado'`; si no se cumple, el servicio de certificado
+> responde 409. El dictamen también alimenta directamente el dashboard
+> gerencial de Oswaldo, que cuenta cuántos candidatos aprobaron o
+> reprobaron por universidad y carrera."
+
+### 3.4 Un detalle de seguridad que también es mío: nunca exponer la respuesta correcta
+
+> "Algo pequeño pero importante para EaC-03 (seguridad — rechazar
+> alteración de calificación): la función que devuelve una pregunta al
+> frontend (`ocultarRespuesta`) elimina explícitamente el campo
+> `respuesta_correcta` (y el `_id` interno de Mongo) antes de enviarla. El
+> candidato nunca recibe en la respuesta HTTP la clave de la pregunta que
+> está respondiendo — la validación de si acertó o no se hace siempre en
+> el servidor, comparando contra el documento completo que el backend trae
+> de Mongo, nunca confiando en lo que el cliente diga que es correcto."
+
+### 3.5 Preguntas probables sobre mi parte (Jencer)
+
+| Pregunta probable | Respuesta corta y honesta |
+|---|---|
+| "¿Esto es un modelo IRT real?" | No, es una máquina de estados de 3 niveles (sube con acierto, baja con fallo). El esquema de Mongo ya tiene un campo `metadatos: {}` preparado para parámetros IRT reales a futuro, pero no se calibró ningún modelo en este MVP — calibrar IRT requiere datos históricos que no existen en un curso. |
+| "¿Por qué inicia en nivel Medio y no en Básico?" | Para no asumir de entrada que el candidato es principiante ni avanzado; es un punto de partida neutral. |
+| "¿Qué pasa si dos candidatos responden las mismas 10 preguntas?" | No necesariamente — `getPregunta` usa `$sample` para elegir al azar entre las preguntas disponibles de ese nivel, excluyendo las ya respondidas en la sesión. |
+| "¿Por qué Básico/Medio/Avanzado valen distinto puntaje?" | Para que el puntaje refleje la dificultad real superada, no solo la cantidad de respuestas correctas — 1/2/3 puntos respectivamente. |
+| "¿Cómo evitan que el candidato haga trampa viendo la respuesta correcta en la red?" | El backend nunca envía `respuesta_correcta` en la respuesta JSON de la pregunta; la validación de acierto siempre ocurre del lado del servidor contra el documento completo de Mongo. |
+| "¿De dónde sale el umbral de 60% para aprobar?" | Es un umbral fijo configurado en el código (`porcentaje >= 60`), no calculado dinámicamente por área de certificación — una simplificación razonable para el MVP frente a lo que Fase 1 imaginaba (umbral configurable por período/competencia). |
 
 ---
 
