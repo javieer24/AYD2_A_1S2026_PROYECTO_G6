@@ -7,46 +7,52 @@ function HomePage() {
   const modules = [
     {
       title: "Ingesta universitaria",
-      description: "Carga, transformación, normalización y persistencia de expedientes académicos provenientes de USAC, UCR y UES.",
+      description:
+        "Carga, transformación, normalización y persistencia de expedientes académicos provenientes de USAC, UCR y UES.",
       route: "/ingesta",
       label: "RF-06 · RF-07",
-      status: "Integración"
+      status: "Integración",
     },
     {
       title: "Examen adaptativo",
-      description: "Evaluación de competencias digitales con dificultad básica, intermedia y avanzada según la respuesta inmediata anterior.",
+      description:
+        "Evaluación de competencias digitales con dificultad básica, intermedia y avanzada según la respuesta inmediata anterior.",
       route: "/examen",
       label: "RF-02 · EaC-05",
-      status: "Core"
+      status: "Core",
     },
     {
       title: "Credencial inmutable",
-      description: "Emisión de certificado digital con hash SHA-256, firma criptográfica y registro inmutable para verificación posterior.",
+      description:
+        "Emisión de certificado digital con hash SHA-256, firma criptográfica y registro inmutable para verificación posterior.",
       route: "/certificado",
       label: "RF-04 · RF-05",
-      status: "Certificación"
+      status: "Certificación",
     },
     {
       title: "Dashboard regional",
-      description: "Indicadores agregados y anonimizados sobre competencias digitales por país, carrera universitaria y género.",
+      description:
+        "Indicadores agregados y anonimizados sobre competencias digitales por país, carrera universitaria y género.",
       route: "/dashboard",
       label: "RF-08 · RF-09",
-      status: "Analítica"
+      status: "Analítica",
     },
     {
       title: "Verificación pública",
-      description: "Consulta externa de certificados mediante código, hash o QR sin exponer datos personales sensibles del candidato.",
+      description:
+        "Consulta externa de certificados mediante código, hash o QR sin exponer datos personales sensibles del candidato.",
       route: "/verificar",
       label: "RF-10",
-      status: "Validación"
+      status: "Validación",
     },
     {
       title: "Auditoría y evidencia",
-      description: "Bitácora inmutable, trazabilidad de eventos, retención de evidencia antifraude y verificación de integridad.",
+      description:
+        "Bitácora inmutable, trazabilidad de eventos, retención de evidencia antifraude y verificación de integridad.",
       route: "/auditoria",
       label: "RF-03 · EaC-07",
-      status: "Auditoría"
-    }
+      status: "Auditoría",
+    },
   ];
 
   return (
@@ -58,22 +64,33 @@ function HomePage() {
             <span>Certificación Regional SICA</span>
           </div>
 
-          <nav className="home-nav">
-            <Link to="/ingesta">Ingesta</Link>
-            <Link to="/examen">Examen</Link>
-            <Link to="/dashboard">Dashboard</Link>
-            <Link to="/verificar">Verificar</Link>
-          </nav>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/verificar"
+              className="text-sm text-gray-500 hover:text-gray-800"
+            >
+              Verificar certificado
+            </Link>
+            <Link
+              to="/login"
+              className="text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
+            >
+              Iniciar sesión
+            </Link>
+          </div>
         </header>
 
         <section className="home-hero">
           <div className="home-hero__content">
             <span className="home-kicker">Producto Mínimo Viable · Fase 2</span>
-            <h1>Plataforma Regional de Certificación de Competencias Digitales</h1>
+            <h1>
+              Plataforma Regional de Certificación de Competencias Digitales
+            </h1>
             <p>
-              MVP orientado a demostrar los flujos críticos del ecosistema PRCCD: ingesta universitaria heterogénea,
-              examen adaptativo, evidencia antifraude, emisión de credenciales inmutables, analítica anonimizada y
-              verificación pública de certificados.
+              MVP orientado a demostrar los flujos críticos del ecosistema
+              PRCCD: ingesta universitaria heterogénea, examen adaptativo,
+              evidencia antifraude, emisión de credenciales inmutables,
+              analítica anonimizada y verificación pública de certificados.
             </p>
 
             <div className="home-actions">
@@ -113,10 +130,26 @@ function HomePage() {
         </section>
 
         <section className="home-metrics">
-          <MetricCard value="5" label="Flujos principales" detail="Ingesta, examen, antifraude, credencial y dashboard." />
-          <MetricCard value="3" label="Universidades piloto" detail="USAC, UCR y UES como fuentes heterogéneas." />
-          <MetricCard value="12" label="Drivers funcionales" detail="Trazabilidad directa con los requerimientos RF." />
-          <MetricCard value="5 años" label="Retención" detail="Custodia de evidencia antifraude e integridad." />
+          <MetricCard
+            value="5"
+            label="Flujos principales"
+            detail="Ingesta, examen, antifraude, credencial y dashboard."
+          />
+          <MetricCard
+            value="3"
+            label="Universidades piloto"
+            detail="USAC, UCR y UES como fuentes heterogéneas."
+          />
+          <MetricCard
+            value="12"
+            label="Drivers funcionales"
+            detail="Trazabilidad directa con los requerimientos RF."
+          />
+          <MetricCard
+            value="5 años"
+            label="Retención"
+            detail="Custodia de evidencia antifraude e integridad."
+          />
         </section>
 
         <section className="home-section-title">
@@ -140,11 +173,15 @@ function HomePage() {
         <section className="home-traceability">
           <div>
             <span>Trazabilidad arquitectónica</span>
-            <h2>Esta pantalla no es decorativa: funciona como índice operativo del MVP</h2>
+            <h2>
+              Esta pantalla no es decorativa: funciona como índice operativo del
+              MVP
+            </h2>
           </div>
           <p>
-            Cada acceso lleva a un flujo exigido por la Fase 2 y respaldado por los requerimientos, atributos de calidad
-            y restricciones definidos en la Fase 1.
+            Cada acceso lleva a un flujo exigido por la Fase 2 y respaldado por
+            los requerimientos, atributos de calidad y restricciones definidos
+            en la Fase 1.
           </p>
         </section>
       </section>
