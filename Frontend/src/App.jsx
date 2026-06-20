@@ -1,122 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+const UNIVERSITY_COUNTRY = {
+  USAC: 'Guatemala',
+  UCR: 'Costa Rica',
+  UES: 'El Salvador',
 }
 
-export default App
+const SAMPLE_RECORDS = [
+  { pais: 'Guatemala', universidad: 'USAC', carrera: 'Ingenieria en Sistemas', genero: 'Femenino', competencia: 'Programacion', evaluaciones: 46, aprobados: 38, certificados: 34, fecha: '2026-06-15' },
+  { pais: 'Guatemala', universidad: 'USAC', carrera: 'Ingenieria Industrial', genero: 'Masculino', competencia: 'Datos', evaluaciones: 33, aprobados: 24, certificados: 20, fecha: '2026-06-16' },
+  { pais: 'Costa Rica', universidad: 'UCR', carrera: 'Ingenieria en Sistemas', genero: 'Masculino', competencia: 'Ciberseguridad', evaluaciones: 41, aprobados: 31, certificados: 28, fecha: '2026-06-16' },
+  { pais: 'Costa Rica', universidad: 'UCR', carrera: 'Administracion', genero: 'Femenino', competencia: 'Ofimatica', evaluaciones: 28, aprobados: 22, certificados: 18, fecha: '2026-06-17' },
+  { pais: 'El Salvador', universidad: 'UES', carrera: 'Ingenieria en Sistemas', genero: 'No especificado', competencia: 'Redes', evaluaciones: 37, aprobados: 26, certificados: 24, fecha: '2026-06-17' },
+  { pais: 'El Salvador', universidad: 'UES', carrera: 'Mercadeo', genero: 'Femenino', competencia: 'Analitica', evaluaciones: 21, aprobados: 17, certificados: 15, fecha: '2026-06-18' },
+  { pais: 'Guatemala', universidad: 'USAC', carrera: 'Administracion', genero: 'Masculino', competencia: 'Ofimatica', evaluaciones: 24, aprobados: 18, certificados: 14, fecha: '2026-06-18' },
+  { pais: 'Costa Rica', universidad: 'UCR', carrera: 'Ingenieria Industrial', genero: 'No especificado', competencia: 'Programacion', evaluaciones: 19, aprobados: 14, certificados: 12, fecha: '2026-06-19' },
+  { pais: 'El Salvador', universidad: 'UES', carrera: 'Ingenieria en Sistemas', genero: 'Masculino', competencia: 'Ciberseguridad', evaluaciones: 29, aprobados: 19, certificados: 17, fecha: '2026-06-19' },
+]
+
+const INITIAL_FILTERS = {
+  pais: 'Todos',
+  carrera: 'Todas',
+  genero: 'Todos',
+  desde: '2026-06-15',
+  hasta: '2026-06-19',
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
+}
+
+export default App;
