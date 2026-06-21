@@ -1,516 +1,293 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ConsoleLayout from "../../layouts/ConsoleLayout";
-import { LineChart } from "@mui/x-charts/LineChart";
-import { BarChart } from "@mui/x-charts/BarChart";
-import { PieChart } from "@mui/x-charts/PieChart";
-import Box from "@mui/material/Box";
+import MetricCard from "../../components/MetricCard";
+import TraceCard from "../../components/TraceCard";
+import { obtenerEstadisticasDashboard } from "../../services/dashboardApi";
 import "./DashboardPage.css";
-import KpiCard from "../../components/kpiCard";
-import certIcon from "../../assets/certificate-svgrepo-com.svg";
-import userIcon from "../../assets/users-group-rounded-svgrepo-com.svg";
-import aprovedIcon from "../../assets/approved-aproved-certificate-svgrepo-com.svg";
-import examIcon from "../../assets/studying-exam-svgrepo-com.svg"
-
-const SAMPLE_RECORDS = [
-  {
-    pais: "Guatemala",
-    universidad: "USAC",
-    carrera: "Ing. Sistemas",
-    genero: "Femenino",
-    competencia: "Programacion",
-    evaluaciones: 46,
-    aprobados: 38,
-    certificados: 34,
-    fecha: "2026-06-15",
-  },
-  {
-    pais: "Guatemala",
-    universidad: "USAC",
-    carrera: "Ing. Industrial",
-    genero: "Masculino",
-    competencia: "Datos",
-    evaluaciones: 33,
-    aprobados: 24,
-    certificados: 20,
-    fecha: "2026-06-16",
-  },
-  {
-    pais: "Costa Rica",
-    universidad: "UCR",
-    carrera: "Ing. Sistemas",
-    genero: "Masculino",
-    competencia: "Ciberseguridad",
-    evaluaciones: 41,
-    aprobados: 31,
-    certificados: 28,
-    fecha: "2026-06-16",
-  },
-  {
-    pais: "Costa Rica",
-    universidad: "UCR",
-    carrera: "Administracion",
-    genero: "Femenino",
-    competencia: "Ofimatica",
-    evaluaciones: 28,
-    aprobados: 22,
-    certificados: 18,
-    fecha: "2026-06-17",
-  },
-  {
-    pais: "El Salvador",
-    universidad: "UES",
-    carrera: "Ing. Sistemas",
-    genero: "No especificado",
-    competencia: "Redes",
-    evaluaciones: 37,
-    aprobados: 26,
-    certificados: 24,
-    fecha: "2026-06-17",
-  },
-  {
-    pais: "El Salvador",
-    universidad: "UES",
-    carrera: "Mercadeo",
-    genero: "Femenino",
-    competencia: "Analitica",
-    evaluaciones: 21,
-    aprobados: 17,
-    certificados: 15,
-    fecha: "2026-06-18",
-  },
-  {
-    pais: "Guatemala",
-    universidad: "USAC",
-    carrera: "Administracion",
-    genero: "Masculino",
-    competencia: "Ofimatica",
-    evaluaciones: 24,
-    aprobados: 18,
-    certificados: 14,
-    fecha: "2026-06-18",
-  },
-  {
-    pais: "Costa Rica",
-    universidad: "UCR",
-    carrera: "Ing. Industrial",
-    genero: "No especificado",
-    competencia: "Programacion",
-    evaluaciones: 19,
-    aprobados: 14,
-    certificados: 12,
-    fecha: "2026-06-19",
-  },
-  {
-    pais: "El Salvador",
-    universidad: "UES",
-    carrera: "Ing. Sistemas",
-    genero: "Masculino",
-    competencia: "Ciberseguridad",
-    evaluaciones: 29,
-    aprobados: 19,
-    certificados: 17,
-    fecha: "2026-06-19",
-  },
-];
-
-const INITIAL_FILTERS = {
-  pais: "Todos",
-  carrera: "Todas",
-  genero: "Todos",
-  desde: "2026-06-15",
-  hasta: "2026-06-19",
-};
-
-const margin = { top: 10, bottom: 30, left: 50, right: 24 };
-
-function SelectFilter({ label, value, options, onChange }) {
-  return (
-    <label className="flex flex-col text-xs text-gray-500 gap-1">
-      {label}
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="border rounded-lg px-2 py-1 text-sm text-gray-700 bg-white"
-      >
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
-function unique(items) {
-  return Array.from(new Set(items)).sort((a, b) => a.localeCompare(b));
-}
-
-function aggregateBy(records, key, valueKey) {
-  const map = new Map();
-  records.forEach((item) => {
-    map.set(item[key], (map.get(item[key]) || 0) + item[valueKey]);
-  });
-  return Array.from(map, ([label, value]) => ({ label, value })).sort(
-    (a, b) => b.value - a.value,
-  );
-}
-
-function buildOptions(records) {
-  return {
-    paises: ["Todos", ...unique(records.map((r) => r.pais))],
-    carreras: ["Todas", ...unique(records.map((r) => r.carrera))],
-    generos: ["Todos", ...unique(records.map((r) => r.genero))],
-  };
-}
 
 function DashboardPage() {
-  const [filters, setFilters] = useState(INITIAL_FILTERS);
+  const [data, setData] = useState(null);
+  const [carrera, setCarrera] = useState("Todas");
+  const [loading, setLoading] = useState(true);
+  const [mensaje, setMensaje] = useState("");
 
-  const options = useMemo(() => buildOptions(SAMPLE_RECORDS), []);
+  const metricas = data?.metricas;
 
-  const filteredRecords = useMemo(() => {
-    return SAMPLE_RECORDS.filter((item) => {
-      return (
-        (filters.pais === "Todos" || item.pais === filters.pais) &&
-        (filters.carrera === "Todas" || item.carrera === filters.carrera) &&
-        (filters.genero === "Todos" || item.genero === filters.genero) &&
-        (!filters.desde || item.fecha >= filters.desde) &&
-        (!filters.hasta || item.fecha <= filters.hasta)
-      );
-    });
-  }, [filters]);
+  const carrerasDisponibles = useMemo(() => {
+    const carreras = metricas?.candidatos_por_carrera || [];
+    return ["Todas", ...carreras.map((item) => item.carrera).filter(Boolean)];
+  }, [metricas]);
 
-  const metrics = useMemo(() => {
-    const evaluaciones = filteredRecords.reduce(
-      (s, r) => s + r.evaluaciones,
-      0,
-    );
-    const aprobados = filteredRecords.reduce((s, r) => s + r.aprobados, 0);
-    const certificados = filteredRecords.reduce(
-      (s, r) => s + r.certificados,
-      0,
-    );
-    const tasaAprobacion = evaluaciones
-      ? Math.round((aprobados / evaluaciones) * 100)
-      : 0;
-    return { evaluaciones, aprobados, certificados, tasaAprobacion };
-  }, [filteredRecords]);
+  const totalCandidatos = useMemo(() => {
+    return sumar(metricas?.candidatos_por_universidad, "total");
+  }, [metricas]);
 
-  const byCompetence = useMemo(
-    () => aggregateBy(filteredRecords, "competencia", "aprobados"),
-    [filteredRecords],
-  );
-  const byCountry = useMemo(
-    () => aggregateBy(filteredRecords, "pais", "certificados"),
-    [filteredRecords],
-  );
-  const byCareer = useMemo(
-    () => aggregateBy(filteredRecords, "carrera", "evaluaciones"),
-    [filteredRecords],
-  );
-  const byGender = useMemo(
-    () => aggregateBy(filteredRecords, "genero", "aprobados"),
-    [filteredRecords]
-  )
-  const byDate = useMemo(() => {
-    const map = new Map();
-    filteredRecords.forEach((r) => {
-      map.set(r.fecha, (map.get(r.fecha) || 0) + r.certificados);
-    });
-    const sorted = Array.from(map, ([fecha, value]) => ({ fecha, value })).sort(
-      (a, b) => a.fecha.localeCompare(b.fecha),
-    );
-    return {
-      labels: sorted.map((r) => r.fecha.slice(5)),
-      data: sorted.map((r) => r.value),
-    };
-  }, [filteredRecords]);
+  const totalCarreras = metricas?.candidatos_por_carrera?.length || 0;
+  const totalSesiones = numero(metricas?.examenes?.total_sesiones);
+  const aprobados = numero(metricas?.examenes?.aprobados);
+  const reprobados = numero(metricas?.examenes?.reprobados);
+  const enProgreso = numero(metricas?.examenes?.en_progreso);
+  const totalCertificados = numero(metricas?.certificados?.total_emitidos);
+  const certificadosVigentes = numero(metricas?.certificados?.vigentes);
+  const tasaAprobacion = totalSesiones > 0 ? Math.round((aprobados / totalSesiones) * 100) : 0;
 
-  function updateFilter(key, value) {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  async function cargarDashboard(filtroCarrera = carrera) {
+    setLoading(true);
+    setMensaje("");
+
+    try {
+      const response = await obtenerEstadisticasDashboard({ carrera: filtroCarrera });
+      setData(response);
+    } catch (error) {
+      setMensaje(error.message || "No se pudieron cargar las métricas del dashboard.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function resetFilters() {
-    setFilters(INITIAL_FILTERS);
-  }
+  useEffect(() => {
+    cargarDashboard("Todas");
+  }, []);
 
-  const kpis = [
-    {
-      label: "Evaluaciones aprobadas",
-      value: metrics.aprobados,
-      icon:examIcon,
-      color: "bg-red-100"
-    },
-    {
-      label: "Certificaciones emitidas",
-      value: metrics.certificados,
-      icon: certIcon,
-      color: "bg-green-100",
-    },
-    {
-      label: "Candidatos evaluados",
-      value: metrics.evaluaciones,
-      icon: userIcon,
-      color: "bg-blue-100",
-    },
-    {
-      label: "Tasa de aprobación",
-      value: `${metrics.tasaAprobacion}%`,
-      icon: aprovedIcon,
-      color: "bg-yellow-100",
-    },
-  ];
+  function aplicarCarrera(value) {
+    setCarrera(value);
+    cargarDashboard(value);
+  }
 
   return (
-    <main>
-      <ConsoleLayout title="Dashboard">
-        <div className="flex flex-wrap gap-3 mb-4">
-          <SelectFilter
-            label="País"
-            value={filters.pais}
-            options={options.paises}
-            onChange={(v) => updateFilter("pais", v)}
-          />
-          <SelectFilter
-            label="Carrera"
-            value={filters.carrera}
-            options={options.carreras}
-            onChange={(v) => updateFilter("carrera", v)}
-          />
-          <SelectFilter
-            label="Género"
-            value={filters.genero}
-            options={options.generos}
-            onChange={(v) => updateFilter("genero", v)}
-          />
-          <label className="flex flex-col text-xs text-gray-500 gap-1">
-            Desde
-            <input
-              type="date"
-              value={filters.desde}
-              onChange={(e) => updateFilter("desde", e.target.value)}
-              className="border rounded-lg px-2 py-1 text-sm text-gray-700"
-            />
-          </label>
-          <label className="flex flex-col text-xs text-gray-500 gap-1">
-            Hasta
-            <input
-              type="date"
-              value={filters.hasta}
-              onChange={(e) => updateFilter("hasta", e.target.value)}
-              className="border rounded-lg px-2 py-1 text-sm text-gray-700"
-            />
-          </label>
-          <button
-            onClick={resetFilters}
-            className="self-end border rounded-lg px-4 py-1 text-sm text-gray-500 hover:bg-gray-50"
-          >
-            Limpiar
-          </button>
-        </div>
-
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          {kpis.map((kpi, i) => (
-            <KpiCard key={i} {...kpi} />
-          ))}
-        </div>
-
-        <div className="flex gap-3 w-full mb-4">
-          <div className="flex-1 bg-white border rounded-xl p-4 min-w-0">
-            <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">
-              Certificaciones por fecha
+    <ConsoleLayout
+      title="Dashboard regional anonimizado"
+      subtitle="Panel gerencial para consultar indicadores agregados de candidatos, exámenes y certificados sin exponer datos personales identificables."
+      badge="RF-08 · RF-09 · EaC-06"
+    >
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">
+              Inteligencia de negocio
+            </span>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+              Métricas operativas del ecosistema PRCCD
             </h2>
-            <Box sx={{ width: "100%", height: 260 }}>
-              <LineChart
-                series={[{ data: byDate.data, label: "Certificados" }]}
-                xAxis={[
-                  { scaleType: "point", data: byDate.labels, height: 28 },
-                ]}
-                yAxis={[{ width: 40 }]}
-                margin={margin}
-              />
-            </Box>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              Los datos se consultan desde el servicio de dashboard y se presentan únicamente en forma agregada.
+            </p>
           </div>
 
-          <div className="flex-1 bg-white border rounded-xl p-4 min-w-0">
-            <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">
-              Aprobados por competencia
-            </h2>
-            <Box sx={{ width: "100%", height: 260 }}>
-              <BarChart
-                series={[
-                  {
-                    data: byCompetence.map((r) => r.value),
-                    label: "Aprobados",
-                  },
-                ]}
-                xAxis={[
-                  {
-                    data: byCompetence.map((r) => r.label),
-                    scaleType: "band",
-                    height: 28,
-                  },
-                ]}
-                yAxis={[{ width: 40 }]}
-                margin={margin}
-              />
-            </Box>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <label className="grid gap-2">
+              <span className="text-sm font-black text-slate-800">Carrera</span>
+              <select
+                value={carrera}
+                onChange={(event) => aplicarCarrera(event.target.value)}
+                className="h-12 min-w-64 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800 outline-none ring-indigo-600 transition focus:ring-2"
+              >
+                {carrerasDisponibles.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <button
+              type="button"
+              onClick={() => cargarDashboard(carrera)}
+              className="h-12 rounded-2xl bg-indigo-700 px-5 text-sm font-black text-white shadow-lg shadow-indigo-900/15 transition hover:bg-indigo-800"
+            >
+              Refrescar datos
+            </button>
           </div>
         </div>
 
-        <div className="flex gap-3 w-full mb-4">
-          <div className="flex-1 bg-white border rounded-xl p-4 min-w-0">
-            <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">
-              Certificados por país
-            </h2>
-            <Box sx={{ width: "100%", height: 240 }}>
-              <BarChart
-                series={[
-                  {
-                    data: byCountry.map((r) => r.value),
-                    label: "Certificados",
-                  },
-                ]}
-                xAxis={[
-                  {
-                    data: byCountry.map((r) => r.label),
-                    scaleType: "band",
-                    height: 28,
-                  },
-                ]}
-                yAxis={[{ width: 40 }]}
-                margin={margin}
-              />
-            </Box>
-          </div>
+        <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+          <strong className="block text-sm font-black text-emerald-900">
+            {data?.nota || "Datos agregados y anonimizados"}
+          </strong>
+          <p className="mt-1 text-sm leading-6 text-emerald-800">
+            La vista no muestra nombres, identificadores de candidatos ni información individual.
+          </p>
+        </div>
 
-          <div className="flex-1 bg-white border rounded-xl p-4 min-w-0">
-            <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">
-              Evaluaciones por carrera
+        {mensaje && (
+          <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-800">
+            {mensaje}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <MetricCard value={loading ? "..." : String(totalCandidatos)} label="Candidatos registrados" detail="Total agregado por universidades integradas." />
+        <MetricCard value={loading ? "..." : String(totalSesiones)} label="Sesiones de examen" detail="Evaluaciones registradas en el motor adaptativo." />
+        <MetricCard value={loading ? "..." : `${tasaAprobacion}%`} label="Tasa de aprobación" detail="Relación entre sesiones aprobadas y sesiones totales." />
+        <MetricCard value={loading ? "..." : String(totalCertificados)} label="Certificados emitidos" detail="Credenciales generadas por el sistema." />
+      </section>
+
+      <section className="mt-5 grid gap-5 xl:grid-cols-[1fr_1fr]">
+        <Panel title="Candidatos por universidad" label="Segmentación institucional">
+          <BarList
+            data={metricas?.candidatos_por_universidad || []}
+            labelKey="universidad_origen"
+            valueKey="total"
+            emptyText={loading ? "Cargando universidades..." : "No hay datos por universidad."}
+          />
+        </Panel>
+
+        <Panel title="Candidatos por carrera" label="Segmentación académica">
+          <BarList
+            data={metricas?.candidatos_por_carrera || []}
+            labelKey="carrera"
+            valueKey="total"
+            emptyText={loading ? "Cargando carreras..." : "No hay datos por carrera."}
+          />
+        </Panel>
+      </section>
+
+      <section className="mt-5 grid gap-5 xl:grid-cols-[1fr_1fr]">
+        <Panel title="Estado de exámenes" label="Motor adaptativo">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <StatusBox label="Aprobados" value={aprobados} tone="emerald" />
+            <StatusBox label="Reprobados" value={reprobados} tone="rose" />
+            <StatusBox label="En progreso" value={enProgreso} tone="indigo" />
+            <StatusBox label="Total sesiones" value={totalSesiones} tone="slate" />
+          </div>
+        </Panel>
+
+        <Panel title="Estado de certificados" label="Credencial inmutable">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <StatusBox label="Emitidos" value={totalCertificados} tone="indigo" />
+            <StatusBox label="Vigentes" value={certificadosVigentes} tone="emerald" />
+            <StatusBox label="Carreras visibles" value={totalCarreras} tone="slate" />
+            <StatusBox label="Filtro aplicado" value={carrera === "Todas" ? "General" : carrera} tone="slate" />
+          </div>
+        </Panel>
+      </section>
+
+      <section className="mt-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
+        <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">
+              Respuesta backend
+            </span>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+              Resumen técnico del servicio
             </h2>
-            <div className="flex flex-col gap-3 mt-2">
-              {byCareer.map((item) => (
-                <div key={item.label} className="flex items-center gap-3">
-                  <span className="text-xs text-gray-500 w-32 truncate">
-                    {item.label}
-                  </span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-2">
-                    <div
-                      className="bg-blue-400 h-2 rounded-full"
-                      style={{
-                        width: `${(item.value / byCareer[0].value) * 100}%`,
-                      }}
-                    />
-                  </div>
-                  <span className="text-xs font-medium text-gray-700 w-6 text-right">
-                    {item.value}
-                  </span>
-                </div>
-              ))}
+          </div>
+          <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">
+            {data?.status === "ok" ? "Respuesta 200 OK" : "Pendiente"}
+          </span>
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-slate-200">
+          <table className="w-full border-collapse bg-white text-left text-sm">
+            <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
+              <tr>
+                <th className="px-4 py-4 font-black">Indicador</th>
+                <th className="px-4 py-4 font-black">Valor</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              <ResumenRow label="status" value={data?.status || "Pendiente"} />
+              <ResumenRow label="carrera_filtrada" value={carrera} />
+              <ResumenRow label="candidatos_total" value={totalCandidatos} />
+              <ResumenRow label="total_sesiones" value={totalSesiones} />
+              <ResumenRow label="aprobados" value={aprobados} />
+              <ResumenRow label="reprobados" value={reprobados} />
+              <ResumenRow label="en_progreso" value={enProgreso} />
+              <ResumenRow label="certificados_emitidos" value={totalCertificados} />
+              <ResumenRow label="certificados_vigentes" value={certificadosVigentes} />
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <TraceCard code="RF-08" title="Dashboards analíticos" text="Visualización de indicadores regionales sobre competencias digitales." />
+        <TraceCard code="RF-09" title="Anonimización" text="Exposición de datos agregados sin información personal identificable." />
+        <TraceCard code="EaC-06" title="Privacidad" text="Protección de identidad individual en consultas gerenciales." />
+        <TraceCard code="Dashboard Service" title="Microservicio BI" text="Consumo del endpoint /api/dashboard/stats mediante gateway." />
+      </section>
+    </ConsoleLayout>
+  );
+}
+
+function Panel({ title, label, children }) {
+  return (
+    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
+      <div className="mb-5">
+        <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">{label}</span>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{title}</h2>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function BarList({ data, labelKey, valueKey, emptyText }) {
+  const max = Math.max(...data.map((item) => numero(item[valueKey])), 0);
+
+  if (!data.length) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-semibold text-slate-500">
+        {emptyText}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-4">
+      {data.map((item) => {
+        const value = numero(item[valueKey]);
+        const width = max > 0 ? Math.max(6, Math.round((value / max) * 100)) : 0;
+
+        return (
+          <div key={`${item[labelKey]}-${value}`} className="grid gap-2">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm font-black text-slate-800">{item[labelKey] || "Sin clasificar"}</span>
+              <span className="text-sm font-black text-indigo-700">{value}</span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full rounded-full bg-indigo-700 transition-all" style={{ width: `${width}%` }} />
             </div>
           </div>
-        </div>
-
-        <div className="flex gap-3 w-full mb-4">
-          <div className="flex-1 bg-white border rounded-xl p-4 min-w-0">
-            <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">
-              Participacion por género
-            </h2>
-            <Box sx={{width:'100%', height:240}}>
-              <PieChart
-                series={[
-                  {
-                    data: byGender.map((r, i) => ({
-                      id: i,
-                      value: r.value,
-                      label: r.label,
-                    })),
-                    innerRadius: 50,
-                    outerRadius: 90,
-                    paddingAngle: 3,
-                    cornerRadius: 4,
-                  },
-                ]}
-                margin={margin}
-              />
-            </Box>
-          </div>
-          <div className="flex-1 bg-white border rounded-xl p-4 min-w-0">
-            <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">
-              Distribucion por pais
-            </h2>
-                        <Box sx={{width:'100%', height:240}}>
-              <PieChart
-                series={[
-                  {
-                    data: byCountry.map((r, i) => ({
-                      id: i,
-                      value: r.value,
-                      label: r.label,
-                    })),
-                    innerRadius: 50,
-                    outerRadius: 90,
-                    paddingAngle: 3,
-                    cornerRadius: 4,
-                  },
-                ]}
-                margin={margin}
-              />
-            </Box>
-          </div>
-        </div>
-
-        <div className="bg-white border rounded-xl p-4">
-          <div className="flex justify-between items-center mb-3">
-            <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wide">
-              Resumen filtrado
-            </h2>
-            <span className="text-xs text-gray-400">
-              {filteredRecords.length} segmentos
-            </span>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs text-gray-400 border-b">
-                  <th className="pb-2 font-medium">País</th>
-                  <th className="pb-2 font-medium">Carrera</th>
-                  <th className="pb-2 font-medium">Género</th>
-                  <th className="pb-2 font-medium">Competencia</th>
-                  <th className="pb-2 font-medium text-right">Evaluaciones</th>
-                  <th className="pb-2 font-medium text-right">Aprobados</th>
-                  <th className="pb-2 font-medium text-right">Certificados</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredRecords.map((item, i) => (
-                  <tr
-                    key={i}
-                    className="border-b last:border-0 hover:bg-gray-50"
-                  >
-                    <td className="py-2 text-gray-700">{item.pais}</td>
-                    <td className="py-2 text-gray-700">{item.carrera}</td>
-                    <td className="py-2 text-gray-700">{item.genero}</td>
-                    <td className="py-2 text-gray-700">{item.competencia}</td>
-                    <td className="py-2 text-gray-700 text-right">
-                      {item.evaluaciones}
-                    </td>
-                    <td className="py-2 text-gray-700 text-right">
-                      {item.aprobados}
-                    </td>
-                    <td className="py-2 text-gray-700 text-right">
-                      {item.certificados}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </ConsoleLayout>
-    </main>
+        );
+      })}
+    </div>
   );
+}
+
+function StatusBox({ label, value, tone }) {
+  const tones = {
+    emerald: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    rose: "border-rose-200 bg-rose-50 text-rose-800",
+    indigo: "border-indigo-200 bg-indigo-50 text-indigo-800",
+    slate: "border-slate-200 bg-slate-50 text-slate-800"
+  };
+
+  return (
+    <article className={`rounded-2xl border p-5 ${tones[tone]}`}>
+      <span className="block text-xs font-black uppercase tracking-[0.16em] opacity-70">{label}</span>
+      <strong className="mt-2 block text-3xl font-black tracking-tight">{value}</strong>
+    </article>
+  );
+}
+
+function ResumenRow({ label, value }) {
+  return (
+    <tr>
+      <td className="px-4 py-4 font-black text-slate-700">{label}</td>
+      <td className="px-4 py-4 text-slate-700">{String(value)}</td>
+    </tr>
+  );
+}
+
+function numero(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function sumar(items = [], key) {
+  return items.reduce((total, item) => total + numero(item[key]), 0);
 }
 
 export default DashboardPage;

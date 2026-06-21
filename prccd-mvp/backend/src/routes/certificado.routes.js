@@ -4,9 +4,10 @@ const router = express.Router();
 const { sequelize } = require('../config/database');
 const { QueryTypes } = require('sequelize');
 const crypto = require('crypto');
+const authMiddleware = require('../middleware/auth.middleware');
 
 // POST /api/certificate/issue
-router.post('/issue', async (req, res, next) => {
+router.post('/issue', authMiddleware, async (req, res, next) => {
   try {
     const { id_candidato, sesion_id, datos_certificado } = req.body;
     if (!id_candidato || !sesion_id) {

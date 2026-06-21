@@ -1,78 +1,159 @@
-import ConsoleLayout from "../../layouts/ConsoleLayout";
+import { useState } from "react";
+import { verificarCertificadoPublico } from "../../services/certificadoApi";
 import "./VerificarPage.css";
-import searchIcon from "../../assets/search-globe-svgrepo-com.svg";
 
 function VerificarPage() {
+  const [hash, setHash] = useState("");
+  const [resultado, setResultado] = useState(null);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState("");
+
+  async function buscarCertificado(event) {
+    event.preventDefault();
+
+    if (!hash.trim()) {
+      setError("Ingrese el hash público del certificado.");
+      return;
+    }
+
+    setCargando(true);
+    setError("");
+    setResultado(null);
+
+    try {
+      const data = await verificarCertificadoPublico(hash.trim());
+      setResultado(data);
+    } catch (requestError) {
+      setError(requestError.message || "No fue posible verificar el certificado.");
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  const certificado = resultado?.certificado;
+  const valido = resultado?.valido === true;
+
   return (
-    <main>
-      <ConsoleLayout title="Verificacion de certificado">
-        <div className="p-4 rounded-md">
-          <div className="flex items-center gap-3 p-2">
-            <div className="relative flex-1">
-              <img
-                src={searchIcon}
-                className="absolute left-3 top-1/2 w-5 h-5 -translate-y-1/2 opacity-60"
-                alt="searchIcon"
-              />
-              <input
-                className="w-full rounded-lg bg-white border border-gay-300 py-2.5 pl-11 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                placeholder="Ingrese codigo de certificado"
-                type="text"
-                name=""
-                id=""
-              />
-            </div>
-            <button className="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700">
-              Verificar
+    <main className="verificar-page">
+      <section className="verificar-shell">
+        <header className="verificar-topbar">
+          <div>
+            <strong>PRCCD</strong>
+            <span>Portal público de verificación</span>
+          </div>
+          <span className="verificar-access">Consulta pública</span>
+        </header>
+
+        <section className="verificar-hero">
+          <span className="verificar-eyebrow">Validación de certificado</span>
+          <h1>Verificar autenticidad de una credencial PRCCD</h1>
+          <p>
+            Ingrese el hash público del certificado para consultar su validez sin iniciar sesión.
+          </p>
+
+          <form className="verificar-form" onSubmit={buscarCertificado}>
+            <input
+              type="text"
+              value={hash}
+              onChange={(event) => setHash(event.target.value)}
+              placeholder="Hash SHA-256 del certificado"
+            />
+            <button type="submit" disabled={cargando}>
+              {cargando ? "Verificando..." : "Verificar"}
             </button>
-          </div>
-          <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                <span className="text-2xl text-green-600">✓</span>
-              </div>
+          </form>
 
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">
-                  Certificado válido
-                </h2>
-                <p className="text-sm text-gray-500">
-                  La información coincide con nuestros registros.
-                </p>
-              </div>
+          {error && <div className="verificar-alert verificar-alert-error">{error}</div>}
+        </section>
+
+        {resultado && (
+          <section className="verificar-result">
+            <div className={`verificar-status-card ${valido ? "valid" : "invalid"}`}>
+              <span>{valido ? "Certificado válido" : "Certificado no válido"}</span>
+              <h2>{valido ? "Autenticidad confirmada" : "No se pudo confirmar la validez"}</h2>
+              <p>
+                Resultado obtenido desde el endpoint público de verificación por hash.
+              </p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <p className="text-sm text-gray-500">Nombre</p>
-                <p className="font-medium text-gray-800">Juan José Gerardi</p>
-              </div>
+            <div className="verificar-grid">
+              <article className="verificar-card verificar-main-card">
+                <div className="verificar-card-header">
+                  <div>
+                    <span>Certificado</span>
+                    <h3>{certificado?.id || "No disponible"}</h3>
+                  </div>
+                  <strong>{certificado?.estado || "No disponible"}</strong>
+                </div>
 
-              <div>
-                <p className="text-sm text-gray-500">Código</p>
-                <p className="font-medium text-gray-800">CERT-2026-001</p>
-              </div>
+                <div className="verificar-details">
+                  <Detail label="ID candidato" value={certificado?.id_candidato} />
+                  <Detail label="Sesión de examen" value={certificado?.sesion_id} />
+                  <Detail label="Fecha de emisión" value={formatearFecha(certificado?.emitido_en)} />
+                  <Detail label="Estado" value={certificado?.estado} />
+                </div>
+              </article>
 
-              <div>
-                <p className="text-sm text-gray-500">Programa</p>
-                <p className="font-medium text-gray-800">Desarrollo Web</p>
-              </div>
+              <article className="verificar-card">
+                <div className="verificar-card-header">
+                  <div>
+                    <span>Hash público</span>
+                    <h3>Integridad del certificado</h3>
+                  </div>
+                </div>
 
-              <div>
-                <p className="text-sm text-gray-500">Fecha de emisión</p>
-                <p className="font-medium text-gray-800">19/06/2026</p>
-              </div>
-
-              <div className="sm:col-span-2">
-                <p className="text-sm text-gray-500">Institución</p>
-                <p className="font-medium text-gray-800">Universidad XYZ</p>
-              </div>
+                <div className="verificar-hashes">
+                  <HashBlock label="Hash certificado" value={certificado?.hash_certificado} />
+                </div>
+              </article>
             </div>
-          </div>
-        </div>
-      </ConsoleLayout>
+
+            <article className="verificar-card">
+              <div className="verificar-card-header">
+                <div>
+                  <span>Respuesta técnica</span>
+                  <h3>Payload de verificación</h3>
+                </div>
+              </div>
+
+              <pre>{JSON.stringify(resultado, null, 2)}</pre>
+            </article>
+          </section>
+        )}
+      </section>
     </main>
   );
+}
+
+function Detail({ label, value }) {
+  return (
+    <div>
+      <span>{label}</span>
+      <strong>{String(value || "No disponible")}</strong>
+    </div>
+  );
+}
+
+function HashBlock({ label, value }) {
+  return (
+    <div className="verificar-hash-block">
+      <span>{label}</span>
+      <code>{value || "No disponible"}</code>
+    </div>
+  );
+}
+
+function formatearFecha(value) {
+  if (!value) return "No disponible";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("es-GT", {
+    dateStyle: "medium",
+    timeStyle: "medium",
+  }).format(date);
 }
 
 export default VerificarPage;

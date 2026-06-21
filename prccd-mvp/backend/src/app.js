@@ -36,7 +36,7 @@ app.use('/api/ingest', authMiddleware, ingestaRoutes);
 app.use('/api/examen', authMiddleware, examenRoutes);
 app.use('/api/telemetria', authMiddleware, telemetriaRoutes);
 app.use('/api/audit', authMiddleware, auditoriaRoutes);
-app.use('/api/certificate', authMiddleware, certificadoRoutes);
+app.use('/api/certificate', certificadoRoutes);
 app.use('/api/dashboard', authMiddleware, dashboardRoutes);
 
 // Error handler global — siempre al final
