@@ -1,136 +1,288 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom"; 
 import ConsoleLayout from "../../layouts/ConsoleLayout";
 import MetricCard from "../../components/MetricCard";
 import TraceCard from "../../components/TraceCard";
-import { bancoPreguntasMock, candidatoExamenMock, trazabilidadExamen } from "../../data/examenMock";
+import { trazabilidadExamen } from "../../data/examenMock";
 import "./ExamenPage.css";
 
-const totalPreguntas = 5;
-
 function ExamenPage() {
-  const [indice, setIndice] = useState(0);
+  const [fase, setFase] = useState("inicio"); 
+  const [sesionId, setSesionId] = useState(null);
+  const [preguntaActual, setPreguntaActual] = useState(null);
+  const [numeroPregunta, setNumeroPregunta] = useState(1);
+  const [totalPreguntas, setTotalPreguntas] = useState(10);
   const [seleccion, setSeleccion] = useState("");
   const [historial, setHistorial] = useState([]);
-  const [terminado, setTerminado] = useState(false);
+  const [dictamen, setDictamen] = useState(null);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState("");
 
-  const preguntaActual = bancoPreguntasMock[indice];
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+  const token = localStorage.getItem("token");
 
-  const puntaje = useMemo(() => {
-    return historial.reduce((total, item) => total + (item.correcto ? item.peso : 0), 0);
-  }, [historial]);
+  const progreso = Math.round((numeroPregunta / totalPreguntas) * 100);
 
-  const maxPuntaje = useMemo(() => {
-    return historial.reduce((total, item) => total + item.peso, 0);
-  }, [historial]);
+  useEffect(() => {
+    if (fase !== "examen" || !sesionId) return;
 
-  const porcentaje = maxPuntaje > 0 ? Math.round((puntaje / maxPuntaje) * 100) : 0;
-  const dictamen = porcentaje >= 60 ? "Aprobado" : "Reprobado";
-
-  const progreso = Math.round(((terminado ? totalPreguntas : indice + 1) / totalPreguntas) * 100);
-
-  const responder = () => {
-    if (!seleccion || terminado) return;
-
-    const correcto = seleccion === preguntaActual.correcta;
-    const peso = obtenerPeso(preguntaActual.nivel);
-
-    const nuevoHistorial = [
-      ...historial,
-      {
-        numero: indice + 1,
-        pregunta_id: preguntaActual.id,
-        nivel: preguntaActual.nivel,
-        respuesta: seleccion,
-        correcto,
-        peso
+    async function reportarEvento(tipo_evento, metadatos = {}) {
+      try {
+        const res = await fetch("http://localhost/api/telemetria", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ sesion_id: sesionId, tipo_evento, metadatos }),
+        });
+        const data = await res.json();
+        if (data.suspendido) setFase("suspendido");
+      } catch {
+        console.error("Error enviando telemetría");
       }
-    ];
-
-    setHistorial(nuevoHistorial);
-
-    if (indice + 1 >= totalPreguntas) {
-      setTerminado(true);
-      return;
     }
 
-    const siguienteNivel = correcto ? "Avanzado" : "Básico";
-    const siguienteIndice = bancoPreguntasMock.findIndex(
-      (pregunta, posicion) => posicion > indice && pregunta.nivel === siguienteNivel
-    );
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") reportarEvento("CAMBIO_PESTANA");
+    };
+    const handleBlur  = () => reportarEvento("PERDIDA_FOCO");
+    const handleCopy  = () => reportarEvento("COPIAR_PEGAR", { detalle: "copy" });
+    const handlePaste = () => reportarEvento("COPIAR_PEGAR", { detalle: "paste" });
 
-    setIndice(siguienteIndice === -1 ? indice + 1 : siguienteIndice);
-    setSeleccion("");
-  };
+    const devtoolsInterval = setInterval(() => {
+      if (
+        window.outerWidth  - window.innerWidth  > 160 ||
+        window.outerHeight - window.innerHeight > 160
+      ) {
+        reportarEvento("DEVTOOLS_DETECTADO");
+      }
+    }, 3000);
 
-  const reiniciar = () => {
-    setIndice(0);
+    const channel = new BroadcastChannel("prccd_examen");
+    channel.postMessage("nueva_pestana");
+    channel.onmessage = (e) => {
+      if (e.data === "nueva_pestana") reportarEvento("MULTIPLES_PESTANAS");
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("blur", handleBlur);
+    document.addEventListener("copy",  handleCopy);
+    document.addEventListener("paste", handlePaste);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("blur", handleBlur);
+      document.removeEventListener("copy",  handleCopy);
+      document.removeEventListener("paste", handlePaste);
+      clearInterval(devtoolsInterval);
+      channel.close();
+    };
+  }, [fase, sesionId, token]);
+
+  async function iniciarExamen() {
+    setCargando(true);
+    setError("");
+    try {
+      const res = await fetch("http://localhost/api/examen/iniciar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id_candidato: usuario.id_candidato }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setSesionId(data.sesion_id);
+        setPreguntaActual(data.pregunta);
+        setNumeroPregunta(data.numero);
+        setTotalPreguntas(data.total);
+        setFase("examen");
+      } else {
+        setError(data.message || data.error || "No se pudo iniciar el examen");
+      }
+    } catch {
+      setError("No se pudo conectar con el servidor");
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  async function responder() {
+    if (!seleccion || cargando) return;
+    setCargando(true);
+    setError("");
+
+    try {
+      const res = await fetch("http://localhost/api/examen/responder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          sesion_id:   sesionId,
+          pregunta_id: preguntaActual.id,
+          respuesta:   seleccion,
+        }),
+      });
+
+      const data = await res.json();
+
+      setHistorial((prev) => [
+        ...prev,
+        {
+          numero:    numeroPregunta,
+          nivel:     preguntaActual.nivel,
+          respuesta: seleccion,
+          correcto:  data.correcto,
+        },
+      ]);
+
+      if (data.terminado) {
+        setDictamen(data.dictamen);
+        setFase("resultado");
+      } else {
+        setPreguntaActual(data.pregunta);
+        setNumeroPregunta(data.numero);
+        setSeleccion("");
+      }
+    } catch {
+      setError("Error al enviar la respuesta");
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  function reiniciar() {
+    setFase("inicio");
+    setSesionId(null);
+    setPreguntaActual(null);
+    setNumeroPregunta(1);
     setSeleccion("");
     setHistorial([]);
-    setTerminado(false);
-  };
+    setDictamen(null);
+    setError("");
+  }
+
+  const opciones = preguntaActual
+    ? [
+        { clave: "A", texto: preguntaActual.opcion_a },
+        { clave: "B", texto: preguntaActual.opcion_b },
+        { clave: "C", texto: preguntaActual.opcion_c },
+        { clave: "D", texto: preguntaActual.opcion_d },
+      ]
+    : [];
 
   return (
     <ConsoleLayout
-      title="Motor transaccional de examen adaptativo"
-      subtitle="Simulación funcional del núcleo de evaluación del candidato, aplicando transición de dificultad según acierto o fallo inmediato anterior y registrando historial de sesión."
+      title="Examen adaptativo de competencias"
+      subtitle="Evaluación con dificultad adaptativa según respuesta inmediata anterior. Antifraude activo durante la sesión."
       badge="RF-02 · EaC-05 · UC-2.4"
     >
-      <section className="grid gap-5 xl:grid-cols-[1fr_360px]">
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
-          <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 md:flex-row md:items-start md:justify-between">
-            <div>
-              <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">
-                Candidato
-              </span>
-              <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
-                {candidatoExamenMock.certificacion}
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                {candidatoExamenMock.nombre} · {candidatoExamenMock.universidad} · {candidatoExamenMock.carrera}
+
+      {fase === "inicio" && (
+        <section className="max-w-2xl mx-auto rounded-3xl border border-slate-200 bg-white p-10 shadow-xl shadow-slate-200/70">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">
+            Evaluación de competencias digitales
+          </span>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+            Bienvenido, {usuario.nombre || usuario.id_candidato}
+          </h2>
+          <p className="mt-2 text-sm text-slate-500">
+            {usuario.universidad} · {usuario.id_candidato}
+          </p>
+
+          <div className="mt-8 grid gap-3">
+            <InfoItem label="Preguntas" value="10 preguntas de opción múltiple (A, B, C, D)" />
+            <InfoItem label="Dificultad" value="Adaptativa — inicia en nivel Medio" />
+            <InfoItem label="Aprobación" value="Puntaje mínimo según dictamen del sistema" />
+            <div className="rounded-2xl bg-amber-50 border border-amber-100 p-4">
+              <span className="text-xs font-black uppercase tracking-wider text-amber-600">Advertencia antifraude</span>
+              <p className="mt-1 text-sm text-amber-800">
+                No cambies de pestaña, copies texto ni abras DevTools durante el examen. Al acumular 5 eventos sospechosos el examen se suspende automáticamente.
               </p>
             </div>
-
-            <div className="rounded-2xl bg-indigo-50 px-4 py-3 text-right ring-1 ring-indigo-100">
-              <span className="block text-xs font-black uppercase tracking-[0.16em] text-indigo-600">
-                Sesión
-              </span>
-              <strong className="mt-1 block text-sm text-indigo-900">
-                {terminado ? "Completada" : "En progreso"}
-              </strong>
-            </div>
           </div>
 
-          <div className="mt-6">
-            <div className="flex items-center justify-between gap-4">
+          {error && (
+            <p className="mt-4 text-sm text-red-600 font-semibold">{error}</p>
+          )}
+
+          <button
+            onClick={iniciarExamen}
+            disabled={cargando}
+            className="mt-8 w-full h-14 rounded-2xl bg-indigo-700 text-sm font-black text-white shadow-lg shadow-indigo-900/15 transition hover:bg-indigo-800 disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {cargando ? (
+              <>
+                <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Iniciando...
+              </>
+            ) : (
+              "Iniciar examen"
+            )}
+          </button>
+        </section>
+      )}
+
+      {fase === "examen" && preguntaActual && (
+        <section className="grid gap-5 xl:grid-cols-[1fr_360px]">
+          <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
+
+            <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 md:flex-row md:items-start md:justify-between">
               <div>
-                <span className="text-sm font-black text-slate-500">
-                  Pregunta {terminado ? totalPreguntas : indice + 1} de {totalPreguntas}
-                </span>
-                <h3 className="mt-1 text-lg font-black text-slate-950">
-                  Dificultad actual: {terminado ? "Finalizada" : normalizarNivel(preguntaActual.nivel)}
-                </h3>
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">Candidato</span>
+                <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+                  {usuario.nombre || usuario.id_candidato}
+                </h2>
+                <p className="mt-2 text-sm text-slate-600">
+                  {usuario.universidad} · Sesión #{sesionId}
+                </p>
               </div>
-
-              <span className="rounded-full bg-emerald-50 px-4 py-2 text-xs font-black text-emerald-700 ring-1 ring-emerald-100">
-                Motor IRT simulado
-              </span>
+              <div className="rounded-2xl bg-indigo-50 px-4 py-3 text-right ring-1 ring-indigo-100">
+                <span className="block text-xs font-black uppercase tracking-[0.16em] text-indigo-600">Sesión</span>
+                <strong className="mt-1 block text-sm text-indigo-900">En progreso</strong>
+              </div>
             </div>
 
-            <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full rounded-full bg-indigo-700 transition-all" style={{ width: `${progreso}%` }} />
+            <div className="mt-6">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <span className="text-sm font-black text-slate-500">
+                    Pregunta {numeroPregunta} de {totalPreguntas}
+                  </span>
+                  <h3 className="mt-1 text-lg font-black text-slate-950">
+                    Dificultad actual: {normalizarNivel(preguntaActual.nivel)}
+                  </h3>
+                </div>
+                <span className="rounded-full bg-emerald-50 px-4 py-2 text-xs font-black text-emerald-700 ring-1 ring-emerald-100">
+                  Motor adaptativo
+                </span>
+              </div>
+              <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-full rounded-full bg-indigo-700 transition-all" style={{ width: `${progreso}%` }} />
+              </div>
             </div>
-          </div>
 
-          {!terminado && (
             <section className="mt-6 rounded-3xl bg-slate-50 p-5 ring-1 ring-slate-100">
-              <h3 className="text-lg font-black leading-8 text-slate-950">{preguntaActual.pregunta}</h3>
+              <h3 className="text-lg font-black leading-8 text-slate-950">
+                {preguntaActual.pregunta}
+              </h3>
 
               <div className="mt-5 grid gap-3">
-                {preguntaActual.opciones.map((opcion) => (
+                {opciones.map((opcion) => (
                   <button
                     key={opcion.clave}
                     type="button"
                     onClick={() => setSeleccion(opcion.clave)}
+                    disabled={cargando}
                     className={`flex min-h-14 items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-semibold transition ${
                       seleccion === opcion.clave
                         ? "border-indigo-600 bg-indigo-50 text-indigo-800 ring-2 ring-indigo-100"
@@ -147,102 +299,152 @@ function ExamenPage() {
                 ))}
               </div>
 
+              {error && <p className="mt-3 text-sm text-red-600 font-semibold">{error}</p>}
+
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm font-semibold text-slate-500">
-                  La siguiente dificultad se calculará únicamente con base en esta respuesta.
+                  La siguiente dificultad se calculará con base en esta respuesta.
                 </p>
                 <button
                   type="button"
                   onClick={responder}
-                  disabled={!seleccion}
-                  className="h-12 rounded-2xl bg-indigo-700 px-6 text-sm font-black text-white shadow-lg shadow-indigo-900/15 transition hover:bg-indigo-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
+                  disabled={!seleccion || cargando}
+                  className="h-12 rounded-2xl bg-indigo-700 px-6 text-sm font-black text-white shadow-lg shadow-indigo-900/15 transition hover:bg-indigo-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none flex items-center gap-2"
                 >
-                  Enviar respuesta
+                  {cargando ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Enviando...
+                    </>
+                  ) : (
+                    "Enviar respuesta"
+                  )}
                 </button>
               </div>
             </section>
-          )}
+          </section>
 
-          {terminado && (
-            <section className="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-6">
-              <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-700">
-                Dictamen emitido
+          <aside className="grid gap-5">
+            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">
+                Reglas del motor
               </span>
-              <h3 className="mt-2 text-3xl font-black tracking-tight text-emerald-950">{dictamen}</h3>
-              <p className="mt-2 text-sm leading-6 text-emerald-800">
-                Puntaje ponderado {puntaje} de {maxPuntaje}. Porcentaje final: {porcentaje}%.
-              </p>
-
-              <div className="mt-5 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={reiniciar}
-                  className="h-12 rounded-2xl bg-emerald-700 px-6 text-sm font-black text-white transition hover:bg-emerald-800"
-                >
-                  Reiniciar simulación
-                </button>
-                <a
-                  href="/certificado"
-                  className="inline-flex h-12 items-center rounded-2xl border border-emerald-300 bg-white px-6 text-sm font-black text-emerald-800 transition hover:bg-emerald-50"
-                >
-                  Continuar a certificado
-                </a>
+              <div className="mt-5 grid gap-3">
+                <RuleItem label="Inicio" value="Pregunta 1 en Medio" />
+                <RuleItem label="Respuesta correcta" value="Siguiente pregunta Avanzada" />
+                <RuleItem label="Respuesta incorrecta" value="Siguiente pregunta Básica" />
+                <RuleItem label="Cierre" value={`Dictamen al completar ${totalPreguntas} preguntas`} />
               </div>
             </section>
-          )}
-        </section>
 
-        <aside className="grid gap-5">
-          <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">
-              Reglas del motor
-            </span>
-
-            <div className="mt-5 grid gap-3">
-              <RuleItem label="Inicio" value="Pregunta 1 en Intermedio" />
-              <RuleItem label="Respuesta correcta" value="Siguiente pregunta Avanzada" />
-              <RuleItem label="Respuesta incorrecta" value="Siguiente pregunta Básica" />
-              <RuleItem label="Cierre MVP" value="Dictamen al completar 5 preguntas" />
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">
-              Historial de sesión
-            </span>
-
-            <div className="mt-5 grid gap-3">
-              {historial.map((item) => (
-                <div key={`${item.pregunta_id}-${item.numero}`} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <strong className="text-sm text-slate-950">Pregunta {item.numero}</strong>
-                    <span className={`rounded-full px-3 py-1 text-xs font-black ${
-                      item.correcto ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
-                    }`}>
-                      {item.correcto ? "Correcta" : "Incorrecta"}
-                    </span>
+            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">
+                Historial de sesión
+              </span>
+              <div className="mt-5 grid gap-3">
+                {historial.map((item, i) => (
+                  <div key={i} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <strong className="text-sm text-slate-950">Pregunta {item.numero}</strong>
+                      <span className={`rounded-full px-3 py-1 text-xs font-black ${
+                        item.correcto ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                      }`}>
+                        {item.correcto ? "Correcta" : "Incorrecta"}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-xs font-semibold text-slate-500">
+                      Nivel {normalizarNivel(item.nivel)} · Respuesta {item.respuesta}
+                    </p>
                   </div>
-                  <p className="mt-2 text-xs font-semibold text-slate-500">
-                    Nivel {normalizarNivel(item.nivel)} · Respuesta {item.respuesta} · Peso {item.peso}
+                ))}
+                {historial.length === 0 && (
+                  <p className="rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-slate-500">
+                    El historial se llenará conforme respondas cada pregunta.
                   </p>
-                </div>
-              ))}
+                )}
+              </div>
+            </section>
+          </aside>
+        </section>
+      )}
 
-              {historial.length === 0 && (
-                <p className="rounded-2xl bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-500">
-                  El historial se llenará conforme el candidato responda cada pregunta.
-                </p>
-              )}
-            </div>
-          </section>
-        </aside>
-      </section>
+      {fase === "resultado" && dictamen && (
+        <section className="max-w-2xl mx-auto rounded-3xl border border-emerald-200 bg-emerald-50 p-10 shadow-xl">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-700">
+            Dictamen emitido
+          </span>
+          <h3 className={`mt-2 text-4xl font-black tracking-tight ${
+            dictamen.dictamen === "Aprobado" ? "text-emerald-950" : "text-red-800"
+          }`}>
+            {dictamen.dictamen}
+          </h3>
+          <p className="mt-2 text-sm text-emerald-800">
+            Puntaje: {dictamen.puntaje} / {dictamen.maxPuntaje} · {dictamen.porcentaje}%
+          </p>
+
+          <div className="mt-6 grid gap-3">
+            {historial.map((item, i) => (
+              <div key={i} className="rounded-2xl border border-emerald-200 bg-white p-4 flex items-center justify-between">
+                <span className="text-sm font-semibold text-slate-700">
+                  Pregunta {item.numero} — {normalizarNivel(item.nivel)}
+                </span>
+                <span className={`rounded-full px-3 py-1 text-xs font-black ${
+                  item.correcto ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                }`}>
+                  {item.correcto ? "Correcta" : "Incorrecta"}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              onClick={reiniciar}
+              className="h-12 rounded-2xl bg-slate-700 px-6 text-sm font-black text-white transition hover:bg-slate-800"
+            >
+              Volver al inicio
+            </button>
+            
+            {dictamen.dictamen === "Aprobado" && (
+              <Link
+                to="/certificado"
+                className="inline-flex h-12 items-center rounded-2xl bg-emerald-700 px-6 text-sm font-black text-white transition hover:bg-emerald-800 shadow-md shadow-emerald-700/15"
+              >
+                Continuar a certificado →
+              </Link>
+            )}
+          </div>
+        </section>
+      )}
+
+      {fase === "suspendido" && (
+        <section className="max-w-2xl mx-auto rounded-3xl border border-red-200 bg-red-50 p-10 shadow-xl">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-red-600">
+            Sesión suspendida
+          </span>
+          <h3 className="mt-2 text-4xl font-black tracking-tight text-red-900">
+            Examen suspendido
+          </h3>
+          <p className="mt-2 text-sm text-red-800">
+            Se detectaron demasiados eventos sospechosos durante la sesión. El examen ha sido marcado como suspendido automáticamente.
+          </p>
+          <button
+            onClick={reiniciar}
+            className="mt-8 h-12 rounded-2xl bg-red-700 px-6 text-sm font-black text-white transition hover:bg-red-800"
+          >
+            Volver al inicio
+          </button>
+        </section>
+      )}
 
       <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard value={`${historial.length}/${totalPreguntas}`} label="Preguntas respondidas" detail="Avance de la sesión adaptativa." />
-        <MetricCard value={`${porcentaje}%`} label="Porcentaje actual" detail="Cálculo ponderado sobre respuestas registradas." />
-        <MetricCard value={terminado ? dictamen : "Pendiente"} label="Dictamen" detail="Resultado final al terminar el bloque." />
-        <MetricCard value="< 2s" label="Meta EaC-05" detail="Tiempo objetivo para ajustar dificultad." />
+        <MetricCard value={dictamen ? `${dictamen.porcentaje}%` : "—"} label="Porcentaje final" detail="Cálculo ponderado sobre respuestas registradas." />
+        <MetricCard value={dictamen ? dictamen.dictamen : "Pendiente"} label="Dictamen" detail="Resultado final al terminar el bloque." />
+        <MetricCard value={sesionId ? `#${sesionId}` : "—"} label="ID de sesión" detail="Identificador de esta sesión en el backend." />
       </section>
 
       <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -251,12 +453,6 @@ function ExamenPage() {
         ))}
       </section>
 
-      <section className="mt-5 rounded-3xl border border-amber-200 bg-amber-50 p-5">
-        <strong className="block text-sm font-black text-amber-900">Nota de integración backend</strong>
-        <p className="mt-1 text-sm leading-6 text-amber-800">
-          Esta pantalla todavía no consume el backend. La conexión posterior debe usar POST /api/examen/iniciar con id_candidato y POST /api/examen/responder con sesion_id, pregunta_id y respuesta.
-        </p>
-      </section>
     </ConsoleLayout>
   );
 }
@@ -270,11 +466,13 @@ function RuleItem({ label, value }) {
   );
 }
 
-function obtenerPeso(nivel) {
-  if (nivel === "Básico") return 1;
-  if (nivel === "Medio") return 2;
-  if (nivel === "Avanzado") return 3;
-  return 1;
+function InfoItem({ label, value }) {
+  return (
+    <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+      <span className="text-xs font-black uppercase tracking-wider text-slate-400">{label}</span>
+      <p className="mt-1 text-sm font-semibold text-slate-700">{value}</p>
+    </div>
+  );
 }
 
 function normalizarNivel(nivel) {

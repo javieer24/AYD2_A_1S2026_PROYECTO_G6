@@ -15,28 +15,68 @@ function IngestaPage() {
   const [universidad, setUniversidad] = useState("USAC");
   const [archivo, setArchivo] = useState(null);
   const [procesado, setProcesado] = useState(false);
+  const [cargando, setCargando] = useState(false);
+  const [resultado, setResultado] = useState(null); 
+  const [error, setError] = useState("");
 
   const institucion = useMemo(
     () => institucionesIngesta.find((item) => item.id === universidad),
     [universidad]
   );
 
-  const registros = useMemo(
-    () => (procesado ? expedienteNormalizadoMock[universidad] : []),
-    [procesado, universidad]
+  const registros = useMemo(() => {
+    if (!procesado) return [];
+    return expedienteNormalizadoMock[universidad] || [];
+  }, [procesado, universidad]);
+
+  const cursosTotales = registros.reduce(
+    (total, registro) => total + registro.cursos_aprobados.length, 0
   );
 
-  const cursosTotales = registros.reduce((total, registro) => total + registro.cursos_aprobados.length, 0);
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setProcesado(true);
+    if (!archivo) return;
+
+    setCargando(true);
+    setError("");
+    setResultado(null);
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const formData = new FormData();
+      formData.append("archivo", archivo);
+      formData.append("universidad", universidad);
+
+      const res = await fetch("http://localhost/api/ingest", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.status === "ok") {
+        setResultado(data);
+        setProcesado(true);
+      } else {
+        setError(data.message || "Error al procesar el archivo");
+      }
+    } catch {
+      setError("No se pudo conectar con el servidor");
+    } finally {
+      setCargando(false);
+    }
   };
 
   const handleUniversidadChange = (event) => {
     setUniversidad(event.target.value);
     setArchivo(null);
     setProcesado(false);
+    setResultado(null);
+    setError("");
   };
 
   return (
@@ -56,7 +96,7 @@ function IngestaPage() {
               </p>
             </div>
             <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">
-              Maqueta funcional
+              Conectado al backend
             </span>
           </div>
 
@@ -77,7 +117,12 @@ function IngestaPage() {
             </label>
 
             <label className="grid gap-2">
-              <span className="text-sm font-black text-slate-800">Archivo académico</span>
+              <span className="text-sm font-black text-slate-800">
+                Archivo académico
+                <span className="ml-2 text-xs font-normal text-slate-400">
+                  {institucion.formato} — {institucion.adaptador}
+                </span>
+              </span>
               <input
                 key={universidad}
                 type="file"
@@ -86,6 +131,32 @@ function IngestaPage() {
                 className="block w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-indigo-600 file:px-4 file:py-2 file:text-sm file:font-black file:text-white hover:file:bg-indigo-700"
               />
             </label>
+
+            {/* Error */}
+            {error && (
+              <div className="rounded-2xl bg-red-50 border border-red-200 p-4">
+                <p className="text-sm font-semibold text-red-700">{error}</p>
+              </div>
+            )}
+
+            {/* Resultado de la API */}
+            {resultado && (
+              <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 grid gap-1">
+                <p className="text-sm font-black text-emerald-800">Ingesta completada</p>
+                <p className="text-sm text-emerald-700">
+                  Procesados: <strong>{resultado.procesados}</strong> · Exitosos: <strong>{resultado.exitosos}</strong> · Errores: <strong>{resultado.errores?.length ?? 0}</strong>
+                </p>
+                {resultado.errores?.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {resultado.errores.map((e, i) => (
+                      <p key={i} className="text-xs text-red-600">
+                        Fila {e.fila}: {e.mensaje}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="rounded-3xl border border-dashed border-indigo-200 bg-indigo-50/70 p-5">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -96,16 +167,26 @@ function IngestaPage() {
                   </strong>
                   <p className="mt-1 text-sm leading-6 text-slate-600">
                     {archivo
-                      ? `${Math.max(1, Math.round(archivo.size / 1024))} KB preparados para simulación de procesamiento`
+                      ? `${Math.max(1, Math.round(archivo.size / 1024))} KB listos para enviar`
                       : `Para ${institucion.id}, el adaptador esperado es ${institucion.adaptador}.`}
                   </p>
                 </div>
                 <button
                   type="submit"
-                  disabled={!archivo}
-                  className="h-12 rounded-2xl bg-indigo-700 px-5 text-sm font-black text-white shadow-lg shadow-indigo-900/15 transition hover:bg-indigo-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
+                  disabled={!archivo || cargando}
+                  className="h-12 rounded-2xl bg-indigo-700 px-5 text-sm font-black text-white shadow-lg shadow-indigo-900/15 transition hover:bg-indigo-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none flex items-center gap-2"
                 >
-                  Procesar expediente
+                  {cargando ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Procesando...
+                    </>
+                  ) : (
+                    "Procesar expediente"
+                  )}
                 </button>
               </div>
             </div>
@@ -131,10 +212,26 @@ function IngestaPage() {
       </section>
 
       <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard value={procesado ? "1" : "0"} label="Registros recibidos" detail="Expedientes detectados en el lote cargado." />
-        <MetricCard value={procesado ? "1" : "0"} label="Registros normalizados" detail="Expedientes convertidos al modelo canónico." />
-        <MetricCard value={procesado ? String(cursosTotales) : "0"} label="Cursos homologados" detail="Cursos aprobados con código oficial y nota final." />
-        <MetricCard value={procesado ? "VÁLIDO" : "EN ESPERA"} label="Estado del lote" detail="Resultado previo a la persistencia definitiva." />
+        <MetricCard
+          value={resultado ? String(resultado.procesados) : procesado ? "1" : "0"}
+          label="Registros recibidos"
+          detail="Expedientes detectados en el lote cargado."
+        />
+        <MetricCard
+          value={resultado ? String(resultado.exitosos) : procesado ? "1" : "0"}
+          label="Registros normalizados"
+          detail="Expedientes convertidos al modelo canónico."
+        />
+        <MetricCard
+          value={procesado ? String(cursosTotales) : "0"}
+          label="Cursos homologados"
+          detail="Cursos aprobados con código oficial y nota final."
+        />
+        <MetricCard
+          value={resultado ? (resultado.errores?.length > 0 ? "CON ERRORES" : "VÁLIDO") : procesado ? "VÁLIDO" : "EN ESPERA"}
+          label="Estado del lote"
+          detail="Resultado previo a la persistencia definitiva."
+        />
       </section>
 
       <section className="mt-5 grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
@@ -143,7 +240,6 @@ function IngestaPage() {
             <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">Pipeline técnico</span>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Flujo de homologación</h2>
           </div>
-
           <div className="grid gap-3">
             {pipelineIngesta.map((step) => (
               <PipelineStep key={step.numero} number={step.numero} title={step.titulo} text={step.texto} />
@@ -202,13 +298,6 @@ function IngestaPage() {
                 </tbody>
               </table>
             </div>
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-            <strong className="block text-sm font-black text-amber-900">Nota de integración</strong>
-            <p className="mt-1 text-sm leading-6 text-amber-800">
-              Esta pantalla no consume todavía el backend. La estructura queda lista para conectar posteriormente con POST /api/ingest enviando multipart/form-data con archivo y universidad.
-            </p>
           </div>
         </div>
       </section>
