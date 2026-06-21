@@ -66,12 +66,6 @@ function HomePage() {
 
           <div className="flex items-center gap-3">
             <Link
-              to="/verificar"
-              className="text-sm text-gray-500 hover:text-gray-800"
-            >
-              Verificar certificado
-            </Link>
-            <Link
               to="/login"
               className="text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
             >
