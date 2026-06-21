@@ -4,8 +4,8 @@ import ConsoleLayout from "../../layouts/ConsoleLayout";
 function AuditoriaPage() {
   const [sesionId, setSesionId] = useState("");
   const [buscando, setBuscando] = useState(false);
+  const [error, setError] = useState("");
 
-  // Datos simulados basados exactamente en los payloads del API_ENDPOINTS.md
   const [logs, setLogs] = useState([
     {
       timestamp: "2026-06-20 18:01:23",
@@ -49,150 +49,119 @@ function AuditoriaPage() {
     },
   ]);
 
-  const handleBuscar = (e) => {
+  const handleBuscar = async (e) => {
     e.preventDefault();
     if (!sesionId) return;
     setBuscando(true);
-    // Aquí conectarías con: GET /api/audit/trail?sesion_id=${sesionId}
-    setTimeout(() => setBuscando(false), 600);
+    setError("");
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`/api/audit/trail?sesion_id=${sesionId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.status === "ok") {
+        setLogs(data.trail);
+      } else {
+        setError("No se encontraron registros para esa sesión.");
+      }
+    } catch {
+      setError("No se pudo conectar con el servidor.");
+    } finally {
+      setBuscando(false);
+    }
+  };
+
+  const severidadColor = (s) => {
+    if (s === "CRITICAL") return "bg-red-100 text-red-700";
+    if (s === "WARNING")  return "bg-yellow-100 text-yellow-700";
+    return "bg-gray-100 text-gray-500";
+  };
+
+  const tipoColor = (t) => {
+    if (t === "TELEMETRIA")   return "bg-orange-50 text-orange-600";
+    if (t === "EXAMEN")       return "bg-indigo-50 text-indigo-600";
+    if (t === "AUTENTICACION") return "bg-emerald-50 text-emerald-600";
+    return "bg-gray-50 text-gray-500";
   };
 
   return (
     <ConsoleLayout
-      title="Motor transaccional de examen adaptativo"
-      subtitle="Simulación funcional del núcleo de evaluación del candidato, aplicando transición de dificultad según acierto o fallo inmediato anterior y registrando historial de sesión."
-      badge="RF-02 · EaC-05 · UC-2.4"
+      title="Auditoría y trazabilidad"
+      subtitle="Bitácora inmutable de eventos. Retención 5 años conforme al convenio SICA."
+      badge="RF-03 · EaC-07"
     >
-      <div className="space-y-6 animate-fadeIn">
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-900">
-            Buscador de Pistas de Auditoría
-          </h3>
-          <p className="text-sm text-slate-500 mt-1">
-            Filtre por ID de Sesión de Examen para reconstruir la cronología
-            inmutable de eventos.
-          </p>
+      <div className="space-y-4">
 
-          <form
-            onSubmit={handleBuscar}
-            className="mt-4 flex flex-col sm:flex-row gap-3"
-          >
-            <div className="relative flex-1">
-              <input
-                type="number"
-                value={sesionId}
-                onChange={(e) => setSesionId(e.target.value)}
-                placeholder="Ingrese el ID de Sesión (ej. 2)..."
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all font-mono"
-              />
-            </div>
+        {/* Buscador */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-5">
+          <form onSubmit={handleBuscar} className="flex gap-3">
+            <input
+              type="number"
+              value={sesionId}
+              onChange={(e) => setSesionId(e.target.value)}
+              placeholder="ID de sesión (ej. 2)"
+              className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition"
+            />
             <button
               type="submit"
               disabled={buscando}
-              className="bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm px-6 py-3 rounded-xl transition flex items-center gap-2 justify-center disabled:opacity-50"
+              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl transition disabled:opacity-50"
             >
-              {buscando ? "Consultando Ledger..." : "Rastrear Flujo"}
+              {buscando ? "Buscando..." : "Buscar"}
             </button>
           </form>
+
+          {error && (
+            <p className="mt-3 text-sm text-red-500">{error}</p>
+          )}
         </div>
 
-        {/* Visor de Logs Estilo Terminal */}
-        <div className="bg-slate-950 text-slate-200 rounded-3xl border border-slate-800 shadow-xl overflow-hidden font-mono text-xs">
-          {/* Encabezado del visor */}
-          <div className="bg-slate-900 px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-rose-500"></span>
-              <span className="w-3 h-3 rounded-full bg-amber-500"></span>
-              <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
-              <span className="text-slate-400 ml-2 font-sans font-semibold text-sm">
-                Registro de Eventos Seguro (Retención 5 años)
-              </span>
-            </div>
-            <span className="text-slate-500 text-[11px]">
-              IMMUTABLE_DB_ENG_V2
-            </span>
+        {/* Lista de eventos */}
+        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-gray-700">Eventos registrados</h3>
+            <span className="text-xs text-gray-400">{logs.length} registros</span>
           </div>
 
-          {/* Tabla de Logs de Baja Densidad */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-900/50 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="px-6 py-3">Timestamp</th>
-                  <th className="px-6 py-3">Servicio</th>
-                  <th className="px-6 py-3">Acción / Evento</th>
-                  <th className="px-6 py-3">Actor (ID)</th>
-                  <th className="px-6 py-3">Severidad</th>
-                  <th className="px-6 py-3">Metadatos (JSON)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-900">
-                {logs.map((log, index) => (
-                  <tr
-                    key={index}
-                    className="hover:bg-slate-900/30 transition-colors"
-                  >
-                    <td className="px-6 py-3.5 text-slate-400 whitespace-nowrap">
-                      {log.timestamp}
-                    </td>
-                    <td className="px-6 py-3.5 whitespace-nowrap">
-                      <span className="text-indigo-400 font-bold">
-                        [{log.tipo}]
-                      </span>
-                    </td>
-                    <td className="px-6 py-3.5 text-white font-semibold whitespace-nowrap">
-                      {log.evento}
-                    </td>
-                    <td className="px-6 py-3.5 text-slate-300 font-bold whitespace-nowrap">
-                      {log.usuario}
-                    </td>
-                    <td className="px-6 py-3.5 whitespace-nowrap">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-black ${
-                          log.severidad === "CRITICAL"
-                            ? "bg-red-950 text-red-400 border border-red-800/50"
-                            : log.severidad === "WARNING"
-                              ? "bg-amber-950 text-amber-400 border border-amber-800/50"
-                              : "bg-slate-900 text-slate-400"
-                        }`}
-                      >
-                        {log.severidad}
-                      </span>
-                    </td>
-                    <td className="px-6 py-3.5 text-emerald-400 whitespace-pre-wrap max-w-xs xl:max-w-md">
-                      {JSON.stringify(log.metadatos)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="divide-y divide-gray-50">
+            {logs.map((log, index) => (
+              <div key={index} className="px-5 py-4 flex items-start gap-4 hover:bg-gray-50 transition">
+
+                {/* Tipo */}
+                <span className={`mt-0.5 shrink-0 text-xs font-semibold px-2 py-1 rounded-lg ${tipoColor(log.tipo)}`}>
+                  {log.tipo}
+                </span>
+
+                {/* Contenido */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-semibold text-gray-800">{log.evento}</span>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${severidadColor(log.severidad)}`}>
+                      {log.severidad}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex gap-3 text-xs text-gray-400 flex-wrap">
+                    <span>{log.timestamp}</span>
+                    <span>·</span>
+                    <span>{log.usuario}</span>
+                  </div>
+                  <p className="mt-1.5 text-xs text-gray-500 font-mono bg-gray-50 rounded-lg px-3 py-1.5">
+                    {JSON.stringify(log.metadatos)}
+                  </p>
+                </div>
+
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Nota Informativa Legal */}
-        <div className="rounded-2xl bg-amber-50 border border-amber-200 p-4 flex gap-3 items-start">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="w-5 h-5 text-amber-600 shrink-0 mt-0.5"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-8-5a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 10 5zm0 10a1a1 0 100-2 1 1 0 000 2z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="text-xs text-amber-800 leading-relaxed">
-            <strong className="font-bold block mb-0.5">
-              Aviso de Cumplimiento de Auditoría Regional
-            </strong>
-            Este visor despliega datos crudos que alimentan de forma interna el
-            Ledger General. Modificar, truncar o depurar estas tablas mediante
-            cualquier consola está estrictamente prohibido por los términos del
-            convenio SICA de educación superior.
-          </div>
-        </div>
+        {/* Nota */}
+        <p className="text-xs text-gray-400 text-center pb-2">
+          Registros de solo lectura · Retención mínima 5 años · Convenio SICA de educación superior
+        </p>
+
       </div>
     </ConsoleLayout>
   );

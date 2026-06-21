@@ -41,7 +41,7 @@ function LoginPage() {
       if (data.status === "ok") {
         localStorage.setItem("token", data.token);
         localStorage.setItem("usuario", JSON.stringify(data.usuario));
-       const rol = data.usuario.rol;
+        const rol = data.usuario.rol;
 
         if (rol === "ADMIN" || rol === "EVALUADOR") {
           navigate("/dashboard");
@@ -64,7 +64,6 @@ function LoginPage() {
 
   return (
     <main className="relative min-h-screen w-screen flex bg-slate-50 overflow-hidden font-sans antialiased">
-
       {/* Panel izquierdo */}
       <section className="hidden lg:flex w-1/2 relative bg-gradient-to-br from-emerald-800 via-green-700 to-teal-900 text-white p-16 flex-col justify-between overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
@@ -85,13 +84,15 @@ function LoginPage() {
           </h1>
 
           <p className="mt-6 text-lg text-emerald-100/90 max-w-md leading-relaxed font-normal">
-            Plataforma centralizada para la gestión, emisión y verificación auditable de certificaciones académicas en la región.
+            Plataforma centralizada para la gestión, emisión y verificación
+            auditable de certificaciones académicas en la región.
           </p>
         </div>
 
         <div className="relative z-10 border-t border-emerald-600/30 pt-6">
           <p className="text-emerald-200/70 text-xs tracking-wide">
-            © 2026 Sistema de Certificación Académica. Todos los derechos reservados.
+            © 2026 Sistema de Certificación Académica. Todos los derechos
+            reservados.
           </p>
         </div>
       </section>
@@ -99,15 +100,25 @@ function LoginPage() {
       {/* Panel derecho */}
       <section className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 md:p-16 relative">
         <div className="w-full max-w-md bg-white lg:bg-transparent p-8 sm:p-10 lg:p-0 rounded-3xl shadow-xl shadow-slate-200/50 lg:shadow-none border border-slate-100 lg:border-none">
-
           {/* Volver */}
           <div className="mb-6">
             <Link
               to="/"
               className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-emerald-600 transition-colors group"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+                stroke="currentColor"
+                className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+                />
               </svg>
               Volver al inicio
             </Link>
@@ -126,7 +137,10 @@ function LoginPage() {
           {/* Tabs */}
           <div className="flex gap-1 mb-6 bg-slate-100 p-1 rounded-xl">
             <button
-              onClick={() => { setModo("staff"); setError(""); }}
+              onClick={() => {
+                setModo("staff");
+                setError("");
+              }}
               className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 modo === "staff"
                   ? "bg-white shadow text-slate-800"
@@ -136,7 +150,10 @@ function LoginPage() {
               Staff / Admin
             </button>
             <button
-              onClick={() => { setModo("candidato"); setError(""); }}
+              onClick={() => {
+                setModo("candidato");
+                setError("");
+              }}
               className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 modo === "candidato"
                   ? "bg-white shadow text-slate-800"
@@ -149,7 +166,6 @@ function LoginPage() {
 
           {/* Formulario */}
           <div className="space-y-5">
-
             {/* Staff */}
             {modo === "staff" && (
               <>
@@ -231,8 +247,17 @@ function LoginPage() {
             {/* Error */}
             {error && (
               <div className="rounded-xl bg-red-50 border border-red-100 p-3.5 flex items-start gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-red-500 shrink-0 mt-0.5">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="w-5 h-5 text-red-500 shrink-0 mt-0.5"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <p className="text-sm font-medium text-red-700">{error}</p>
               </div>
@@ -246,9 +271,24 @@ function LoginPage() {
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <svg
+                    className="animate-spin h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
                   </svg>
                   Autenticando...
                 </>
@@ -256,7 +296,6 @@ function LoginPage() {
                 "Iniciar Sesión"
               )}
             </button>
-
           </div>
         </div>
       </section>
