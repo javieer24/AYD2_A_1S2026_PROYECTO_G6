@@ -1,0 +1,49 @@
+# ── Node.js ─────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+dist/
+build/
+
+# ── Variables de entorno (NUNCA commitear .env con secretos reales) ──────────
+.env
+.env.local
+.env.*.local
+
+# ── Build ──────────────────────────────────────────────────────────────────
+dist/
+build/
+
+# ── Frontend — build de producción ──────────────────────────────────────────
+prccd-mvp/frontend/dist/
+prccd-mvp/frontend/.vite/
+
+# ── Docker — datos persistidos localmente (volúmenes) ───────────────────────
+prccd-mvp/docker/data/
+prccd-mvp/postgres-data/
+prccd-mvp/mongo-data/
+prccd-mvp/minio-data/
+
+# ── PKI — claves privadas (NUNCA commitear material criptográfico privado) ──
+prccd-mvp/backend/data/pki/*-private.pem
+prccd-mvp/backend/data/pki/*.key
+prccd-mvp/services/certificado-service/data/pki/*-private.pem
+prccd-mvp/services/certificado-service/data/pki/*.key
+
+# ── Sistema operativo ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editores / IDEs ──────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.user
+
+# ── Archivos temporales ──────────────────────────────────────────────────────
+*.tmp
+*.temp
+*.swp

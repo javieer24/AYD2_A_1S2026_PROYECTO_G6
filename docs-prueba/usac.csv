@@ -1,0 +1,4 @@
+student_id,full_name,institution,program,courses
+USAC-2024-001,Maria Lopez,USAC,Ingenieria en Sistemas,"MAT101:90,PRG201:85,RED301:78"
+USAC-2024-002,Carlos Perez,USAC,Administracion,"MAT101:75,ADM201:88,ECO301:92"
+USAC-2024-003,Ana Garcia,USAC,Ingenieria Industrial,"MAT101:95,IND201:87,PRO301:91"
