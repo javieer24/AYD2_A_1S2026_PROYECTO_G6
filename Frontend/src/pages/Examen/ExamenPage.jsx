@@ -100,6 +100,7 @@ function ExamenPage() {
         setPreguntaActual(data.pregunta);
         setNumeroPregunta(data.numero);
         setTotalPreguntas(data.total);
+        localStorage.setItem("ultima_sesion_id", String(data.sesion_id)); // ← CAMBIO 1
         setFase("examen");
       } else {
         setError(data.message || data.error || "No se pudo iniciar el examen");
@@ -407,10 +408,11 @@ function ExamenPage() {
             >
               Volver al inicio
             </button>
-            
+
             {dictamen.dictamen === "Aprobado" && (
               <Link
                 to="/certificado"
+                state={{ sesion_id: sesionId, dictamen: dictamen }} // ← CAMBIO 2
                 className="inline-flex h-12 items-center rounded-2xl bg-emerald-700 px-6 text-sm font-black text-white transition hover:bg-emerald-800 shadow-md shadow-emerald-700/15"
               >
                 Continuar a certificado →
