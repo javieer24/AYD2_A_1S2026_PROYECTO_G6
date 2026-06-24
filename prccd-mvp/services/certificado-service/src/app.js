@@ -17,7 +17,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'certificado-service', timestamp: new Date().toISOString() });
 });
 
-app.use('/api/certificate', authMiddleware, certificadoRoutes);
+app.use('/api/certificate', certificadoRoutes);
 
 app.use(errorMiddleware);
 
