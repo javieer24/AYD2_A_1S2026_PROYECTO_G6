@@ -3,6 +3,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body } = require('express-validator');
 const validateRequest = require('../middleware/validate.middleware');
+const authMiddleware = require('../middleware/auth.middleware');
 const Candidato = require('../models/candidato.model');
 
 const router = express.Router();
@@ -119,6 +120,36 @@ router.get('/me', (req, res) => {
     res.json({ status: 'ok', usuario: payload });
   } catch {
     res.status(401).json({ status: 'error', message: 'Token inválido o expirado' });
+  }
+});
+
+/**
+ * GET /api/auth/candidatos/:id_candidato
+ * Endpoint interno — solo accesible con JWT rol SERVICE.
+ * Lo consume certificado-service y notificaciones-service para obtener
+ * datos del candidato (nombre, email, universidad) sin cruzar tablas.
+ */
+router.get('/candidatos/:id_candidato', authMiddleware, async (req, res, next) => {
+  try {
+    if (!req.usuario || req.usuario.rol !== 'SERVICE') {
+      return res.status(403).json({ status: 'error', message: 'Acceso restringido a servicios internos' });
+    }
+    const candidato = await Candidato.findOne({
+      where: { id_candidato: req.params.id_candidato },
+    });
+    if (!candidato) {
+      return res.status(404).json({ status: 'error', message: 'Candidato no encontrado' });
+    }
+    return res.json({
+      id_candidato:      candidato.id_candidato,
+      nombre_completo:   candidato.nombre_completo,
+      universidad_origen: candidato.universidad_origen,
+      carrera:           candidato.carrera,
+      email:             candidato.email || null,
+      estado:            candidato.estado,
+    });
+  } catch (err) {
+    next(err);
   }
 });
 
