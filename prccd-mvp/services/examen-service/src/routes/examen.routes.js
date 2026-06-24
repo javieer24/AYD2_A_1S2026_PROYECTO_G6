@@ -53,6 +53,51 @@ router.post('/responder', async (req, res, next) => {
   }
 });
 
+// GET /api/examen/stats — interno, consumido por dashboard-service (rol SERVICE)
+router.get('/stats', async (req, res, next) => {
+  try {
+    const [totales] = await sequelize.query(
+      `SELECT
+         COUNT(*)::int                                                    AS total_sesiones,
+         COUNT(*) FILTER (WHERE completado = true)::int                  AS completadas,
+         COUNT(*) FILTER (WHERE completado = false)::int                 AS en_progreso,
+         COUNT(*) FILTER (WHERE dictamen = 'Aprobado')::int              AS aprobados,
+         COUNT(*) FILTER (WHERE dictamen = 'Reprobado')::int             AS reprobados,
+         COUNT(*) FILTER (WHERE dictamen = 'Suspendido')::int            AS suspendidos
+       FROM sesiones_examen`,
+      { type: QueryTypes.SELECT }
+    );
+
+    const porNivel = await sequelize.query(
+      `SELECT nivel_actual AS nivel, COUNT(*)::int AS total
+       FROM sesiones_examen
+       WHERE completado = false
+       GROUP BY nivel_actual
+       ORDER BY nivel_actual`,
+      { type: QueryTypes.SELECT }
+    );
+
+    const total = totales.completadas || 1;
+    const porcentaje_aprobacion = ((totales.aprobados / total) * 100).toFixed(1);
+
+    return res.json({
+      status: 'ok',
+      stats: {
+        total_sesiones:       totales.total_sesiones,
+        completadas:          totales.completadas,
+        en_progreso:          totales.en_progreso,
+        aprobados:            totales.aprobados,
+        reprobados:           totales.reprobados,
+        suspendidos:          totales.suspendidos,
+        porcentaje_aprobacion: parseFloat(porcentaje_aprobacion),
+        en_progreso_por_nivel: porNivel,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/examen/sesion/:id  — ver estado de una sesión
 router.get('/sesion/:id', async (req, res, next) => {
   try {
