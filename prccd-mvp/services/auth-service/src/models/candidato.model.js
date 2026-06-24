@@ -43,6 +43,10 @@ const Candidato = sequelize.define(
       type: DataTypes.STRING(20),
       defaultValue: 'ACTIVO',
     },
+    email: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
   },
   {
     tableName: 'candidatos',

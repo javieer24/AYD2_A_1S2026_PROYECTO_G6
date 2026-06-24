@@ -124,4 +124,20 @@ router.get('/cadena/verificar', async (req, res, next) => {
   }
 });
 
+// GET /api/certificate/stats/interno  (rol SERVICE — para dashboard-service)
+router.get('/stats/interno', authMiddleware, async (req, res, next) => {
+  try {
+    const [stats] = await sequelize.query(
+      `SELECT
+         COUNT(*)::int AS total_emitidos,
+         COUNT(CASE WHEN estado = 'EMITIDO' THEN 1 END)::int AS vigentes
+       FROM certificados_pki`,
+      { type: QueryTypes.SELECT }
+    );
+    res.json({ status: 'ok', stats });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;

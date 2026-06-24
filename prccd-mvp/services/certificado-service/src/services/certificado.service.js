@@ -11,12 +11,16 @@ const { QueryTypes } = require('sequelize');
 const pki = require('./pki.service');
 const { publish } = require('../config/kafka.producer');
 const { TOPICS } = require('../config/kafka.topics');
+const { createServiceClient } = require('../config/serviceClient');
+
+const EXAMEN_URL = process.env.EXAMEN_SERVICE_URL || 'http://examen-service:3003';
+const AUTH_URL   = process.env.AUTH_SERVICE_URL   || 'http://auth-service:3001';
 
 async function emitirCertificado(sesion_id) {
-  const [sesion] = await sequelize.query(
-    `SELECT * FROM sesiones_examen WHERE id = :sesion_id`,
-    { replacements: { sesion_id }, type: QueryTypes.SELECT }
-  );
+  const client = createServiceClient();
+
+  const { data: sesionData } = await client.get(`${EXAMEN_URL}/api/examen/sesion/${sesion_id}`);
+  const sesion = sesionData;
   if (!sesion) throw Object.assign(new Error('Sesión de examen no encontrada'), { status: 404 });
   if (!sesion.completado) {
     throw Object.assign(new Error('El examen aún no ha finalizado'), { status: 409 });
@@ -34,9 +38,8 @@ async function emitirCertificado(sesion_id) {
   );
   if (existente) return formatearCertificado(existente);
 
-  const [candidato] = await sequelize.query(
-    `SELECT * FROM candidatos WHERE id_candidato = :id_candidato`,
-    { replacements: { id_candidato: sesion.id_candidato }, type: QueryTypes.SELECT }
+  const { data: candidato } = await client.get(
+    `${AUTH_URL}/api/auth/candidatos/${sesion.id_candidato}`
   );
 
   const id_certificado = `CERT-${sesion.id_candidato}-${Date.now()}`;

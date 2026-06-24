@@ -9,6 +9,9 @@ const { sequelize } = require('../config/database');
 const { QueryTypes } = require('sequelize');
 const { publish } = require('../config/kafka.producer');
 const { TOPICS } = require('../config/kafka.topics');
+const { createServiceClient } = require('../config/serviceClient');
+
+const EXAMEN_URL = process.env.EXAMEN_SERVICE_URL || 'http://examen-service:3003';
 
 const TIPOS_VALIDOS = [
   'CAMBIO_PESTANA',
@@ -22,11 +25,13 @@ const RETENCION_ANIOS = 5;
 const UMBRAL_SUSPENSION = 5; // cantidad de eventos sospechosos antes de suspender el examen
 
 async function obtenerSesion(sesion_id) {
-  const [sesion] = await sequelize.query(
-    'SELECT id, id_candidato, completado FROM sesiones_examen WHERE id = :sesion_id',
-    { replacements: { sesion_id }, type: QueryTypes.SELECT }
-  );
-  return sesion || null;
+  try {
+    const client = createServiceClient();
+    const { data } = await client.get(`${EXAMEN_URL}/api/examen/sesion/${sesion_id}`);
+    return data || null;
+  } catch {
+    return null;
+  }
 }
 
 async function registrarEvento(sesion_id, id_candidato, tipo_evento, metadatos = {}) {
