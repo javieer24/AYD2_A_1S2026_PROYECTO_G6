@@ -15,11 +15,12 @@ const { sequelize } = require('../config/database');
 const { QueryTypes } = require('sequelize');
 const crypto = require('crypto');
 const certificadoPki = require('../services/certificado.service');
+const authMiddleware = require('../middleware/auth.middleware');
 
 // ───────────────────────── F2-27: emisión simple ─────────────────────────
 
-// POST /api/certificate/issue
-router.post('/issue', async (req, res, next) => {
+// POST /api/certificate/issue  (protegido — solo usuarios autenticados)
+router.post('/issue', authMiddleware, async (req, res, next) => {
   try {
     const { id_candidato, sesion_id, datos_certificado } = req.body;
     if (!id_candidato || !sesion_id) {
@@ -88,9 +89,9 @@ router.get('/verify', async (req, res, next) => {
 
 // ───────────────────── F2-17/F2-18: emisión PKI + log inmutable ─────────────────────
 
-// POST /api/certificate/emitir
+// POST /api/certificate/emitir  (protegido — solo usuarios autenticados)
 // Body: { "sesion_id": 1 }
-router.post('/emitir', async (req, res, next) => {
+router.post('/emitir', authMiddleware, async (req, res, next) => {
   try {
     const { sesion_id } = req.body;
     if (!sesion_id) {
