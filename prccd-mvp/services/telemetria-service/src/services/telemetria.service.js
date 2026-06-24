@@ -7,6 +7,8 @@
 
 const { sequelize } = require('../config/database');
 const { QueryTypes } = require('sequelize');
+const { publish } = require('../config/kafka.producer');
+const { TOPICS } = require('../config/kafka.topics');
 
 const TIPOS_VALIDOS = [
   'CAMBIO_PESTANA',
@@ -61,6 +63,8 @@ async function suspenderSiCorresponde(sesion_id) {
      WHERE id = :sesion_id AND completado = false`,
     { replacements: { sesion_id }, type: QueryTypes.UPDATE }
   );
+
+  publish(TOPICS.FRAUDE_DETECTADO, { sesion_id, total_eventos: total });
 
   return { suspendido: true, total };
 }

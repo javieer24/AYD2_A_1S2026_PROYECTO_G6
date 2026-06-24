@@ -9,6 +9,8 @@
 const { sequelize } = require('../config/database');
 const { QueryTypes } = require('sequelize');
 const pki = require('./pki.service');
+const { publish } = require('../config/kafka.producer');
+const { TOPICS } = require('../config/kafka.topics');
 
 async function emitirCertificado(sesion_id) {
   const [sesion] = await sequelize.query(
@@ -90,7 +92,16 @@ async function emitirCertificado(sesion_id) {
     }
   );
 
-  return formatearCertificado(resultado[0][0]);
+  const cert = formatearCertificado(resultado[0][0]);
+
+  publish(TOPICS.CERTIFICADO_EMITIDO, {
+    id_certificado: cert.id_certificado,
+    id_candidato: cert.id_candidato,
+    hash_documento: cert.hash_documento,
+    sesion_examen_id: cert.sesion_examen_id || sesion.id,
+  });
+
+  return cert;
 }
 
 async function verificarCertificado(identificador) {
