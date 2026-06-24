@@ -5,7 +5,44 @@ const { body } = require('express-validator');
 const validateRequest = require('../middleware/validate.middleware');
 const { procesarExpediente } = require('../services/ingesta.service');
 
+const { sequelize } = require('../config/database');
+const { QueryTypes } = require('sequelize');
+
 const router = express.Router();
+
+// GET /api/ingesta/candidatos/stats — interno, consumido por dashboard-service (rol SERVICE)
+router.get('/candidatos/stats', async (req, res, next) => {
+  try {
+    const [totales] = await sequelize.query(
+      `SELECT
+         COUNT(*)::int                                              AS total_candidatos,
+         COUNT(*) FILTER (WHERE estado = 'ACTIVO')::int            AS activos,
+         COUNT(*) FILTER (WHERE estado != 'ACTIVO')::int           AS inactivos
+       FROM candidatos`,
+      { type: QueryTypes.SELECT }
+    );
+
+    const porUniversidad = await sequelize.query(
+      `SELECT universidad_origen AS universidad, COUNT(*)::int AS total
+       FROM candidatos
+       GROUP BY universidad_origen
+       ORDER BY universidad_origen`,
+      { type: QueryTypes.SELECT }
+    );
+
+    return res.json({
+      status: 'ok',
+      stats: {
+        total_candidatos: totales.total_candidatos,
+        activos:          totales.activos,
+        inactivos:        totales.inactivos,
+        por_universidad:  porUniversidad,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 // Multer almacena el archivo en memoria para pasarlo al adaptador como Buffer
 const upload = multer({
