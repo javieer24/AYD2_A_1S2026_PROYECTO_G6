@@ -330,13 +330,12 @@ services:
     container_name: prccd_voz_service
     restart: unless-stopped
     environment:
-      PORT: 3008
+      PORT: 3009
       NODE_ENV: development
       JWT_SECRET: prccd_secret_2026
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       EXAMEN_SERVICE_URL: http://examen-service:3003
     ports:
-      - "3008:3008"
+      - "3009:3009"
     depends_on:
       - examen-service
     networks:
