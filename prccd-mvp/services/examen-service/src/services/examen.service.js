@@ -168,4 +168,4 @@ function ocultarRespuesta(pregunta) {
   return rest;
 }
 
-module.exports = { iniciarExamen, responderPregunta };
+module.exports = { iniciarExamen, responderPregunta, calcularDictamen };

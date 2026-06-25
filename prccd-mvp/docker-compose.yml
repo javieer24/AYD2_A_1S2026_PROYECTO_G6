@@ -323,6 +323,27 @@ services:
       - ./services/notificaciones-service:/app
       - /app/node_modules
 
+  voz-service:
+    build:
+      context: ./services/voz-service
+      dockerfile: Dockerfile
+    container_name: prccd_voz_service
+    restart: unless-stopped
+    environment:
+      PORT: 3009
+      NODE_ENV: development
+      JWT_SECRET: prccd_secret_2026
+      EXAMEN_SERVICE_URL: http://examen-service:3003
+    ports:
+      - "3009:3009"
+    depends_on:
+      - examen-service
+    networks:
+      - prccd_network
+    volumes:
+      - ./services/voz-service:/app
+      - /app/node_modules
+
   nginx:
     image: nginx:alpine
     container_name: prccd_nginx
@@ -340,6 +361,7 @@ services:
       - auditoria-service
       - dashboard-service
       - notificaciones-service
+      - voz-service
     networks:
       - prccd_network
 
