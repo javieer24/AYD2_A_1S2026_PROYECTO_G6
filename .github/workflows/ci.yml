@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [develop, main]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   # ─── FASE TEST ───────────────────────────────────────────────
   test:
@@ -14,10 +18,10 @@ jobs:
 
     steps:
       - name: Checkout código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.4.0
         with:
           node-version: '18'
 
@@ -41,7 +45,7 @@ jobs:
 
     steps:
       - name: Checkout código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Login a GitHub Container Registry
         uses: docker/login-action@v3
@@ -55,63 +59,63 @@ jobs:
         with:
           context: prccd-mvp/services/auth-service
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/prccd-auth-service:latest
+          tags: ghcr.io/javieer24/prccd-auth-service:latest
 
       - name: Build y Push ingesta-service
         uses: docker/build-push-action@v5
         with:
           context: prccd-mvp/services/ingesta-service
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/prccd-ingesta-service:latest
+          tags: ghcr.io/javieer24/prccd-ingesta-service:latest
 
       - name: Build y Push examen-service
         uses: docker/build-push-action@v5
         with:
           context: prccd-mvp/services/examen-service
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/prccd-examen-service:latest
+          tags: ghcr.io/javieer24/prccd-examen-service:latest
 
       - name: Build y Push certificado-service
         uses: docker/build-push-action@v5
         with:
           context: prccd-mvp/services/certificado-service
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/prccd-certificado-service:latest
+          tags: ghcr.io/javieer24/prccd-certificado-service:latest
 
       - name: Build y Push telemetria-service
         uses: docker/build-push-action@v5
         with:
           context: prccd-mvp/services/telemetria-service
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/prccd-telemetria-service:latest
+          tags: ghcr.io/javieer24/prccd-telemetria-service:latest
 
       - name: Build y Push auditoria-service
         uses: docker/build-push-action@v5
         with:
           context: prccd-mvp/services/auditoria-service
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/prccd-auditoria-service:latest
+          tags: ghcr.io/javieer24/prccd-auditoria-service:latest
 
       - name: Build y Push dashboard-service
         uses: docker/build-push-action@v5
         with:
           context: prccd-mvp/services/dashboard-service
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/prccd-dashboard-service:latest
+          tags: ghcr.io/javieer24/prccd-dashboard-service:latest
 
       - name: Build y Push notificaciones-service
         uses: docker/build-push-action@v5
         with:
           context: prccd-mvp/services/notificaciones-service
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/prccd-notificaciones-service:latest
+          tags: ghcr.io/javieer24/prccd-notificaciones-service:latest
 
       - name: Build y Push voz-service
         uses: docker/build-push-action@v5
         with:
           context: prccd-mvp/services/voz-service
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/prccd-voz-service:latest
+          tags: ghcr.io/javieer24/prccd-voz-service:latest
 
   # ─── FASE DEPLOY STAGING ─────────────────────────────────────
   deploy-staging:
@@ -122,7 +126,7 @@ jobs:
 
     steps:
       - name: Checkout código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Deploy en EC2 Staging
         uses: appleboy/ssh-action@v1.0.3
@@ -148,7 +152,7 @@ jobs:
 
     steps:
       - name: Checkout código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Deploy en EC2 Producción
         uses: appleboy/ssh-action@v1.0.3
