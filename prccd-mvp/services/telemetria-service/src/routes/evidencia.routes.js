@@ -7,7 +7,7 @@ const { subirEvidencia, listarEvidencia, descargarEvidencia, TIPOS_VALIDOS } = r
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB (capturas/video pueden pesar mas que un CSV)
+  limits: { fileSize: 250 * 1024 * 1024 }, // 250 MB — video evidencia antifraude (grabacion sesion completa)
 });
 
 function esEstudiante(req) {
