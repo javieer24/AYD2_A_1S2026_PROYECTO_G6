@@ -10,6 +10,26 @@
 
 ---
 
+## Evolucion documental Fase 1 -> Fase 2 -> Fase 3
+
+La documentacion del proyecto evoluciono de una propuesta arquitectonica inicial hacia evidencia ejecutable, validable y alineada con Git Flow. Esta tabla resume como cada fase agrego valor tecnico, arquitectonico y academico al ecosistema PRCCD/SICA.
+
+| Fase | Enfoque documental | Artefactos consolidados | Evidencia de evolucion |
+|---|---|---|---|
+| Fase 1 | Definicion arquitectonica y analisis del caso PRCCD/SICA. | Stakeholders, drivers, atributos de calidad, requisitos, casos de uso, vistas UML, decisiones arquitectonicas y trazabilidad inicial. | Se establecio la vision del sistema, el alcance regional y la arquitectura objetivo basada en microservicios, seguridad, auditoria y analitica. |
+| Fase 2 | Construccion del MVP y validacion tecnica de la arquitectura. | Microservicios, dashboard BI, certificados, telemetria, evidencia antifraude, adaptadores universitarios, SCRUM, dailies, retrospectiva y burndown. | La documentacion dejo de ser solo conceptual y paso a respaldar codigo ejecutable, decisiones de integracion y evidencia de sprint. |
+| Fase 3 | Cierre final, endurecimiento tecnico, automatizacion y pruebas. | Kafka, notificaciones, voz a texto, CI/CD, pruebas unitarias, pruebas de integracion, pruebas de aceptacion, dashboard F3 y backlog final. | Se agrego trazabilidad entre arquitectura, calidad, validacion automatizada, operabilidad y evidencia final para defensa. |
+
+### Criterio de cierre documental
+
+| Nivel | Evidencia |
+|---|---|
+| Intencion | Fase 1 define que se quiere construir y por que. |
+| Ejecucion | Fase 2 demuestra que el diseno puede materializarse en un MVP funcional. |
+| Validacion | Fase 3 comprueba el comportamiento mediante pruebas, integracion, CI/CD y evidencia SCRUM. |
+
+---
+
 ## Cuadro de roles del grupo
 
 | Integrante | Carnet | Rol propuesto | Responsabilidad principal |
