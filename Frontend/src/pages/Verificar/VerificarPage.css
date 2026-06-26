@@ -7,10 +7,87 @@
   color: #0f172a;
 }
 
+.verificar-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.88);
+  border-right: 1px solid rgba(226, 232, 240, 0.9);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  box-sizing: border-box;
+  z-index: 1000;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.04);
+}
+
+.verificar-navbar__brand {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.verificar-navbar__brand strong {
+  font-size: 24px;
+  color: #065f46;
+  letter-spacing: 0.04em;
+  font-weight: 900;
+}
+
+.verificar-navbar__brand span {
+  font-size: 12px;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-top: 4px;
+  font-weight: 800;
+}
+
+.verificar-navbar__links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.verificar-navbar__links a {
+  text-decoration: none;
+  color: #334155;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.verificar-navbar__links a:hover {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.verificar-navbar__cta {
+  margin-top: auto;
+  text-align: center;
+  background: #065f46;
+  color: #ffffff;
+  padding: 14px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-weight: 900;
+  transition: opacity 0.2s;
+}
+
+.verificar-navbar__cta:hover {
+  opacity: 0.9;
+}
+
 .verificar-shell {
-  width: min(1120px, calc(100% - 48px));
+  width: min(1380px, 100%);
   margin: 0 auto;
-  padding: 24px 0 44px;
+  padding: 24px 24px 44px 284px;
+  box-sizing: border-box;
 }
 
 .verificar-topbar {
@@ -347,6 +424,18 @@
 }
 
 @media (max-width: 900px) {
+  .verificar-navbar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  }
+
+  .verificar-shell {
+    padding: 24px;
+  }
+
   .verificar-grid,
   .verificar-form,
   .verificar-details {

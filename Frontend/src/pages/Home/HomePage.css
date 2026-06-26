@@ -407,3 +407,101 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .home-shell {
+    width: calc(100% - 16px);
+    padding: 12px 0 32px;
+  }
+
+  .home-hero {
+    padding: 20px;
+    border-radius: 18px;
+    min-height: unset;
+  }
+
+  .home-hero h1 {
+    font-size: clamp(28px, 8vw, 38px);
+    margin-top: 14px;
+  }
+
+  .home-hero p {
+    font-size: 15px;
+    margin-top: 14px;
+  }
+
+  .home-actions {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .home-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .architecture-panel {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .architecture-panel__title strong {
+    font-size: 18px;
+  }
+
+  .architecture-flow {
+    margin-top: 18px;
+    gap: 8px;
+  }
+
+  .architecture-flow div {
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .home-metrics {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .metric-card {
+    min-height: unset;
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .metric-card strong {
+    font-size: 24px;
+  }
+
+  .home-section-title h2 {
+    font-size: 20px;
+  }
+
+  .home-modules {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .module-card {
+    min-height: unset;
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .module-card h3 {
+    font-size: 17px;
+    margin-top: 14px;
+  }
+
+  .home-traceability {
+    padding: 18px;
+    border-radius: 18px;
+    gap: 16px;
+  }
+
+  .home-traceability h2 {
+    font-size: 19px;
+  }
+}

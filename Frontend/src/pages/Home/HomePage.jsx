@@ -66,6 +66,12 @@ function HomePage() {
 
           <div className="flex items-center gap-3">
             <Link
+              to="/verificar"
+              className="text-sm text-green-700 font-semibold hover:underline px-3 py-2"
+            >
+              Verificar certificado
+            </Link>
+            <Link
               to="/login"
               className="text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
             >
@@ -93,6 +99,9 @@ function HomePage() {
               </Link>
               <Link className="home-button home-button--secondary" to="/examen">
                 Ir al examen adaptativo
+              </Link>
+              <Link className="home-button home-button--secondary" to="/verificar">
+                Verificar certificado
               </Link>
             </div>
           </div>
@@ -144,6 +153,22 @@ function HomePage() {
             label="Retención"
             detail="Custodia de evidencia antifraude e integridad."
           />
+        </section>
+
+        {/* Banner de verificación pública */}
+        <section className="home-verify-banner">
+          <div className="home-verify-banner__content">
+            <span>Verificación pública · Sin inicio de sesión</span>
+            <h2>¿Recibiste un certificado PRCCD?</h2>
+            <p>
+              Consulta la autenticidad de cualquier credencial emitida por la
+              plataforma ingresando su hash SHA-256. No requiere cuenta ni
+              contraseña.
+            </p>
+          </div>
+          <Link to="/verificar" className="home-verify-banner__btn">
+            Verificar certificado →
+          </Link>
         </section>
 
         <section className="home-section-title">

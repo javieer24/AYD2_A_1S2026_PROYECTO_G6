@@ -100,7 +100,7 @@ function ExamenPage() {
         setPreguntaActual(data.pregunta);
         setNumeroPregunta(data.numero);
         setTotalPreguntas(data.total);
-        localStorage.setItem("ultima_sesion_id", String(data.sesion_id)); // ← CAMBIO 1
+        localStorage.setItem("ultima_sesion_id", String(data.sesion_id));
         setFase("examen");
       } else {
         setError(data.message || data.error || "No se pudo iniciar el examen");
@@ -300,6 +300,28 @@ function ExamenPage() {
                 ))}
               </div>
 
+              {/* Botón de voz - solo visible en móvil */}
+              <div className="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50 p-4 sm:hidden">
+                <p className="mb-3 text-xs font-black uppercase tracking-wider text-indigo-600">
+                  Respuesta por voz
+                </p>
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-700 px-4 py-3 text-sm font-black text-white shadow-md"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                  Grabar respuesta por voz
+                </button>
+                <p className="mt-2 text-xs text-indigo-400">
+                  Di claramente "A", "B", "C" o "D".
+                </p>
+              </div>
+
               {error && <p className="mt-3 text-sm text-red-600 font-semibold">{error}</p>}
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -412,7 +434,7 @@ function ExamenPage() {
             {dictamen.dictamen === "Aprobado" && (
               <Link
                 to="/certificado"
-                state={{ sesion_id: sesionId, dictamen: dictamen }} // ← CAMBIO 2
+                state={{ sesion_id: sesionId, dictamen: dictamen }}
                 className="inline-flex h-12 items-center rounded-2xl bg-emerald-700 px-6 text-sm font-black text-white transition hover:bg-emerald-800 shadow-md shadow-emerald-700/15"
               >
                 Continuar a certificado →
