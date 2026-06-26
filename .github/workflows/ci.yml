@@ -128,12 +128,13 @@ jobs:
       - name: Deploy en EC2 Staging
         run: |
           cd /home/ec2-user/prccd
-          git pull origin develop
+          git fetch origin develop
+          git reset --hard origin/develop
           cd prccd-mvp
           docker compose pull
           docker compose up -d --remove-orphans
           docker system prune -f
-          
+
   # ─── FASE DEPLOY PRODUCCIÓN ──────────────────────────────────
   deploy-produccion:
     name: "Deploy — Producción"
