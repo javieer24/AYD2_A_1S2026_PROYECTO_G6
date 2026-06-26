@@ -11,25 +11,59 @@ function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [mensaje, setMensaje] = useState("");
 
-  const metricas = data?.metricas;
+  const metricas = data?.metricas || {};
+  const candidatosStats = metricas.candidatos || {};
+  const examenesStats = metricas.examenes || {};
+  const certificadosStats = metricas.certificados || {};
+
+  const candidatosPorUniversidad =
+    candidatosStats.por_universidad ||
+    metricas.candidatos_por_universidad ||
+    [];
+
+  const candidatosPorCarrera =
+    candidatosStats.por_carrera ||
+    metricas.candidatos_por_carrera ||
+    [];
 
   const carrerasDisponibles = useMemo(() => {
-    const carreras = metricas?.candidatos_por_carrera || [];
-    return ["Todas", ...carreras.map((item) => item.carrera).filter(Boolean)];
-  }, [metricas]);
+    const carreras = candidatosPorCarrera.map((item) => item.carrera).filter(Boolean);
+    return ["Todas", ...carreras];
+  }, [candidatosPorCarrera]);
 
   const totalCandidatos = useMemo(() => {
-    return sumar(metricas?.candidatos_por_universidad, "total");
-  }, [metricas]);
+    return numero(candidatosStats.total_candidatos) || sumar(candidatosPorUniversidad, "total");
+  }, [candidatosStats.total_candidatos, candidatosPorUniversidad]);
 
-  const totalCarreras = metricas?.candidatos_por_carrera?.length || 0;
-  const totalSesiones = numero(metricas?.examenes?.total_sesiones);
-  const aprobados = numero(metricas?.examenes?.aprobados);
-  const reprobados = numero(metricas?.examenes?.reprobados);
-  const enProgreso = numero(metricas?.examenes?.en_progreso);
-  const totalCertificados = numero(metricas?.certificados?.total_emitidos);
-  const certificadosVigentes = numero(metricas?.certificados?.vigentes);
-  const tasaAprobacion = totalSesiones > 0 ? Math.round((aprobados / totalSesiones) * 100) : 0;
+  const candidatosActivos = numero(candidatosStats.activos);
+  const candidatosInactivos = numero(candidatosStats.inactivos);
+  const totalCarreras = candidatosPorCarrera.length;
+  const totalSesiones = numero(examenesStats.total_sesiones);
+  const completadas = numero(examenesStats.completadas);
+  const aprobados = numero(examenesStats.aprobados);
+  const reprobados = numero(examenesStats.reprobados);
+  const suspendidos = numero(examenesStats.suspendidos);
+  const enProgreso = numero(examenesStats.en_progreso);
+  const totalCertificados = numero(certificadosStats.total_emitidos);
+  const certificadosVigentes = numero(certificadosStats.vigentes);
+  const tasaAprobacion =
+    numero(examenesStats.porcentaje_aprobacion) ||
+    (totalSesiones > 0 ? Math.round((aprobados / totalSesiones) * 100) : 0);
+
+  const pipeline = [
+    {
+      ambiente: "Staging",
+      estado: data?.status === "ok" ? "Disponible" : "Pendiente",
+      detalle: "Validacion integrada contra /api/dashboard/stats.",
+      tone: data?.status === "ok" ? "emerald" : "amber"
+    },
+    {
+      ambiente: "Produccion",
+      estado: "Pendiente de release",
+      detalle: "Requiere merge aprobado, build y version final etiquetada.",
+      tone: "slate"
+    }
+  ];
 
   async function cargarDashboard(filtroCarrera = carrera) {
     setLoading(true);
@@ -39,7 +73,7 @@ function DashboardPage() {
       const response = await obtenerEstadisticasDashboard({ carrera: filtroCarrera });
       setData(response);
     } catch (error) {
-      setMensaje(error.message || "No se pudieron cargar las métricas del dashboard.");
+      setMensaje(error.message || "No se pudieron cargar las metricas del dashboard.");
     } finally {
       setLoading(false);
     }
@@ -57,8 +91,8 @@ function DashboardPage() {
   return (
     <ConsoleLayout
       title="Dashboard regional anonimizado"
-      subtitle="Panel gerencial para consultar indicadores agregados de candidatos, exámenes y certificados sin exponer datos personales identificables."
-      badge="RF-08 · RF-09 · EaC-06"
+      subtitle="Panel gerencial para consultar indicadores agregados de candidatos, examenes y certificados sin exponer datos personales identificables."
+      badge="RF-08 - RF-09 - EaC-06"
     >
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -67,10 +101,10 @@ function DashboardPage() {
               Inteligencia de negocio
             </span>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
-              Métricas operativas del ecosistema PRCCD
+              Metricas operativas del ecosistema PRCCD
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              Los datos se consultan desde el servicio de dashboard y se presentan únicamente en forma agregada.
+              Los datos se consultan desde el servicio de dashboard y se presentan unicamente en forma agregada.
             </p>
           </div>
 
@@ -105,7 +139,7 @@ function DashboardPage() {
             {data?.nota || "Datos agregados y anonimizados"}
           </strong>
           <p className="mt-1 text-sm leading-6 text-emerald-800">
-            La vista no muestra nombres, identificadores de candidatos ni información individual.
+            La vista no muestra nombres, identificadores de candidatos ni informacion individual.
           </p>
         </div>
 
@@ -117,38 +151,56 @@ function DashboardPage() {
       </section>
 
       <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard value={loading ? "..." : String(totalCandidatos)} label="Candidatos registrados" detail="Total agregado por universidades integradas." />
-        <MetricCard value={loading ? "..." : String(totalSesiones)} label="Sesiones de examen" detail="Evaluaciones registradas en el motor adaptativo." />
-        <MetricCard value={loading ? "..." : `${tasaAprobacion}%`} label="Tasa de aprobación" detail="Relación entre sesiones aprobadas y sesiones totales." />
-        <MetricCard value={loading ? "..." : String(totalCertificados)} label="Certificados emitidos" detail="Credenciales generadas por el sistema." />
+        <MetricCard
+          value={loading ? "..." : String(totalCandidatos)}
+          label="Candidatos registrados"
+          detail={`${candidatosActivos} activos / ${candidatosInactivos} inactivos.`}
+        />
+        <MetricCard
+          value={loading ? "..." : String(totalSesiones)}
+          label="Sesiones de examen"
+          detail="Evaluaciones registradas en el motor adaptativo."
+        />
+        <MetricCard
+          value={loading ? "..." : `${tasaAprobacion}%`}
+          label="Tasa de aprobacion"
+          detail="Porcentaje calculado por el endpoint interno de examenes."
+        />
+        <MetricCard
+          value={loading ? "..." : String(totalCertificados)}
+          label="Certificados emitidos"
+          detail="Credenciales generadas por el sistema."
+        />
       </section>
 
       <section className="mt-5 grid gap-5 xl:grid-cols-[1fr_1fr]">
-        <Panel title="Candidatos por universidad" label="Segmentación institucional">
+        <Panel title="Candidatos por universidad" label="Segmentacion institucional">
           <BarList
-            data={metricas?.candidatos_por_universidad || []}
-            labelKey="universidad_origen"
+            data={candidatosPorUniversidad}
+            labelKey="universidad"
             valueKey="total"
             emptyText={loading ? "Cargando universidades..." : "No hay datos por universidad."}
           />
         </Panel>
 
-        <Panel title="Candidatos por carrera" label="Segmentación académica">
+        <Panel title="Candidatos por carrera" label="Segmentacion academica">
           <BarList
-            data={metricas?.candidatos_por_carrera || []}
+            data={candidatosPorCarrera}
             labelKey="carrera"
             valueKey="total"
-            emptyText={loading ? "Cargando carreras..." : "No hay datos por carrera."}
+            emptyText={loading ? "Cargando carreras..." : "El endpoint Fase 3 aun no expone desglose por carrera."}
           />
         </Panel>
       </section>
 
       <section className="mt-5 grid gap-5 xl:grid-cols-[1fr_1fr]">
-        <Panel title="Estado de exámenes" label="Motor adaptativo">
+        <Panel title="Estado de examenes" label="Motor adaptativo">
           <div className="grid gap-3 sm:grid-cols-2">
             <StatusBox label="Aprobados" value={aprobados} tone="emerald" />
             <StatusBox label="Reprobados" value={reprobados} tone="rose" />
             <StatusBox label="En progreso" value={enProgreso} tone="indigo" />
+            <StatusBox label="Suspendidos" value={suspendidos} tone="amber" />
+            <StatusBox label="Completadas" value={completadas} tone="slate" />
             <StatusBox label="Total sesiones" value={totalSesiones} tone="slate" />
           </div>
         </Panel>
@@ -167,10 +219,35 @@ function DashboardPage() {
         <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
             <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">
+              CI/CD
+            </span>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+              Estado del pipeline por ambiente
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              Indicador operativo para diferenciar la validacion en Staging del paso controlado hacia Produccion.
+            </p>
+          </div>
+          <span className="w-fit rounded-full bg-indigo-50 px-3 py-1 text-xs font-black text-indigo-700">
+            Staging vs Produccion
+          </span>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {pipeline.map((item) => (
+            <PipelineBox key={item.ambiente} {...item} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
+        <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">
               Respuesta backend
             </span>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
-              Resumen técnico del servicio
+              Resumen tecnico del servicio
             </h2>
           </div>
           <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">
@@ -189,22 +266,28 @@ function DashboardPage() {
             <tbody className="divide-y divide-slate-100">
               <ResumenRow label="status" value={data?.status || "Pendiente"} />
               <ResumenRow label="carrera_filtrada" value={carrera} />
+              <ResumenRow label="candidatos_activos" value={candidatosActivos} />
+              <ResumenRow label="candidatos_inactivos" value={candidatosInactivos} />
               <ResumenRow label="candidatos_total" value={totalCandidatos} />
               <ResumenRow label="total_sesiones" value={totalSesiones} />
+              <ResumenRow label="completadas" value={completadas} />
               <ResumenRow label="aprobados" value={aprobados} />
               <ResumenRow label="reprobados" value={reprobados} />
+              <ResumenRow label="suspendidos" value={suspendidos} />
               <ResumenRow label="en_progreso" value={enProgreso} />
               <ResumenRow label="certificados_emitidos" value={totalCertificados} />
               <ResumenRow label="certificados_vigentes" value={certificadosVigentes} />
+              <ResumenRow label="pipeline_staging" value={pipeline[0].estado} />
+              <ResumenRow label="pipeline_produccion" value={pipeline[1].estado} />
             </tbody>
           </table>
         </div>
       </section>
 
       <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <TraceCard code="RF-08" title="Dashboards analíticos" text="Visualización de indicadores regionales sobre competencias digitales." />
-        <TraceCard code="RF-09" title="Anonimización" text="Exposición de datos agregados sin información personal identificable." />
-        <TraceCard code="EaC-06" title="Privacidad" text="Protección de identidad individual en consultas gerenciales." />
+        <TraceCard code="RF-08" title="Dashboards analiticos" text="Visualizacion de indicadores regionales sobre competencias digitales." />
+        <TraceCard code="RF-09" title="Anonimizacion" text="Exposicion de datos agregados sin informacion personal identificable." />
+        <TraceCard code="EaC-06" title="Privacidad" text="Proteccion de identidad individual en consultas gerenciales." />
         <TraceCard code="Dashboard Service" title="Microservicio BI" text="Consumo del endpoint /api/dashboard/stats mediante gateway." />
       </section>
     </ConsoleLayout>
@@ -236,14 +319,15 @@ function BarList({ data, labelKey, valueKey, emptyText }) {
 
   return (
     <div className="grid gap-4">
-      {data.map((item) => {
+      {data.map((item, index) => {
         const value = numero(item[valueKey]);
         const width = max > 0 ? Math.max(6, Math.round((value / max) * 100)) : 0;
+        const label = item[labelKey] || item.universidad_origen || "Sin clasificar";
 
         return (
-          <div key={`${item[labelKey]}-${value}`} className="grid gap-2">
+          <div key={`${label}-${value}-${index}`} className="grid gap-2">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-sm font-black text-slate-800">{item[labelKey] || "Sin clasificar"}</span>
+              <span className="text-sm font-black text-slate-800">{label}</span>
               <span className="text-sm font-black text-indigo-700">{value}</span>
             </div>
             <div className="h-3 overflow-hidden rounded-full bg-slate-100">
@@ -260,14 +344,33 @@ function StatusBox({ label, value, tone }) {
   const tones = {
     emerald: "border-emerald-200 bg-emerald-50 text-emerald-800",
     rose: "border-rose-200 bg-rose-50 text-rose-800",
+    amber: "border-amber-200 bg-amber-50 text-amber-800",
     indigo: "border-indigo-200 bg-indigo-50 text-indigo-800",
     slate: "border-slate-200 bg-slate-50 text-slate-800"
   };
 
   return (
-    <article className={`rounded-2xl border p-5 ${tones[tone]}`}>
+    <article className={`rounded-2xl border p-5 ${tones[tone] || tones.slate}`}>
       <span className="block text-xs font-black uppercase tracking-[0.16em] opacity-70">{label}</span>
       <strong className="mt-2 block text-3xl font-black tracking-tight">{value}</strong>
+    </article>
+  );
+}
+
+function PipelineBox({ ambiente, estado, detalle, tone }) {
+  const tones = {
+    emerald: "border-emerald-200 bg-emerald-50 text-emerald-900",
+    amber: "border-amber-200 bg-amber-50 text-amber-900",
+    slate: "border-slate-200 bg-slate-50 text-slate-900"
+  };
+
+  return (
+    <article className={`rounded-2xl border p-5 ${tones[tone] || tones.slate}`}>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs font-black uppercase tracking-[0.16em] opacity-70">{ambiente}</span>
+        <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-black">{estado}</span>
+      </div>
+      <p className="mt-3 text-sm font-semibold leading-6 opacity-80">{detalle}</p>
     </article>
   );
 }
