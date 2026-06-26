@@ -120,50 +120,36 @@ jobs:
   # ─── FASE DEPLOY STAGING ─────────────────────────────────────
   deploy-staging:
     name: "Deploy — Staging"
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build
     if: github.ref == 'refs/heads/develop'
 
     steps:
-      - name: Checkout código
-        uses: actions/checkout@v4.2.2
-
       - name: Deploy en EC2 Staging
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_STAGING_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ec2-user/prccd
-            git pull origin develop
-            cd prccd-mvp
-            docker compose pull
-            docker compose up -d --remove-orphans
-            docker system prune -f
+        run: |
+          cd /home/ec2-user/prccd
+          git fetch origin develop
+          git reset --hard origin/develop
+          cd prccd-mvp
+          docker-compose pull
+          docker-compose up -d --remove-orphans
+          docker system prune -f
 
-  # ─── FASE DEPLOY PRODUCCIÓN ──────────────────────────────────
+# ─── FASE DEPLOY PRODUCCIÓN ──────────────────────────────────
   deploy-produccion:
     name: "Deploy — Producción"
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build
     if: github.ref == 'refs/heads/main'
     environment: produccion
 
     steps:
-      - name: Checkout código
-        uses: actions/checkout@v4.2.2
-
       - name: Deploy en EC2 Producción
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_PROD_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ec2-user/prccd
-            git pull origin main
-            cd prccd-mvp
-            docker compose pull
-            docker compose up -d --remove-orphans
-            docker system prune -f
+        run: |
+          cd /home/ec2-user/prccd
+          git fetch origin main
+          git reset --hard origin/main
+          cd prccd-mvp
+          docker-compose pull
+          docker-compose up -d --remove-orphans
+          docker system prune -f

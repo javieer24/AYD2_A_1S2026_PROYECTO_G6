@@ -4,6 +4,7 @@ npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 *.log
+coverage/
 dist/
 build/
 
@@ -19,6 +20,7 @@ build/
 # ── Frontend — build de producción ──────────────────────────────────────────
 prccd-mvp/frontend/dist/
 prccd-mvp/frontend/.vite/
+Frontend/.vite/
 
 # ── Docker — datos persistidos localmente (volúmenes) ───────────────────────
 prccd-mvp/docker/data/
