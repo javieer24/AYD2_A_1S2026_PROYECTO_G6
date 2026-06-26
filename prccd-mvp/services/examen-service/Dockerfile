@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 3003
 
-CMD ["node", "index.js"]
+CMD ["sh", "-c", "node scripts/seed.js && node scripts/seed-mongo.js && node index.js"]
