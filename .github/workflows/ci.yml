@@ -131,8 +131,8 @@ jobs:
           git fetch origin develop
           git reset --hard origin/develop
           cd prccd-mvp
-          docker compose pull
-          docker compose up -d --remove-orphans
+          docker-compose pull
+          docker-compose up -d --remove-orphans
           docker system prune -f
 
   # ─── FASE DEPLOY PRODUCCIÓN ──────────────────────────────────
