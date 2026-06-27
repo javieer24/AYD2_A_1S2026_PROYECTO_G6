@@ -6,9 +6,14 @@ import TraceCard from "../../components/TraceCard";
 import { trazabilidadExamen } from "../../data/examenMock";
 import "./ExamenPage.css";
 
+<<<<<<< Updated upstream
 
 // ─── Grabación de pantalla ────────────────────────────────────────────────────
 // Puerto: 3005 · campo tipo: "VIDEO" (manual §2)
+=======
+const API_URL = import.meta.env.VITE_BACKEND_URL_API ?? "http://localhost";
+
+>>>>>>> Stashed changes
 
 async function iniciarCaptura() {
   const stream = await navigator.mediaDevices.getDisplayMedia({
@@ -58,13 +63,9 @@ async function subirEvidenciaPantalla(blob, sesionId, token) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message || `Error ${res.status} al subir evidencia`);
   }
-  return res.json(); // { status:'ok', evidencia:{ id, tipo, hash_archivo, ... } }
+  return res.json(); 
 }
 
-// ─── Grabación de voz (micrófono, solo móvil) ────────────────────────────────
-// Puerto: 3009 · endpoint: POST /api/voz/responder (manual §1.2)
-// El voz-service ya llama al examen-service internamente — no hay que
-// hacer una segunda llamada a /api/examen/responder.
 
 async function abrirMicrofono() {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
