@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost";
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL_API ?? "http://localhost";
 
 export async function apiRequest(path, options = {}) {
   const token = localStorage.getItem("token");

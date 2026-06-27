@@ -18,6 +18,7 @@ function IngestaPage() {
   const [cargando, setCargando] = useState(false);
   const [resultado, setResultado] = useState(null); 
   const [error, setError] = useState("");
+  const API_URL = import.meta.env.VITE_BACKEND_URL_API;
 
   const institucion = useMemo(
     () => institucionesIngesta.find((item) => item.id === universidad),
@@ -48,7 +49,7 @@ function IngestaPage() {
       formData.append("archivo", archivo);
       formData.append("universidad", universidad);
 
-      const res = await fetch("http://localhost/api/ingest", {
+      const res = await fetch(`${API_URL}/api/ingest`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
