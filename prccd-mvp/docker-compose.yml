@@ -29,18 +29,7 @@ services:
     networks:
       - prccd_network
 
-  mongodb:
-    image: mongo:6-jammy
-    container_name: prccd_mongo
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_DATABASE: prccd_docs
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-    networks:
-      - prccd_network
+
 
   minio:
     image: minio/minio:latest
