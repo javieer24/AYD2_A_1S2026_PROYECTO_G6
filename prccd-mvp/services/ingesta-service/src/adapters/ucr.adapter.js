@@ -6,6 +6,7 @@
 //   "nombreEstudiante": "string",
 //   "universidadProcedencia": "UCR",
 //   "programaAcademico": "string",
+//   "correo": "string",           (opcional)
 //   "materiasAprobadas": [{ "codigoCurso": "string", "calificacion": number }]
 // }
 
@@ -56,6 +57,7 @@ function toCanonical(record, index) {
     universidad_origen: String(record.universidadProcedencia).trim().toUpperCase(),
     carrera: String(record.programaAcademico).trim(),
     cursos_aprobados: cursos,
+    email: record.correo ? String(record.correo).trim() : null,
   };
 
   return { record: canonical, errors: courseErrors };

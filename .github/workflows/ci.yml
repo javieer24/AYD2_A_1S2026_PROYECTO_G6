@@ -18,10 +18,10 @@ jobs:
 
     steps:
       - name: Checkout código
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
@@ -125,6 +125,9 @@ jobs:
     if: github.ref == 'refs/heads/develop'
 
     steps:
+      - name: Login a GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
       - name: Deploy en EC2 Staging
         run: |
           cd /home/ec2-user/prccd
@@ -144,6 +147,9 @@ jobs:
     environment: produccion
 
     steps:
+      - name: Login a GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
       - name: Deploy en EC2 Producción
         run: |
           cd /home/ec2-user/prccd

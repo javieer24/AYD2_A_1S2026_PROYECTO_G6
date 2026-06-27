@@ -86,6 +86,7 @@ services:
       start_period: 30s
 
   auth-service:
+    image: ghcr.io/javieer24/prccd-auth-service:latest
     build:
       context: ./services/auth-service
       dockerfile: Dockerfile
@@ -112,6 +113,7 @@ services:
       - /app/node_modules
 
   ingesta-service:
+    image: ghcr.io/javieer24/prccd-ingesta-service:latest
     build:
       context: ./services/ingesta-service
       dockerfile: Dockerfile
@@ -138,6 +140,7 @@ services:
       - /app/node_modules
 
   examen-service:
+    image: ghcr.io/javieer24/prccd-examen-service:latest
     build:
       context: ./services/examen-service
       dockerfile: Dockerfile
@@ -170,6 +173,7 @@ services:
       - /app/node_modules
 
   certificado-service:
+    image: ghcr.io/javieer24/prccd-certificado-service:latest
     build:
       context: ./services/certificado-service
       dockerfile: Dockerfile
@@ -201,6 +205,7 @@ services:
       - /app/node_modules
 
   telemetria-service:
+    image: ghcr.io/javieer24/prccd-telemetria-service:latest
     build:
       context: ./services/telemetria-service
       dockerfile: Dockerfile
@@ -239,6 +244,7 @@ services:
       - /app/node_modules
 
   auditoria-service:
+    image: ghcr.io/javieer24/prccd-auditoria-service:latest
     build:
       context: ./services/auditoria-service
       dockerfile: Dockerfile
@@ -265,6 +271,7 @@ services:
       - /app/node_modules
 
   dashboard-service:
+    image: ghcr.io/javieer24/prccd-dashboard-service:latest
     build:
       context: ./services/dashboard-service
       dockerfile: Dockerfile
@@ -291,6 +298,7 @@ services:
       - /app/node_modules
 
   notificaciones-service:
+    image: ghcr.io/javieer24/prccd-notificaciones-service:latest
     build:
       context: ./services/notificaciones-service
       dockerfile: Dockerfile
@@ -324,6 +332,7 @@ services:
       - /app/node_modules
 
   voz-service:
+    image: ghcr.io/javieer24/prccd-voz-service:latest
     build:
       context: ./services/voz-service
       dockerfile: Dockerfile

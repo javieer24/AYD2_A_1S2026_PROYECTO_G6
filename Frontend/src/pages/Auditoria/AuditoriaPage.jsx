@@ -20,6 +20,7 @@ const tiposTelemetria = new Set([
 
 // Tipos de evidencia según el documento de integración
 const tiposEvidencia = new Set(["VIDEO", "CAPTURA_PANTALLA", "OTRO", "LOG_TECLEO"]);
+const API_URL = import.meta.env.VITE_BACKEND_URL_API ?? "http://localhost";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -97,7 +98,7 @@ function ModalEvidencia({ evidencias, sesionId, onCerrar, token }) {
 
     try {
       const response = await fetch(
-        `http://localhost/api/telemetria/evidencia/descargar/${evidenciaId}`,
+        `${API_URL}/api/telemetria/evidencia/descargar/${evidenciaId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
