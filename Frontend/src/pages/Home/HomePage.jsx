@@ -61,7 +61,7 @@ function HomePage() {
         <header className="home-header">
           <div className="home-brand">
             <strong>PRCCD</strong>
-            <span>Certificación Regional SICA</span>
+            <span>Certificación Regional SICA CALIFICACION FASE 3</span>
           </div>
 
           <div className="flex items-center gap-3">
