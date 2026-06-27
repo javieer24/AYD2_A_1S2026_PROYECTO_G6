@@ -6,6 +6,7 @@
 //   <nombre>string</nombre>
 //   <universidad>UES</universidad>
 //   <carrera>string</carrera>
+//   <email>string</email>         (opcional)
 //   <cursos>
 //     <curso><codigo>string</codigo><nota>number</nota></curso>
 //   </cursos>
@@ -77,6 +78,7 @@ function toCanonical(expediente, index) {
     universidad_origen: universidad.toUpperCase(),
     carrera,
     cursos_aprobados: cursos,
+    email: extractText(expediente.email) || null,
   };
 
   return { record, errors: courseErrors };

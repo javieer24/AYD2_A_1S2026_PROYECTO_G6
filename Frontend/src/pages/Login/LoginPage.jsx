@@ -11,6 +11,7 @@ function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_BACKEND_URL_API;
 
   async function handleLogin() {
     setLoading(true);
@@ -19,13 +20,13 @@ function LoginPage() {
     try {
       let res;
       if (modo === "staff") {
-        res = await fetch("http://localhost/api/auth/login", {
+        res = await fetch(`${API_URL}/api/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password }),
         });
       } else {
-        res = await fetch("http://localhost/api/auth/confirmar-identidad", {
+        res = await fetch(`${API_URL}/api/auth/confirmar-identidad`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

@@ -7,6 +7,7 @@ const { parse } = require('csv-parse');
 //   institution → universidad_origen
 //   program     → carrera
 //   courses     → cursos_aprobados  (formato "COD1:NOTA1;COD2:NOTA2")
+//   email       → email             (opcional)
 
 function parseCourses(coursesStr, rowIndex) {
   if (!coursesStr || coursesStr.trim() === '') {
@@ -64,6 +65,7 @@ function toCanonical(row, rowIndex) {
       universidad_origen: String(row.institution).trim().toUpperCase(),
       carrera: String(row.program).trim(),
       cursos_aprobados: cursos,
+      email: row.email ? String(row.email).trim() : null,
     },
     errors: courseErrors,
   };

@@ -2,6 +2,8 @@
 const { sequelize } = require('../config/database');
 const { QueryTypes } = require('sequelize');
 const { getPreguntasCollection } = require('../config/mongo');
+const { publish } = require('../config/kafka.producer');
+const { TOPICS } = require('../config/kafka.topics');
 
 const NIVEL_ACIERTO = { 'Básico': 'Medio', 'Medio': 'Avanzado', 'Avanzado': 'Avanzado' };
 const NIVEL_FALLO   = { 'Básico': 'Básico', 'Medio': 'Básico',  'Avanzado': 'Medio' };
@@ -99,6 +101,13 @@ async function responderPregunta(sesion_id, pregunta_id, respuesta) {
       }
     );
 
+    publish(TOPICS.EXAMEN_COMPLETADO, {
+      sesion_id,
+      id_candidato: sesion.id_candidato,
+      dictamen: dictamen.dictamen,
+      porcentaje: dictamen.porcentaje,
+    });
+
     return { terminado: true, correcto, dictamen };
   }
 
@@ -159,4 +168,4 @@ function ocultarRespuesta(pregunta) {
   return rest;
 }
 
-module.exports = { iniciarExamen, responderPregunta };
+module.exports = { iniciarExamen, responderPregunta, calcularDictamen };

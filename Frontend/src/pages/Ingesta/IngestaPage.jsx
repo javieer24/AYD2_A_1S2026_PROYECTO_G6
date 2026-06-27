@@ -16,8 +16,9 @@ function IngestaPage() {
   const [archivo, setArchivo] = useState(null);
   const [procesado, setProcesado] = useState(false);
   const [cargando, setCargando] = useState(false);
-  const [resultado, setResultado] = useState(null); 
+  const [resultado, setResultado] = useState(null);
   const [error, setError] = useState("");
+  const API_URL = import.meta.env.VITE_BACKEND_URL_API ?? "http://localhost";
 
   const institucion = useMemo(
     () => institucionesIngesta.find((item) => item.id === universidad),
@@ -48,7 +49,7 @@ function IngestaPage() {
       formData.append("archivo", archivo);
       formData.append("universidad", universidad);
 
-      const res = await fetch("http://localhost/api/ingest", {
+      const res = await fetch(`${API_URL}/api/ingest`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -78,6 +79,9 @@ function IngestaPage() {
     setResultado(null);
     setError("");
   };
+
+  // Candidatos sin email — contrato F3 §5
+  const sinEmail = resultado?.sinEmail ?? [];
 
   return (
     <ConsoleLayout
@@ -141,18 +145,47 @@ function IngestaPage() {
 
             {/* Resultado de la API */}
             {resultado && (
-              <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 grid gap-1">
-                <p className="text-sm font-black text-emerald-800">Ingesta completada</p>
-                <p className="text-sm text-emerald-700">
-                  Procesados: <strong>{resultado.procesados}</strong> · Exitosos: <strong>{resultado.exitosos}</strong> · Errores: <strong>{resultado.errores?.length ?? 0}</strong>
-                </p>
-                {resultado.errores?.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {resultado.errores.map((e, i) => (
-                      <p key={i} className="text-xs text-red-600">
-                        Fila {e.fila}: {e.mensaje}
-                      </p>
-                    ))}
+              <div className="grid gap-3">
+                {/* Éxito */}
+                <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 grid gap-1">
+                  <p className="text-sm font-black text-emerald-800">Ingesta completada</p>
+                  <p className="text-sm text-emerald-700">
+                    Procesados: <strong>{resultado.procesados}</strong> · Exitosos: <strong>{resultado.exitosos}</strong> · Errores: <strong>{resultado.errores?.length ?? 0}</strong>
+                  </p>
+                  {resultado.errores?.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {resultado.errores.map((e, i) => (
+                        <p key={i} className="text-xs text-red-600">
+                          Fila {e.fila}: {e.mensaje}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Aviso candidatos sin email — contrato F3 §5 */}
+                {sinEmail.length > 0 && (
+                  <div className="rounded-2xl bg-amber-50 border border-amber-200 p-4">
+                    <p className="text-sm font-black text-amber-800">
+                      ⚠️ {sinEmail.length} candidato{sinEmail.length !== 1 ? "s" : ""} sin email registrado
+                    </p>
+                    <p className="mt-1 text-sm text-amber-700">
+                      No recibirán notificación por correo al obtener su certificado.
+                      Puedes actualizar sus expedientes incluyendo el campo email en el archivo fuente.
+                    </p>
+                    {/* Lista opcional de IDs afectados */}
+                    {sinEmail.length <= 10 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {sinEmail.map((id) => (
+                          <span
+                            key={id}
+                            className="rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-800 ring-1 ring-amber-200"
+                          >
+                            {id}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -228,9 +261,17 @@ function IngestaPage() {
           detail="Cursos aprobados con código oficial y nota final."
         />
         <MetricCard
-          value={resultado ? (resultado.errores?.length > 0 ? "CON ERRORES" : "VÁLIDO") : procesado ? "VÁLIDO" : "EN ESPERA"}
+          value={resultado
+            ? sinEmail.length > 0
+              ? `${sinEmail.length} sin email`
+              : resultado.errores?.length > 0
+              ? "CON ERRORES"
+              : "VÁLIDO"
+            : procesado ? "VÁLIDO" : "EN ESPERA"}
           label="Estado del lote"
-          detail="Resultado previo a la persistencia definitiva."
+          detail={sinEmail.length > 0
+            ? "Candidatos sin email no recibirán notificación."
+            : "Resultado previo a la persistencia definitiva."}
         />
       </section>
 
@@ -267,6 +308,7 @@ function IngestaPage() {
                     <th className="px-4 py-4 font-black">nombre_completo</th>
                     <th className="px-4 py-4 font-black">universidad_origen</th>
                     <th className="px-4 py-4 font-black">carrera</th>
+                    <th className="px-4 py-4 font-black">email</th>
                     <th className="px-4 py-4 font-black">cursos_aprobados</th>
                   </tr>
                 </thead>
@@ -277,6 +319,15 @@ function IngestaPage() {
                       <td className="px-4 py-4 text-slate-800">{registro.nombre_completo}</td>
                       <td className="px-4 py-4 text-slate-800">{registro.universidad_origen}</td>
                       <td className="px-4 py-4 text-slate-800">{registro.carrera}</td>
+                      <td className="px-4 py-4">
+                        {registro.email ? (
+                          <span className="text-slate-700 text-xs">{registro.email}</span>
+                        ) : (
+                          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-black text-amber-600 ring-1 ring-amber-100">
+                            sin email
+                          </span>
+                        )}
+                      </td>
                       <td className="px-4 py-4 text-slate-700">
                         <div className="flex flex-wrap gap-2">
                           {registro.cursos_aprobados.map((curso) => (
@@ -290,7 +341,7 @@ function IngestaPage() {
                   ))}
                   {!procesado && (
                     <tr>
-                      <td colSpan="5" className="px-4 py-12 text-center text-sm font-semibold text-slate-500">
+                      <td colSpan="6" className="px-4 py-12 text-center text-sm font-semibold text-slate-500">
                         Seleccione la universidad, cargue un archivo compatible y procese el expediente para visualizar la estructura normalizada.
                       </td>
                     </tr>

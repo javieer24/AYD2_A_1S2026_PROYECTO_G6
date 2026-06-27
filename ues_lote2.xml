@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<expedientes>
+  <expediente>
+    <id>UES-2026-004</id>
+    <nombre>Karen Beatriz Escobar Gomez</nombre>
+    <universidad>UES</universidad>
+    <carrera>Ingenieria Civil</carrera>
+    <cursos>
+      <curso><codigo>IC-101</codigo><nota>79</nota></curso>
+      <curso><codigo>IC-102</codigo><nota>85</nota></curso>
+    </cursos>
+  </expediente>
+  <expediente>
+    <id>UES-2026-005</id>
+    <nombre>Luis Fernando Aguilar Portillo</nombre>
+    <universidad>UES</universidad>
+    <carrera>Arquitectura</carrera>
+    <email>juanjgerardiher1998@gmail.com</email>
+    <cursos>
+      <curso><codigo>AR-101</codigo><nota>87</nota></curso>
+      <curso><codigo>AR-102</codigo><nota>90</nota></curso>
+    </cursos>
+  </expediente>
+  <expediente>
+    <id>UES-2026-006</id>
+    <nombre>Sofia Alejandra Ramos Lazo</nombre>
+    <universidad>UES</universidad>
+    <carrera>Derecho</carrera>
+    <cursos>
+      <curso><codigo>DE-101</codigo><nota>83</nota></curso>
+      <curso><codigo>DE-102</codigo><nota>78</nota></curso>
+    </cursos>
+  </expediente>
+</expedientes>

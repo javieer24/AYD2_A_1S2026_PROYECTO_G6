@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ConsoleLayout from "../../layouts/ConsoleLayout";
 import { verificarCertificadoPublico } from "../../services/certificadoApi";
 import "./VerificarPage.css";
 
@@ -25,8 +26,7 @@ function VerificarPage() {
       setResultado(data);
     } catch (requestError) {
       setError(
-        requestError.message ||
-          "No fue posible verificar el certificado."
+        requestError.message || "No fue posible verificar el certificado.",
       );
     } finally {
       setCargando(false);
@@ -38,182 +38,139 @@ function VerificarPage() {
 
   return (
     <main className="verificar-page">
-      <section className="verificar-shell">
-        <header className="verificar-topbar">
-          <div>
-            <strong>PRCCD</strong>
-            <span>Portal público de verificación</span>
-          </div>
-          <span className="verificar-access">
-            Consulta pública
-          </span>
-        </header>
+      <ConsoleLayout>
+        <div className="verificar-container">
+          {/* Hero Section */}
+          <section className="verificar-hero">
+            <h1>Verificar autenticidad de una <br />credencial PRCCD</h1>
+            <form className="verificar-form" onSubmit={buscarCertificado}>
+              <div className="verificar-input-group">
+                <input
+                  type="text"
+                  value={hash}
+                  onChange={(event) => setHash(event.target.value)}
+                  placeholder="Ingrese el hash SHA-256 del certificado"
+                  className={error ? "input-error" : ""}
+                />
+                <button type="submit" disabled={cargando}>
+                  {cargando ? (
+                    <>
+                      <span className="spinner"></span>
+                      Verificando...
+                    </>
+                  ) : (
+                    "Verificar"
+                  )}
+                </button>
+              </div>
+            </form>
 
-        <section className="verificar-hero">
-          <span className="verificar-eyebrow">
-            Validación de certificado
-          </span>
+            {error && (
+              <div className="verificar-alert verificar-alert-error">
+                <span className="alert-icon">⚠️</span>
+                <span>{error}</span>
+              </div>
+            )}
+          </section>
 
-          <h1>
-            Verificar autenticidad de una credencial PRCCD
-          </h1>
-
-          <p>
-            Ingrese el hash público del certificado para
-            consultar su validez sin iniciar sesión.
-          </p>
-
-          <form
-            className="verificar-form"
-            onSubmit={buscarCertificado}
-          >
-            <input
-              type="text"
-              value={hash}
-              onChange={(event) =>
-                setHash(event.target.value)
-              }
-              placeholder="Hash SHA-256 del certificado"
-            />
-
-            <button
-              type="submit"
-              disabled={cargando}
-            >
-              {cargando
-                ? "Verificando..."
-                : "Verificar"}
-            </button>
-          </form>
-
-          {error && (
-            <div className="verificar-alert verificar-alert-error">
-              {error}
-            </div>
-          )}
-        </section>
-
-        {resultado && (
-          <section className="verificar-result">
-            <div
-              className={`verificar-status-card ${
-                valido ? "valid" : "invalid"
-              }`}
-            >
-              <span>
-                {valido
-                  ? "Certificado legal y auténtico"
-                  : "Certificado inválido o inexistente"}
-              </span>
-
-              <h2>
-                {valido
-                  ? "La credencial se encuentra registrada en PRCCD"
-                  : "No se pudo confirmar la validez del certificado"}
-              </h2>
-
-              <p>
-                Resultado obtenido desde el servicio
-                público de verificación.
-              </p>
-            </div>
-
-            <div className="verificar-grid">
-              <article className="verificar-card verificar-main-card">
-                <div className="verificar-card-header">
-                  <div>
-                    <span>Certificado</span>
-                    <h3>
-                      {valido
-                        ? "Certificado Verificado"
-                        : "No encontrado"}
-                    </h3>
-                  </div>
-
-                  <strong>
-                    {certificado?.estado ||
-                      "No disponible"}
-                  </strong>
+          {/* Resultados */}
+          {resultado && (
+            <section className="verificar-result">
+              {/* Status Card */}
+              <div
+                className={`verificar-status-card ${
+                  valido ? "status-valid" : "status-invalid"
+                }`}
+              >
+                <div className="status-icon">
+                  {valido ? "✅" : "❌"}
                 </div>
-
-                <div className="verificar-details">
-                  <Detail
-                    label="ID candidato"
-                    value={
-                      certificado?.id_candidato
-                    }
-                  />
-
-                  <Detail
-                    label="Estado"
-                    value={certificado?.estado}
-                  />
-                </div>
-              </article>
-
-              <article className="verificar-card">
-                <div className="verificar-card-header">
-                  <div>
-                    <span>Hash público</span>
-                    <h3>
-                      Integridad del certificado
-                    </h3>
-                  </div>
-                </div>
-
-                <div className="verificar-hashes">
-                  <HashBlock
-                    label="Hash consultado"
-                    value={hash}
-                  />
-                </div>
-              </article>
-            </div>
-
-            <article className="verificar-card">
-              <div className="verificar-card-header">
-                <div>
-                  <span>
-                    Respuesta técnica
+                <div className="status-content">
+                  <span className="status-label">
+                    {valido ? "Certificado legal y auténtico" : "Certificado inválido o inexistente"}
                   </span>
-                  <h3>
-                    Payload de verificación
-                  </h3>
+                  <h2>
+                    {valido
+                      ? "La credencial se encuentra registrada en PRCCD"
+                      : "No se pudo confirmar la validez del certificado"}
+                  </h2>
+                  <p className="status-meta">
+                    Resultado obtenido desde el servicio público de verificación
+                  </p>
                 </div>
               </div>
 
-              <pre>
-                {JSON.stringify(
-                  resultado,
-                  null,
-                  2
-                )}
-              </pre>
-            </article>
-          </section>
-        )}
-      </section>
+              {/* Grid de detalles */}
+              <div className="verificar-grid">
+                <article className="verificar-card verificar-main-card">
+                  <div className="verificar-card-header">
+                    <div className="card-title">
+                      <span>📄 Certificado</span>
+                      <h3>
+                        {valido ? "Certificado Verificado" : "No encontrado"}
+                      </h3>
+                    </div>
+                    <div className="card-badge">
+                      <strong className={valido ? "badge-valid" : "badge-invalid"}>
+                        {certificado?.estado || "No disponible"}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="verificar-details">
+                    <div className="detail-item">
+                      <span className="detail-label">ID candidato</span>
+                      <strong className="detail-value">
+                        {certificado?.id_candidato || "No disponible"}
+                      </strong>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-label">Estado</span>
+                      <strong className="detail-value">
+                        {certificado?.estado || "No disponible"}
+                      </strong>
+                    </div>
+                  </div>
+                </article>
+
+                <article className="verificar-card">
+                  <div className="verificar-card-header">
+                    <div className="card-title">
+                      <span>🔑 Hash público</span>
+                      <h3>Integridad del certificado</h3>
+                    </div>
+                  </div>
+
+                  <div className="verificar-hash-block">
+                    <span className="hash-label">Hash consultado</span>
+                    <code className="hash-value">{hash}</code>
+                  </div>
+                </article>
+              </div>
+
+              {/* Payload JSON */}
+              <article className="verificar-card verificar-payload">
+                <div className="verificar-card-header">
+                  <div className="card-title">
+                    <span>📦 Respuesta técnica</span>
+                    <h3>Payload de verificación</h3>
+                  </div>
+                  <button 
+                    className="copy-button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(JSON.stringify(resultado, null, 2));
+                    }}
+                  >
+                    📋 Copiar
+                  </button>
+                </div>
+                <pre className="verificar-json">{JSON.stringify(resultado, null, 2)}</pre>
+              </article>
+            </section>
+          )}
+        </div>
+      </ConsoleLayout>
     </main>
-  );
-}
-
-function Detail({ label, value }) {
-  return (
-    <div>
-      <span>{label}</span>
-      <strong>
-        {String(value || "No disponible")}
-      </strong>
-    </div>
-  );
-}
-
-function HashBlock({ label, value }) {
-  return (
-    <div className="verificar-hash-block">
-      <span>{label}</span>
-      <code>{value || "No disponible"}</code>
-    </div>
   );
 }
 

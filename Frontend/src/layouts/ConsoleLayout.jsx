@@ -4,9 +4,8 @@ function ConsoleLayout({ title, subtitle, badge, children }) {
   const usuarioGuardado = localStorage.getItem("usuario");
   const usuario = usuarioGuardado ? JSON.parse(usuarioGuardado) : null;
   
-  const userRol = usuario?.rol || "ESTUDIANTE"; 
+  const userRol = usuario?.rol || "PUBLICO"; // ← CAMBIO: sin sesión = PUBLICO
 
-  // Función para limpiar la sesión al dar clic en Cerrar Sesión
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
@@ -36,7 +35,7 @@ function ConsoleLayout({ title, subtitle, badge, children }) {
     { 
       to: "/certificado", 
       label: "Certificados", 
-      rolesPermitidos: ["ADMIN", "EVALUADOR"],
+      rolesPermitidos: ["ADMIN", "EVALUADOR", "ESTUDIANTE"],
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A5.905 5.905 0 0 1 1.75 5.153a48.221 48.221 0 0 1 20.5 0 5.906 5.906 0 0 1 4.102 4.18c-.965.234-1.851.507-2.658.814m-15.482 0A4.471 4.471 0 0 1 5.75 14h12.5a4.47 4.47 0 0 1 3.864-4.413m-15.482 0a51.986 51.986 0 0 1 7.732-1.004 51.987 51.987 0 0 1 7.732 1.004M12 4.5v3" />
@@ -54,16 +53,6 @@ function ConsoleLayout({ title, subtitle, badge, children }) {
       )
     },
     { 
-      to: "/verificar", 
-      label: "Verificación pública", 
-      rolesPermitidos: ["ADMIN", "EVALUADOR", "COORDINADOR", "ESTUDIANTE"],
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-        </svg>
-      )
-    },
-    { 
       to: "/auditoria", 
       label: "Auditoría", 
       rolesPermitidos: ["ADMIN", "EVALUADOR"],
@@ -73,11 +62,35 @@ function ConsoleLayout({ title, subtitle, badge, children }) {
         </svg>
       )
     },
+
+    // ── Links solo para usuarios sin sesión (página de verificación pública) ──
+    { 
+      to: "/", 
+      label: "Ir a inicio", 
+      rolesPermitidos: ["PUBLICO"],
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        </svg>
+      )
+    },
+    { 
+      to: "/login", 
+      label: "Iniciar sesión", 
+      rolesPermitidos: ["PUBLICO"],
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+        </svg>
+      )
+    },
+
+    // ── Cerrar sesión solo para usuarios con sesión activa ──
     { 
       to: "/", 
       label: "Cerrar Sesión", 
       rolesPermitidos: ["ADMIN", "EVALUADOR", "COORDINADOR", "ESTUDIANTE"],
-      isLogout: true, // Flag para saber si es el botón de salir
+      isLogout: true,
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
@@ -100,17 +113,16 @@ function ConsoleLayout({ title, subtitle, badge, children }) {
               
               <div className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-indigo-800/60 px-2 py-1 text-[10px] font-bold tracking-wider uppercase text-indigo-200 border border-indigo-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                {userRol}
+                {userRol === "PUBLICO" ? "Visitante" : userRol}
               </div>
             </div>
 
             <nav className="mt-6 space-y-1">
               {linksFiltrados.map((link) => {
-                // Si es el link de logout, lo renderizamos con comportamiento especial de clic
                 if (link.isLogout) {
                   return (
                     <NavLink
-                      key={link.to}
+                      key={link.label}
                       to={link.to}
                       onClick={handleLogout}
                       className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition text-rose-600 hover:bg-rose-50"

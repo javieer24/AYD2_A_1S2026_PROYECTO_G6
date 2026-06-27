@@ -58,7 +58,35 @@ services:
     networks:
       - prccd_network
 
+  kafka:
+    image: apache/kafka:latest
+    container_name: prccd_kafka
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: 0
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - prccd_network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
   auth-service:
+    image: ghcr.io/javieer24/prccd-auth-service:latest
     build:
       context: ./services/auth-service
       dockerfile: Dockerfile
@@ -85,6 +113,7 @@ services:
       - /app/node_modules
 
   ingesta-service:
+    image: ghcr.io/javieer24/prccd-ingesta-service:latest
     build:
       context: ./services/ingesta-service
       dockerfile: Dockerfile
@@ -111,6 +140,7 @@ services:
       - /app/node_modules
 
   examen-service:
+    image: ghcr.io/javieer24/prccd-examen-service:latest
     build:
       context: ./services/examen-service
       dockerfile: Dockerfile
@@ -126,6 +156,7 @@ services:
       DB_PASSWORD: prccd_pass
       MONGO_URI: mongodb://mongodb:27017/prccd_docs
       JWT_SECRET: prccd_secret_2026
+      KAFKA_BROKER: kafka:9092
     ports:
       - "3003:3003"
     depends_on:
@@ -133,6 +164,8 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_started
+      kafka:
+        condition: service_healthy
     networks:
       - prccd_network
     volumes:
@@ -140,6 +173,7 @@ services:
       - /app/node_modules
 
   certificado-service:
+    image: ghcr.io/javieer24/prccd-certificado-service:latest
     build:
       context: ./services/certificado-service
       dockerfile: Dockerfile
@@ -154,10 +188,15 @@ services:
       DB_USER: prccd_user
       DB_PASSWORD: prccd_pass
       JWT_SECRET: prccd_secret_2026
+      KAFKA_BROKER: kafka:9092
+      EXAMEN_SERVICE_URL: http://examen-service:3003
+      AUTH_SERVICE_URL: http://auth-service:3001
     ports:
       - "3004:3004"
     depends_on:
       postgres:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     networks:
       - prccd_network
@@ -166,6 +205,7 @@ services:
       - /app/node_modules
 
   telemetria-service:
+    image: ghcr.io/javieer24/prccd-telemetria-service:latest
     build:
       context: ./services/telemetria-service
       dockerfile: Dockerfile
@@ -186,6 +226,8 @@ services:
       MINIO_BUCKET: evidencias
       MINIO_ENCRYPTION_KEY: prccd_evidencia_key_2026_dev
       JWT_SECRET: prccd_secret_2026
+      KAFKA_BROKER: kafka:9092
+      EXAMEN_SERVICE_URL: http://examen-service:3003
     ports:
       - "3005:3005"
     depends_on:
@@ -193,6 +235,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_started
+      kafka:
+        condition: service_healthy
     networks:
       - prccd_network
     volumes:
@@ -200,6 +244,7 @@ services:
       - /app/node_modules
 
   auditoria-service:
+    image: ghcr.io/javieer24/prccd-auditoria-service:latest
     build:
       context: ./services/auditoria-service
       dockerfile: Dockerfile
@@ -226,6 +271,7 @@ services:
       - /app/node_modules
 
   dashboard-service:
+    image: ghcr.io/javieer24/prccd-dashboard-service:latest
     build:
       context: ./services/dashboard-service
       dockerfile: Dockerfile
@@ -251,6 +297,62 @@ services:
       - ./services/dashboard-service:/app
       - /app/node_modules
 
+  notificaciones-service:
+    image: ghcr.io/javieer24/prccd-notificaciones-service:latest
+    build:
+      context: ./services/notificaciones-service
+      dockerfile: Dockerfile
+    container_name: prccd_notificaciones_service
+    restart: unless-stopped
+    environment:
+      PORT: 3008
+      NODE_ENV: development
+      JWT_SECRET: prccd_secret_2026
+      KAFKA_BROKER: kafka:9092
+      AUTH_SERVICE_URL: http://auth-service:3001
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-SICA PRCCD <noreply@sica.gt>}
+      APP_URL: http://localhost:80
+      USAC_EMAIL: ${USAC_EMAIL:-coordinador@usac.edu.gt}
+      UCR_EMAIL: ${UCR_EMAIL:-coordinador@ucr.ac.cr}
+      UES_EMAIL: ${UES_EMAIL:-coordinador@ues.edu.sv}
+      AUDITORES_SICA_EMAILS: ${AUDITORES_SICA_EMAILS:-auditor@sica.gt}
+    ports:
+      - "3008:3008"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - prccd_network
+    volumes:
+      - ./services/notificaciones-service:/app
+      - /app/node_modules
+
+  voz-service:
+    image: ghcr.io/javieer24/prccd-voz-service:latest
+    build:
+      context: ./services/voz-service
+      dockerfile: Dockerfile
+    container_name: prccd_voz_service
+    restart: unless-stopped
+    environment:
+      PORT: 3009
+      NODE_ENV: development
+      JWT_SECRET: prccd_secret_2026
+      EXAMEN_SERVICE_URL: http://examen-service:3003
+    ports:
+      - "3009:3009"
+    depends_on:
+      - examen-service
+    networks:
+      - prccd_network
+    volumes:
+      - ./services/voz-service:/app
+      - /app/node_modules
+
   nginx:
     image: nginx:alpine
     container_name: prccd_nginx
@@ -267,6 +369,8 @@ services:
       - telemetria-service
       - auditoria-service
       - dashboard-service
+      - notificaciones-service
+      - voz-service
     networks:
       - prccd_network
 
@@ -274,6 +378,7 @@ volumes:
   postgres_data:
   mongo_data:
   minio_data:
+  kafka_data:
 
 networks:
   prccd_network:
