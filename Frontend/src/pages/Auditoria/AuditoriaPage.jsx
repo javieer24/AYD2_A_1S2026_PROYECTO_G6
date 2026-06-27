@@ -644,8 +644,8 @@ function AuditoriaPage() {
     setError("");
 
     try {
-      const res = await fetch(
-        `http://localhost/api/telemetria/evidencia/${sesionId}`,
+    const res = await fetch(
+      `/api/telemetria/evidencia/${sesionId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

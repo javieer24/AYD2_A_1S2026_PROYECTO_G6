@@ -6,6 +6,7 @@ import TraceCard from "../../components/TraceCard";
 import { trazabilidadExamen } from "../../data/examenMock";
 import "./ExamenPage.css";
 
+
 // ─── Grabación de pantalla ────────────────────────────────────────────────────
 // Puerto: 3005 · campo tipo: "VIDEO" (manual §2)
 
@@ -47,7 +48,7 @@ async function subirEvidenciaPantalla(blob, sesionId, token) {
   formData.append("tipo", "VIDEO");               // ← valor correcto según manual
 
   // URL directa con puerto 3005 (manual §2)
-  const res = await fetch(`${API_URL}:3005/api/telemetria/evidencia`, {
+  const res = await fetch(`/api/telemetria/evidencia`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
@@ -92,7 +93,7 @@ async function enviarRespuestaVoz(audioBlob, sesionId, preguntaId, token) {
   formVoz.append("sesion_id", String(sesionId));
   formVoz.append("pregunta_id", String(preguntaId));
 
-  const resVoz = await fetch(`${API_URL}:3009/api/voz/responder`, {
+  const resVoz = await fetch(`/api/voz/responder`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formVoz,
@@ -116,7 +117,7 @@ async function enviarRespuestaVoz(audioBlob, sesionId, preguntaId, token) {
     formEv.append("archivo", audioBlob, `audio_pregunta_${preguntaId}.webm`);
     formEv.append("sesion_id", String(sesionId));
     formEv.append("tipo", "OTRO");
-    await fetch(`${API_URL}:3005/api/telemetria/evidencia`, {
+    await fetch(`/api/telemetria/evidencia`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formEv,
@@ -170,7 +171,7 @@ function ExamenPage() {
     async function reportarEvento(tipo_evento, metadatos = {}) {
       try {
         // Puerto 3005 (manual §3)
-        const res = await fetch(`${API_URL}:3005/api/telemetria`, {
+        const res = await fetch(`/api/telemetria`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -346,7 +347,7 @@ function ExamenPage() {
         return;
       }
 
-      const res = await fetch(`${API_URL}/api/examen/iniciar`, {
+      const res = await fetch(`/api/examen/iniciar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -385,7 +386,7 @@ function ExamenPage() {
     setError("");
 
     try {
-      const res = await fetch(`${API_URL}/api/examen/responder`, {
+      const res = await fetch(`/api/examen/responder`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
